@@ -10,6 +10,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
@@ -43,6 +44,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/CustomTheme" >
         </activity>
+        <activity android:name="com.electricimp.blinkup.WifiSelectActivity" />
+        <activity android:name="com.electricimp.blinkup.BlinkupGLActivity" />
+        <activity android:name="com.electricimp.blinkup.WifiActivity" />
+        <activity android:name="com.electricimp.blinkup.WPSActivity" />
+        <activity android:name="com.electricimp.blinkup.ClearWifiActivity" />
+        <activity android:name="com.electricimp.blinkup.InterstitialActivity" />
     </application>
 
 </manifest>

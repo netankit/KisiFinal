@@ -1,0 +1,9 @@
+<resources>
+    <style name="BlinkUp.Header" parent="@android:style/Widget.TextView">
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="BlinkUp.SelectableText" parent="@android:style/Widget.TextView">
+        <item name="android:background">@drawable/__bu_border_background</item>
+    </style>
+</resources>

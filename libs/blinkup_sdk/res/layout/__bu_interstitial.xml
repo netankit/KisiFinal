@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/__bu_interstitial"
+        android:layout_width="280dp"
+        android:layout_height="380dp"
+        android:contentDescription="@string/__bu_interstitial_image" />
+
+    <Button
+        android:id="@+id/__bu_blinkup_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="sendBlinkup"
+        android:layout_marginTop="@dimen/__bu_padding"
+        android:text="@string/__bu_send_blinkup" />
+
+</LinearLayout>
