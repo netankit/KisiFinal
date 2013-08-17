@@ -155,8 +155,10 @@ public class KisiMain extends FragmentActivity implements
 			}
 
 		case R.id.showLog:
+			Place place = locations.valueAt(pager.getCurrentItem());
 
 			Intent logView = new Intent(getApplicationContext(), LogInfo.class);
+			logView.putExtra("place_id", place.getId());
 			startActivity(logView);
 			
 			return true;

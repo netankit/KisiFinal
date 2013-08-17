@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageButton;
+
 
 public class LogInfo extends Activity implements OnClickListener{
 
@@ -23,11 +23,13 @@ public class LogInfo extends Activity implements OnClickListener{
 		
 		WebView webView = (WebView) findViewById(R.id.webView);
 		webView.getSettings().setJavaScriptEnabled(true);
-		webView.setWebViewClient(new WebViewClient());
-
-		//TODO change to Kisi Logpage
-		webView.loadUrl("http://www.google.com");
+		webView.setWebViewClient(new WebClient());
 		
+		 // gets the previously created intent
+		int place_id = getIntent().getIntExtra("place_id", 0);
+		webView.loadUrl(String.format("https://kisi.de/places/%d/activities?auth_token=%s", 
+			place_id, KisiApi.getAuthToken())
+		);
 		ImageButton backButton = (ImageButton) findViewById(R.id.back);
 		
 		backButton.setOnClickListener(this);

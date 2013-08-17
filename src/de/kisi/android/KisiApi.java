@@ -28,6 +28,9 @@ public class KisiApi extends RestApi {
 	public static void setAuthToken(String token) {
 		KisiApi.authToken = token;
 	}
+	public static String getAuthToken() {
+		return KisiApi.authToken;
+	}
 	public static void setUserId(int user_id) {
 		KisiApi.user_id = user_id;
 	}
