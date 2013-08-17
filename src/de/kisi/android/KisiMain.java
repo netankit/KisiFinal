@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.manavo.rest.RestCache;
 import com.manavo.rest.RestCallback;
 
 import de.kisi.android.model.Lock;
@@ -15,6 +16,7 @@ import de.kisi.android.model.Place;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -87,7 +89,7 @@ public class KisiMain extends FragmentActivity implements
 
 	private void updatePlaces() {
 		KisiApi api = new KisiApi(this);
-
+		api.setCachePolicy(RestCache.CachePolicy.CACHE_THEN_NETWORK);
 		api.setCallback(new RestCallback() {
 			public void success(Object obj) {
 				JSONArray data = (JSONArray) obj;
@@ -133,6 +135,7 @@ public class KisiMain extends FragmentActivity implements
 		//set up 
 		switch (item.getItemId()) {
 		case R.id.refresh:
+			RestCache.clear(this);
 			updatePlaces();
 			return true;
 

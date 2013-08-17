@@ -3,6 +3,8 @@ package de.kisi.android;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.manavo.rest.RestCache;
 import com.manavo.rest.RestCallback;
 
 import de.kisi.android.model.Lock;
@@ -67,6 +69,7 @@ public class PlaceViewFragment extends Fragment {
 				}
 
 			});
+			api.setCachePolicy(RestCache.CachePolicy.CACHE_THEN_NETWORK);
 			api.setLoadingMessage(null);
 			api.get("places/" + String.valueOf(place.getId()) + "/locks");
 		} else {
@@ -129,9 +132,7 @@ public class PlaceViewFragment extends Fragment {
 
 					});
 					api.setLoadingMessage("Opening lock...");
-					api.post("places/" + String.valueOf(lock.getPlaceId())
-							+ "/locks/" + String.valueOf(lock.getId())
-							+ "/access");
+					api.post(String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId()));
 				}
 
 			});
