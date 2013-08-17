@@ -130,7 +130,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 				try {
 					KisiApi.setAuthToken(data.getString("authentication_token"));
 					KisiApi.setUserId(data.getInt("id"));
-					Toast.makeText(activity, "Login successful", Toast.LENGTH_LONG).show();
+					Toast.makeText(activity, R.string.login_success, Toast.LENGTH_LONG).show();
 					
 					Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
 					startActivity(mainScreen);

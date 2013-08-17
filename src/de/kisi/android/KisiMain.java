@@ -16,7 +16,6 @@ import de.kisi.android.model.Place;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -70,8 +69,8 @@ public class KisiMain extends FragmentActivity implements
 	}
 
 	@Override
-	public void onPause() { // sends user back to Login Screen if he didn't
-							// choose remember me
+	public void onPause() { 
+		// sends user back to Login Screen if he didn't choose remember me
 		SharedPreferences settings = getSharedPreferences("Config",
 				MODE_PRIVATE);
 		if (!settings.getBoolean("saved", false)) {
@@ -144,18 +143,16 @@ public class KisiMain extends FragmentActivity implements
 			Place p = locations.valueAt(pager.getCurrentItem());
 
 			if (p.getOwnerId() != KisiApi.getUserId()) {
-				Toast.makeText(this,
-						"Only the owner of a place can create new keys.",
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.share_owner_only , Toast.LENGTH_LONG).show();
 				return false;
 			} else {
-				buildAlertDialog(p);
+				buildShareDialog(p);
 				return true;
 			}
 
 		case R.id.showLog:
 			Place place = locations.valueAt(pager.getCurrentItem());
-
+			
 			Intent logView = new Intent(getApplicationContext(), LogInfo.class);
 			logView.putExtra("place_id", place.getId());
 			startActivity(logView);
@@ -184,7 +181,7 @@ public class KisiMain extends FragmentActivity implements
 
 	}
 
-	private void buildAlertDialog(Place p) {
+	private void buildShareDialog(Place p) {
 		final Place currentPlace = p;
 		final List<Lock> locks = currentPlace.getLocks();
 		LinearLayout linearLayout = new LinearLayout(this);
@@ -198,7 +195,7 @@ public class KisiMain extends FragmentActivity implements
 
 		final EditText emailInput = new EditText(this);
 		emailInput.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-		emailInput.setHint("Email");
+		emailInput.setHint(R.string.Email);
 		linearLayout.addView(emailInput, layoutParams);
 
 		final List<CheckBox> checkList = new ArrayList<CheckBox>();
@@ -211,11 +208,10 @@ public class KisiMain extends FragmentActivity implements
 
 		AlertDialog.Builder inputAlertDialog = new AlertDialog.Builder(this);
 		inputAlertDialog.setView(linearLayout);
-		inputAlertDialog.setTitle("Share Location: " + p.getName());
-		inputAlertDialog
-				.setMessage("Enter email and select locks you want to share:");
+		inputAlertDialog.setTitle(getResources().getString(R.string.share_title) + " " + p.getName());
+		inputAlertDialog.setMessage(R.string.share_popup_msg);
 
-		inputAlertDialog.setPositiveButton("Share!",
+		inputAlertDialog.setPositiveButton(R.string.share_submit_button,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface arg0, int arg1) {
 						String email = emailInput.getText().toString();
@@ -227,7 +223,7 @@ public class KisiMain extends FragmentActivity implements
 							}
 						}
 						if(sendlocks.isEmpty()){
-							Toast.makeText(getApplicationContext(), "You have to share at least one lock!", Toast.LENGTH_LONG).show();
+							Toast.makeText(getApplicationContext(), R.string.share_error, Toast.LENGTH_LONG).show();
 							arg0.dismiss();
 						}
 
@@ -267,9 +263,8 @@ public class KisiMain extends FragmentActivity implements
 				try {
 					Toast.makeText(
 							activity,
-							String.format(
-									"Key for %s was created successfully.",
-									data.getString("assignee_email")),
+							String.format(getResources().getString(R.string.share_success),
+								data.getString("assignee_email")),
 							Toast.LENGTH_LONG).show();
 				} catch (JSONException e) {
 					e.printStackTrace();

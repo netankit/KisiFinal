@@ -57,6 +57,7 @@ public class PlaceViewFragment extends Fragment {
 		layout = (RelativeLayout) inflater.inflate(R.layout.place_fragment,
 				container, false);
 
+		// get locks from api, if not already available
 		if (place.getLocks() == null) {
 			KisiApi api = new KisiApi(this.getActivity());
 
@@ -123,15 +124,12 @@ public class PlaceViewFragment extends Fragment {
 
 					api.setCallback(new RestCallback() {
 						public void success(Object obj) {
-							// Toast.makeText(getActivity(),
-							// "Lock was opened successfully",
-							// Toast.LENGTH_LONG).show();
 							// change button design
-							buttonToUnlock(button, lock);
+							changeButtonStyleToUnlock(button, lock);
 						}
 
 					});
-					api.setLoadingMessage("Opening lock...");
+					api.setLoadingMessage(R.string.opening);
 					api.post(String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId()));
 				}
 
@@ -170,7 +168,7 @@ public class PlaceViewFragment extends Fragment {
 
 	}
 
-	public void buttonToUnlock(Button button, Lock lock) {
+	public void changeButtonStyleToUnlock(Button button, Lock lock) {
 		// save button design
 		final Drawable currentBackground = button.getBackground();
 		final Button currentButton = button;
