@@ -151,31 +151,22 @@ public class PlaceViewFragment extends Fragment {
 		LocationListener locListener = new MyLocationListener();
 		locationManager = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
-		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) { // first
-																					// check
-																					// Network
-																					// Connection
-			locationManager = (LocationManager) getActivity().getSystemService(
-					Context.LOCATION_SERVICE);
-			locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 1000, 1, locListener);
-			Location location = locationManager
-					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		// first check Network Connection
+		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) { 
+			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, locListener);
+			Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 			currentLocation = location;
 
-		} else if (locationManager
-				.isProviderEnabled(LocationManager.GPS_PROVIDER)) { // then
-																	// the
-																	// GPS
-																	// Connection
-			locationManager = (LocationManager) getActivity().getSystemService(
-					Context.LOCATION_SERVICE);
-			locationManager.requestLocationUpdates(
-					LocationManager.GPS_PROVIDER, 1000, 1, locListener);
-			Location location = locationManager
-					.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		}
+		// then the GPS Connection
+		else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { 
+			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, locListener);
+			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			currentLocation = location;
 		}
+		// TODO What happens if nothing of both is enabled?
 
 	}
 
