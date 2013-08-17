@@ -105,13 +105,14 @@ public class PlaceViewFragment extends Fragment {
 					// guest key
 					if (place.getOwnerId() != KisiApi.getUserId()) {
 						updateLocation();
-						Log.d("location", "current location is "+currentLocation.getLongitude()+" , "+currentLocation.getLatitude());
 
 						try {
-							JSONObject location = new JSONObject();
-							location.put("latitude", currentLocation.getLatitude());
-							location.put("longitude", currentLocation.getLongitude());
-							api.addParameter("location", location);
+							if ( currentLocation != null ) {
+								JSONObject location = new JSONObject();
+								location.put("latitude", currentLocation.getLatitude());
+								location.put("longitude", currentLocation.getLongitude());
+								api.addParameter("location", location);
+							}
 						} catch (JSONException e) {
 							e.printStackTrace();
 						}
