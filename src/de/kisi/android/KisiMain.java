@@ -43,7 +43,6 @@ public class KisiMain extends FragmentActivity implements
 		PopupMenu.OnMenuItemClickListener {
 
 	public SparseArray<Place> locations;
-	private BlinkupController blinkup;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -164,6 +163,7 @@ public class KisiMain extends FragmentActivity implements
 			return true;
 			
 		case R.id.setup:
+			BlinkupController blinkup;
 			blinkup = BlinkupController.getInstance();;
 			blinkup.selectWifiAndSetupDevice(this, "08a6dd6db0cd365513df881568c47a1c");
 			return true;
