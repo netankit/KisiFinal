@@ -16,10 +16,10 @@ public class Place {
 	private String updated_at;
 	//private GeoPoint location;
 	private double latitude, longitude;
-	private String streetName, streetNumber;
+	/*private String streetName, streetNumber;
 	private String zip, city;
 	private String state, country;
-	private String additionalInformation;
+	private String additionalInformation; */
 	private int owner_id;
 
 	
@@ -42,13 +42,13 @@ public class Place {
 				longitude = 0;
 			}
 			
-			streetName 		= json.getString("street_name");
-			streetNumber	= json.getString("street_number");
-			zip 			= json.getString("zip");
-			city 			= json.getString("city");
-			country 		= json.getString("country");
-			state 			= json.getString("state");
-			additionalInformation = json.getString("additional_information");
+			//streetName 		= json.getString("street_name");
+			//streetNumber	= json.getString("street_number");
+			//zip 			= json.getString("zip");
+			//city 			= json.getString("city");
+			//country 		= json.getString("country");
+			//state 			= json.getString("state");
+			//additionalInformation = json.getString("additional_information");
 			owner_id 		= json.getInt("user_id");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -82,6 +82,7 @@ public class Place {
 		return longitude;
 	}
 
+	/*
 	public String getAddress() {
 		return getStreetName() + ", " + getCity();
 	}
@@ -123,7 +124,7 @@ public class Place {
 	public String getAdditionalInformation() {
 		return additionalInformation;
 	}
-
+	*/
 	public int getOwnerId() {
 		return owner_id;
 	}
