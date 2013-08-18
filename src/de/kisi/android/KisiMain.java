@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.text.InputType;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -134,14 +135,13 @@ public class KisiMain extends FragmentActivity implements
 			return true;
 
 		case R.id.share:
-			// TODO add view with form to select locks + assignee_email
-
 			Place p = places.valueAt(pager.getCurrentItem());
 
 			if (p.getOwnerId() != KisiApi.getUserId()) {
 				Toast.makeText(this, R.string.share_owner_only , Toast.LENGTH_LONG).show();
 				return false;
 			} else {
+				// show view with form to select locks + assignee_email
 				buildShareDialog(p);
 				return true;
 			}
@@ -265,7 +265,6 @@ public class KisiMain extends FragmentActivity implements
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				// Log.d("share", data.toString());
 			}
 
 		});
@@ -274,6 +273,10 @@ public class KisiMain extends FragmentActivity implements
 	}
 
 	public SparseArray<Place> getPlaces() {
+		if (places == null) {
+			Log.d("KisiMain", "places is null");
+			updatePlaces();
+		}
 		return places;
 	}
 }

@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,11 +52,17 @@ public class PlaceFragment extends Fragment {
 			return null;
 		}
 
-		int index = getArguments().getInt("index");
-		final Place place = ((KisiMain) getActivity()).getPlaces().valueAt(index);
-
 		layout = (RelativeLayout) inflater.inflate(R.layout.place_fragment,
 				container, false);
+		
+		int index = getArguments().getInt("index");
+		KisiMain activity = ((KisiMain) getActivity());
+		SparseArray<Place> places = activity.getPlaces();
+		// Workaround for crash when starting app from background
+		if (places == null) {
+			return layout;
+		}
+		final Place place = places.valueAt(index);
 
 		// get locks from api, if not already available
 		if (place.getLocks() == null) {
