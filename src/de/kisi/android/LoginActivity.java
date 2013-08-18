@@ -5,8 +5,6 @@ import org.json.JSONObject;
 
 import com.manavo.rest.RestCallback;
 
-import de.kisi.android.model.Login;
-
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -38,7 +36,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 	private SharedPreferences settings;
 	private SharedPreferences.Editor editor;
 
-	private Login loginData;
+	private String email;
+	private String password;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,14 +84,15 @@ public class LoginActivity extends Activity implements OnClickListener {
 
 	@Override
 	protected void onStart() {
-		Login savedLogin = getLogin();
+		email = settings.getString("email", "");
+		password = settings.getString("password", "");
 
-		if (!savedLogin.getUserName().isEmpty()) {
-			userNameField.setText(savedLogin.getUserName());
-			if (savedLogin.getPassword().isEmpty()) {
+		if (!email.isEmpty()) {
+			userNameField.setText(email);
+			if (password.isEmpty()) {
 				passwordField.requestFocus();
 			} else {
-				passwordField.setText(savedLogin.getPassword());
+				passwordField.setText(password);
 				savePassword.setChecked(true);
 			}
 		}
@@ -142,12 +142,15 @@ public class LoginActivity extends Activity implements OnClickListener {
 		});
 		// TODO set error handler
 
-		loginData = new Login(email, password);
-
 		// Toast.makeText(this, userName+" "+password, Toast.LENGTH_LONG).show();
 
 		if (savePassword.isChecked()) {
-			saveLogin(loginData);
+			// save login credentials
+			editor = settings.edit();
+			editor.putString("email", email);
+			editor.putString("pasword", password);
+			editor.putBoolean("saved", true);
+			editor.commit();
 
 		} else {
 			deleteLogin();
@@ -157,28 +160,11 @@ public class LoginActivity extends Activity implements OnClickListener {
 
 	private void deleteLogin() {
 		editor = settings.edit();
-		//editor.remove("userName"); // TODO (Maybe) temporary for debugging purpurses --Andi
+		//editor.remove("email"); // TODO (Maybe) temporary for debugging purpurses --Andi
 		editor.remove("pasword");
 		editor.remove("saved");
 		editor.commit();
 	}
 
-	private void saveLogin(Login login) {
-		editor = settings.edit();
-		editor.putString("userName", login.getUserName());
-		editor.putString("pasword", login.getPassword());
-		editor.putBoolean("saved", true);
-		editor.commit();
-	}
-
-	public Login getLogin() {
-		if (loginData == null) {
-			String tempUser = settings.getString("userName", "");
-			String tempPw = settings.getString("pasword", "");
-
-			loginData = new Login(tempUser, tempPw);
-		}
-		return loginData;
-	}
 
 }
