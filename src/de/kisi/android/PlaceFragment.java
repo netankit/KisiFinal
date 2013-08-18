@@ -27,16 +27,16 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
-public class PlaceViewFragment extends Fragment {
+public class PlaceFragment extends Fragment {
 
 	private RelativeLayout layout;
-	private final long delay = 3000;
+	private final static long delay = 3000;
 	private Location currentLocation;
 	private LocationManager locationManager;
 
-	static PlaceViewFragment newInstance(int index) {
+	static PlaceFragment newInstance(int index) {
 		// Fragments must not have a custom constructor
-		PlaceViewFragment f = new PlaceViewFragment();
+		PlaceFragment f = new PlaceFragment();
 
 		Bundle args = new Bundle();
 		args.putInt("index", index);
@@ -52,7 +52,7 @@ public class PlaceViewFragment extends Fragment {
 		}
 
 		int index = getArguments().getInt("index");
-		final Place place = ((KisiMain) getActivity()).locations.valueAt(index);
+		final Place place = ((KisiMain) getActivity()).getPlaces().valueAt(index);
 
 		layout = (RelativeLayout) inflater.inflate(R.layout.place_fragment,
 				container, false);
@@ -103,6 +103,9 @@ public class PlaceViewFragment extends Fragment {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					
+					// unlock button was pressed
+					// setup api call to open door
 					KisiApi api = new KisiApi(getActivity());
 
 					// Add gps coordinates to access request if user has only
@@ -125,7 +128,7 @@ public class PlaceViewFragment extends Fragment {
 					api.setCallback(new RestCallback() {
 						public void success(Object obj) {
 							// change button design
-							changeButtonStyleToUnlock(button, lock);
+							changeButtonStyleToUnlocked(button, lock);
 						}
 
 					});
@@ -168,7 +171,7 @@ public class PlaceViewFragment extends Fragment {
 
 	}
 
-	public void changeButtonStyleToUnlock(Button button, Lock lock) {
+	public void changeButtonStyleToUnlocked(Button button, Lock lock) {
 		// save button design
 		final Drawable currentBackground = button.getBackground();
 		final Button currentButton = button;

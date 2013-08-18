@@ -8,14 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+public class PlaceFragmentPagerAdapter extends FragmentPagerAdapter {
 
 	int PAGE_COUNT;
 	private List<Fragment> fragments;
 	private KisiMain activity;
 
 	/** Constructor of the class */
-	public MyFragmentPagerAdapter(FragmentManager fm, List<Fragment> fragments, KisiMain activity) {
+	public PlaceFragmentPagerAdapter(FragmentManager fm, List<Fragment> fragments, KisiMain activity) {
 		super(fm);
 		this.fragments = fragments;
 		this.activity = activity;
@@ -37,8 +37,7 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 	
 	@Override
 	public CharSequence getPageTitle(int num) {
-		//int location_id = getItem(num).getArguments().getInt("location_id");
-		Place l = activity.locations.valueAt(num);
+		Place l = activity.getPlaces().valueAt(num);
 		return l.getName();
 	}
 }
