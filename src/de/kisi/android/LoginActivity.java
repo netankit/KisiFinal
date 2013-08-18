@@ -113,8 +113,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 		editor.remove("authentication_token");
 		editor.commit();
 
-		String email = userNameField.getText().toString(); // get Text of
-		String password = passwordField.getText().toString();
+		email = userNameField.getText().toString(); // get Text of
+		password = passwordField.getText().toString();
 		
 		KisiApi api = new KisiApi(this);
 
