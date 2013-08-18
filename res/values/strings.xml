@@ -20,10 +20,10 @@
     <string name="share">Share this place</string>
     <string name="log">Get log information</string>
     <string name="logout">Logout</string>
-    <string name="setup">Setup Kisibox device</string>
+    <string name="setup">Setup KISI device</string>
     
     <string name="pressto">Press to secure unlock</string>
-    <string name="opening">Opening lock...</string>
+    <string name="opening">Opening lock…</string>
     <string name="share_owner_only">Only the owner of a place can create new keys.</string>
     <string name="share_title">Share place:</string>
     <string name="share_popup_msg">"Enter email and select locks you want to share:"</string>
