@@ -72,6 +72,9 @@ public class KisiApi extends RestApi {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+			if (data.isEmpty()) {
+				data = "Unexpected error: " + String.valueOf(code);
+			}
 		}
 		super.onStatusCodeError(code, data);
 	}
