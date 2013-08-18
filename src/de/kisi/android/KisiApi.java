@@ -20,6 +20,10 @@ public class KisiApi extends RestApi {
 	public KisiApi(Activity activity) {
 		super(activity);
 
+		SharedPreferences settings = activity.getSharedPreferences("Config", android.content.Context.MODE_PRIVATE);
+		KisiApi.authToken = settings.getString("authentication_token", "");
+		KisiApi.user_id = settings.getInt("user_id", -1);
+
 		this.BASE_URL = "https://www.kisi.de/";
 		this.urlSuffix = ".json" + ( KisiApi.authToken != null ? "?auth_token=" + KisiApi.authToken : "" );
 		this.rest.setHost("www.kisi.de");
@@ -28,14 +32,8 @@ public class KisiApi extends RestApi {
 		this.rest.setContentType("application/json");
 	}
 
-	public static void setAuthToken(String token) {
-		KisiApi.authToken = token;
-	}
 	public static String getAuthToken() {
 		return KisiApi.authToken;
-	}
-	public static void setUserId(int user_id) {
-		KisiApi.user_id = user_id;
 	}
 	public static int getUserId() {
 		return KisiApi.user_id;

@@ -45,8 +45,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.login_activity);
-		
-		KisiApi.setAuthToken(null);
 
 		loginButton = (Button) findViewById(R.id.loginButton);
 		loginButton.setOnClickListener(this);
@@ -109,9 +107,11 @@ public class LoginActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View arg0) {
 		// user touched the login botton: gather all informations and send to next view
-
-		// clear old auth token
-		KisiApi.setAuthToken("");
+		
+		// clear auth token
+		editor = settings.edit();
+		editor.remove("authentication_token");
+		editor.commit();
 
 		String email = userNameField.getText().toString(); // get Text of
 		String password = passwordField.getText().toString();
@@ -128,8 +128,10 @@ public class LoginActivity extends Activity implements OnClickListener {
 				JSONObject data = (JSONObject)obj;
 
 				try {
-					KisiApi.setAuthToken(data.getString("authentication_token"));
-					KisiApi.setUserId(data.getInt("id"));
+					editor = settings.edit();
+					editor.putString("authentication_token", data.getString("authentication_token"));
+					editor.putInt("user_id", data.getInt("id"));
+					editor.commit();
 					Toast.makeText(activity, R.string.login_success, Toast.LENGTH_LONG).show();
 					
 					Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
@@ -142,13 +144,11 @@ public class LoginActivity extends Activity implements OnClickListener {
 		});
 		// TODO set error handler
 
-		// Toast.makeText(this, userName+" "+password, Toast.LENGTH_LONG).show();
-
 		if (savePassword.isChecked()) {
 			// save login credentials
 			editor = settings.edit();
 			editor.putString("email", email);
-			editor.putString("pasword", password);
+			editor.putString("password", password);
 			editor.putBoolean("saved", true);
 			editor.commit();
 
@@ -160,8 +160,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 
 	private void deleteLogin() {
 		editor = settings.edit();
-		//editor.remove("email"); // TODO (Maybe) temporary for debugging purpurses --Andi
-		editor.remove("pasword");
+		//editor.remove("email"); // email should stay
+		editor.remove("password");;
 		editor.remove("saved");
 		editor.commit();
 	}
