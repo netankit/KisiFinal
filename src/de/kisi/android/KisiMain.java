@@ -45,10 +45,18 @@ public class KisiMain extends FragmentActivity implements
 	private SparseArray<Place> places;
 	private ViewPager pager;
 
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//set custom window title
+		SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putBoolean("toLog", false);
+		editor.commit();
+
+		
+		
+		// set custom window title
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
 		setContentView(R.layout.kisi_main);
@@ -59,9 +67,10 @@ public class KisiMain extends FragmentActivity implements
 		pager = (ViewPager) findViewById(R.id.pager);
 		updatePlaces();
 
+
 	}
 
-	//creating popup-menu for settings
+	// creating popup-menu for settings
 	public void showPopup(View v) {
 		PopupMenu popup = new PopupMenu(this, v);
 		MenuInflater inflater = popup.getMenuInflater();
@@ -77,9 +86,10 @@ public class KisiMain extends FragmentActivity implements
 		SharedPreferences settings = getSharedPreferences("Config",
 				MODE_PRIVATE);
 		if (!settings.getBoolean("saved", false)) {
+			if(!settings.getBoolean("toLog", false)){
 			Intent loginScreen = new Intent(getApplicationContext(),
 					LoginActivity.class);
-			startActivity(loginScreen);
+			startActivity(loginScreen);}
 		}
 		super.onPause();
 	}
@@ -147,6 +157,12 @@ public class KisiMain extends FragmentActivity implements
 			}
 
 		case R.id.showLog:
+			{
+				SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putBoolean("toLog", true);
+				editor.commit();
+			}
 			Place place = places.valueAt(pager.getCurrentItem());
 			
 			Intent logView = new Intent(getApplicationContext(), LogInfo.class);
@@ -154,24 +170,26 @@ public class KisiMain extends FragmentActivity implements
 			startActivity(logView);
 			
 			return true;
-			
+
 		case R.id.setup:
+			{
+				SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putBoolean("toLog", true);
+				editor.commit();
+			}
 			BlinkupController blinkup;
 			blinkup = BlinkupController.getInstance();;
 			blinkup.selectWifiAndSetupDevice(this, "08a6dd6db0cd365513df881568c47a1c");
 			return true;
 
-
 		case R.id.logout:
 			finish();
 			return true;
 
-		/*
-		case R.id.exit:
-			finish();
-			moveTaskToBack(true);
-			return true;
-		*/
+			/*
+			 * case R.id.exit: finish(); moveTaskToBack(true); return true;
+			 */
 		}
 		return false;
 
@@ -211,7 +229,7 @@ public class KisiMain extends FragmentActivity implements
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface arg0, int arg1) {
 						String email = emailInput.getText().toString();
-						
+
 						List<Lock> sendlocks = new ArrayList<Lock>();
 						for (int i = 0; i < checkList.size(); i++) {
 							if (checkList.get(i).isChecked()) {
