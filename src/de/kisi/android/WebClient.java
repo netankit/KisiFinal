@@ -35,7 +35,8 @@ public class WebClient extends WebViewClient {
 	@Override
 	public void onPageFinished(WebView view, String url) {
 		//view.scrollTo(0, 130);
-		view.loadUrl("javascript: document.getElementById('header').style.display = 'none';");
+		view.loadUrl("javascript: document.getElementsByTagName('header')[0].style.display = 'none';");
+		view.loadUrl("javascript: document.body.style.paddingTop = 0;");
 		view.loadUrl("javascript: document.getElementById('footer').style.display = 'none';");
 		//view.setVisibility(View.VISIBLE);
 	}
