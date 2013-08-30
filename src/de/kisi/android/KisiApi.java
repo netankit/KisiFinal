@@ -6,9 +6,7 @@ import org.json.JSONObject;
 import com.manavo.rest.RestApi;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.widget.Toast;
 
 
 
