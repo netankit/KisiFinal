@@ -72,16 +72,14 @@ public class KisiApi extends RestApi {
 			activity.startActivity(loginScreen);
 			return;
 		} */
-		if (this.errorCallback == null && data.startsWith("{\"error\":") ) {
+		if (this.errorCallback == null && data.startsWith("{") ) {
 			try {
 				JSONObject data_json = new JSONObject(data);
 				data = data_json.getString("error");
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			if (data.isEmpty()) {
-				data = "Unexpected error: " + String.valueOf(code);
-			}
+				if (data.isEmpty()) {
+					data = "Unexpected error: " + String.valueOf(code);
+				}
+			} catch (JSONException e) {}
 		}
 		super.onStatusCodeError(code, data);
 	}
