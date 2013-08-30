@@ -29,7 +29,6 @@ public class KisiApi extends RestApi {
 		this.rest.setHost("www.kisi.de");
 		this.rest.setPort(443);
 		this.setUserAgent("AKey");
-		this.rest.setContentType("application/json");
 	}
 
 	public static String getAuthToken() {
@@ -61,6 +60,9 @@ public class KisiApi extends RestApi {
 	
 	@Override 
 	public void post(String url) {
+		if ( this.getParameters().size() > 0 ) {
+			this.rest.setContentType("application/json");
+		}
 		super.post(url);
 	}
 	
