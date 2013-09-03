@@ -179,7 +179,7 @@ public class KisiMain extends FragmentActivity implements
 				editor.commit();
 			}
 			BlinkupController blinkup;
-			blinkup = BlinkupController.getInstance();;
+			blinkup = BlinkupController.getInstance();
 			blinkup.selectWifiAndSetupDevice(this, "08a6dd6db0cd365513df881568c47a1c");
 			return true;
 
