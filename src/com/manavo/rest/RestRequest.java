@@ -268,26 +268,27 @@ public class RestRequest {
             	targetHost = new HttpHost(this.host, this.sslPort, "https");
             }
             HttpResponse response = this.httpClient.execute(targetHost, request, this.requestContext);
- 
-            String responseData;
+
+            String responseData = null;
             HttpEntity entity = response.getEntity();
             Header contentEncoding = response.getFirstHeader("Content-Encoding");
-            if (contentEncoding != null && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
-                InputStream instream = entity.getContent();
-                instream = new GZIPInputStream(instream);
-                
-                InputStreamReader reader = new InputStreamReader(instream);
-                BufferedReader in = new BufferedReader(reader);
-
-                String readed;
-                responseData = "";
-                while ((readed = in.readLine()) != null) {
-                	responseData += (readed);
+            if ( entity != null ) {
+                if (contentEncoding != null && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
+                    InputStream instream = entity.getContent();
+                    instream = new GZIPInputStream(instream);
+                    
+                    InputStreamReader reader = new InputStreamReader(instream);
+                    BufferedReader in = new BufferedReader(reader);
+                    
+                    String read;
+                    responseData = "";
+                    while ((read = in.readLine()) != null) {
+                        responseData += (read);
+                    }
+                } else {
+                    responseData = EntityUtils.toString(entity);
                 }
-            } else {
-            	responseData = EntityUtils.toString(entity);
             }
-            
             if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() < 300) {
             	b.putString("data", responseData);
             } else {
