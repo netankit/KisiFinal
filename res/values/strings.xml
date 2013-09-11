@@ -32,6 +32,8 @@
     <string name="share_error">You have to share at least one lock!</string>
     
     <string name="session_timeout_relogin">Session timeout. Please login again.</string>
+    <string name="logout_in_progress">Logging out…</string>
+    <string name="logout_successful">Logged out successfully.</string>
 
 
 </resources>

@@ -64,6 +64,11 @@ public class KisiApi extends RestApi {
 		super.post(url);
 	}
 	
+	@Override // to make method public
+	public void delete(String url) {
+		super.delete(url);
+	}
+	
 	@Override 
 	public void onStatusCodeError(int code, String data) {
 		/* if (code == 401) {

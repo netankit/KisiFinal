@@ -184,15 +184,31 @@ public class KisiMain extends FragmentActivity implements
 			return true;
 
 		case R.id.logout:
-			finish();
+			logout();
 			return true;
-
-			/*
-			 * case R.id.exit: finish(); moveTaskToBack(true); return true;
-			 */
 		}
 		return false;
 
+	}
+
+	private void logout() {
+		KisiApi api = new KisiApi(this);
+		final Activity activity = this;
+		
+		api.setLoadingMessage(R.string.logout_in_progress);
+		api.setCallback(new RestCallback() {
+			public void success(Object obj) {
+				SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
+				SharedPreferences.Editor editor = settings.edit();
+				editor = settings.edit();
+				editor.remove("authentication_token");
+				editor.commit();
+				
+				Toast.makeText(activity, R.string.logout_successful, Toast.LENGTH_LONG).show();
+				finish();
+			}
+		});
+		api.delete("users/sign_out");
 	}
 
 	private void buildShareDialog(Place p) {
