@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/__bu_network_list"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:cacheColorHint="@android:color/transparent"
+    android:padding="@dimen/__bu_padding"
+    android:scrollbarStyle="outsideInset" />

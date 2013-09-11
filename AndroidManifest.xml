@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.kisi.android"
+<<<<<<< HEAD
     android:versionCode="7"
     android:versionName="1.0.1" >
+=======
+    android:versionCode="8"
+    android:versionName="1.0.2" >
+>>>>>>> 9bbc21c16dbeddc215c7c32fabd19d3aab109742
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -10,6 +15,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
@@ -43,6 +49,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/CustomTheme" >
         </activity>
+        <activity android:name="com.electricimp.blinkup.WifiSelectActivity" />
+        <activity android:name="com.electricimp.blinkup.BlinkupGLActivity" />
+        <activity android:name="com.electricimp.blinkup.WifiActivity" />
+        <activity android:name="com.electricimp.blinkup.WPSActivity" />
+        <activity android:name="com.electricimp.blinkup.ClearWifiActivity" />
+        <activity android:name="com.electricimp.blinkup.InterstitialActivity" />
     </application>
 
 </manifest>

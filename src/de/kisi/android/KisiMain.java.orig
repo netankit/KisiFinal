@@ -171,6 +171,15 @@ public class KisiMain extends FragmentActivity implements
 			
 			return true;
 
+<<<<<<< HEAD
+		case R.id.logout:
+			finish();
+			return true;
+
+			/*
+			 * case R.id.exit: finish(); moveTaskToBack(true); return true;
+			 */
+=======
 		case R.id.setup:
 			{
 				SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
@@ -186,11 +195,14 @@ public class KisiMain extends FragmentActivity implements
 		case R.id.logout:
 			logout();
 			return true;
+>>>>>>> 9bbc21c16dbeddc215c7c32fabd19d3aab109742
 		}
 		return false;
 
 	}
 
+<<<<<<< HEAD
+=======
 	private void logout() {
 		KisiApi api = new KisiApi(this);
 		final Activity activity = this;
@@ -211,6 +223,7 @@ public class KisiMain extends FragmentActivity implements
 		api.delete("users/sign_out");
 	}
 
+>>>>>>> 9bbc21c16dbeddc215c7c32fabd19d3aab109742
 	private void buildShareDialog(Place p) {
 		final Place currentPlace = p;
 		final List<Lock> locks = currentPlace.getLocks();

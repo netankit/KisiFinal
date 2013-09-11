@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="__bu_blinkup_desc">
+        After tapping \"Send BlinkUp\", hold the screen close to the
+        blinking red light at the edge of the imp card until the flashing ends
+        (about 10 seconds).
+    </string>
+    <string name="__bu_wps_info">
+        To join without using a PIN, press the WPS button on your router and
+        then BlinkUp within 60 seconds.
+    </string>
+    <string name="__bu_clear_wireless">Clear Wireless Configuration</string>
+    <string name="__bu_legacy_mode">Legacy BlinkUp Mode</string>
+    <string name="__bu_legacy_mode_desc">
+        If BlinkUp doesn\'t work on a new device (the device continues to flash
+        red after BlinkUp), you may need to try again with \'Legacy BlinkUp
+        Mode\' selected. A few older Imp cards need this mode to BlinkUp the
+        first time. Once they\'re online (indicated by a green light) they\'ll
+        be automatically updated to the latest version of the imp OS and won\'t
+        need Legacy BlinkUp Mode again.
+    </string>
+    <string name="__bu_ok">OK</string>
+    <string name="__bu_choose_wifi_network">Choose WiFi network</string>
+    <string name="__bu_blinkup_footer">
+        BlinkUp technology provided by Electric Imp
+    </string>
+    <string name="__bu_password">Password</string>
+    <string name="__bu_remember_password">Remember Password</string>
+    <string name="__bu_send_blinkup">Send BlinkUp</string>
+    <string name="__bu_ssid">WiFi network name</string>
+    <string name="__bu_wps_pin">WPS PIN (Optional)</string>
+    <string name="__bu_change_network">Change network</string>
+    <string name="__bu_connect_using_wps">Connect using WPS</string>
+    <string name="__bu_clear_device_settings">Clear device settings</string>
+    <string name="__bu_countdown_desc">Point screen at sensor now</string>
+    <string name="__bu_legacy_mode_link">\?</string>
+    <string name="__bu_logo_desc">Electric Imp Logo</string>
+    <string name="__bu_interstitial_image">Interstitial Image</string>
+    <string name="__bu_next">Next</string>
+</resources>

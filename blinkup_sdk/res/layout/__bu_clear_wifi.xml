@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true"
+    android:scrollbarStyle="outsideInset" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/__bu_padding" >
+
+        <TextView
+            android:id="@+id/__bu_clear_wifi_header"
+            style="@style/BlinkUp.Header"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/__bu_padding"
+            android:text="@string/__bu_clear_device_settings" />
+
+        <TextView
+            android:id="@+id/__bu_blinkup_desc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/__bu_padding"
+            android:layout_marginLeft="@dimen/__bu_padding"
+            android:layout_marginRight="@dimen/__bu_padding"
+            android:gravity="center"
+            android:text="@string/__bu_blinkup_desc" />
+
+        <Button
+            android:id="@+id/__bu_blinkup_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="sendBlinkup"
+            android:text="@string/__bu_clear_wireless" />
+
+        <include layout="@layout/__bu_legacy_mode" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginTop="@dimen/__bu_padding"
+            android:layout_weight="1"
+            android:gravity="center_horizontal|bottom"
+            android:text="@string/__bu_blinkup_footer" />
+    </LinearLayout>
+
+</ScrollView>
