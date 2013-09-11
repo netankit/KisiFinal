@@ -7,6 +7,7 @@ import com.manavo.rest.RestApi;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 
 
@@ -71,12 +72,12 @@ public class KisiApi extends RestApi {
 	
 	@Override 
 	public void onStatusCodeError(int code, String data) {
-		/* if (code == 401) {
-			Toast.makeText(activity, R.string.session_timeout_relogin, Toast.LENGTH_LONG).show();
-			Intent loginScreen = new Intent(activity.getApplicationContext(), LoginActivity.class);
-			activity.startActivity(loginScreen);
+		 if (code == 401) {
+			Toast.makeText(activity, R.string.error_code_401, Toast.LENGTH_LONG).show();
+//			Intent loginScreen = new Intent(activity.getApplicationContext(), LoginActivity.class);
+//			activity.startActivity(loginScreen);
 			return;
-		} */
+		} 
 		if (this.errorCallback == null && data.startsWith("{") ) {
 			try {
 				JSONObject data_json = new JSONObject(data);

@@ -9,8 +9,9 @@ import com.manavo.rest.RestCallback;
 
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
-
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -21,12 +22,16 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 public class PlaceFragment extends Fragment {
 
@@ -54,6 +59,7 @@ public class PlaceFragment extends Fragment {
 
 		layout = (RelativeLayout) inflater.inflate(R.layout.place_fragment,
 				container, false);
+		
 		
 		int index = getArguments().getInt("index");
 		KisiMain activity = ((KisiMain) getActivity());
@@ -88,23 +94,42 @@ public class PlaceFragment extends Fragment {
 	}
 
 	public void setupButtons(final Place place) {
-		int[] buttons = { R.id.buttonLockOne, R.id.buttonLockTwo,
-				R.id.buttonLockThree };
+		//set old buttons invisible
 
+		
+		Drawable lockIcon= getActivity().getResources().getDrawable(R.drawable.kisi_lock);
+		
 		Typeface font = Typeface.createFromAsset(getActivity()
 				.getApplicationContext().getAssets(), "Roboto-Light.ttf");
-
+		//Getting px form Scale-independent Pixels
+		Resources r = getResources();
+		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 350, r.getDisplayMetrics());
+		int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 85, r.getDisplayMetrics());
+		int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15, r.getDisplayMetrics());
+		
+		ScrollView sv =  (ScrollView) layout.getChildAt(0);
+		LinearLayout ly = (LinearLayout) sv.getChildAt(0);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
+		
 		int i = 0;
 		for (final Lock lock : place.getLocks()) {
-			if (i >= buttons.length) {
-				Log.d("waring", "more locks then buttons!");
-				break;
-			}
-
-			final Button button = (Button) layout.findViewById(buttons[i]);
+			
+			final Button button = new Button(getActivity());
 			button.setText(lock.getName());
 			button.setTypeface(font);
+			button.setGravity(Gravity.CENTER);
+			button.setWidth(width);
+			button.setHeight(height);
+			button.setTextColor(Color.WHITE);
+			button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+			button.setCompoundDrawablesWithIntrinsicBounds(lockIcon, null, null, null);
 			button.setVisibility(View.VISIBLE);
+		
+			if(i == 0)
+				layoutParams.setMargins(margin, margin*2, margin, margin);
+			else
+				layoutParams.setMargins(margin, margin, margin, margin);
+			ly.addView(button, layoutParams);
 			i++;
 
 			button.setOnClickListener(new OnClickListener() {
@@ -145,14 +170,77 @@ public class PlaceFragment extends Fragment {
 
 			});
 		}
-		// set unused buttons to gone, so the automatic layout works
-		for (; i < buttons.length; i++) {
-			Button button = (Button) layout.findViewById(buttons[i]);
 
-			button.setVisibility(View.GONE);
-
-		}
+		
 	}
+	
+	
+//	public void setupButtons(final Place place) {
+//		int[] buttons = { R.id.buttonLockOne, R.id.buttonLockTwo,
+//				R.id.buttonLockThree };
+//
+//		Typeface font = Typeface.createFromAsset(getActivity()
+//				.getApplicationContext().getAssets(), "Roboto-Light.ttf");
+//
+//		int i = 0;
+//		for (final Lock lock : place.getLocks()) {
+//			if (i >= buttons.length) {
+//				Log.d("waring", "more locks then buttons!");
+//				break;
+//			}
+//
+//			final Button button = (Button) layout.findViewById(buttons[i]);
+//			button.setText(lock.getName());
+//			button.setTypeface(font);
+//			button.setVisibility(View.VISIBLE);
+//			i++;
+//
+//			button.setOnClickListener(new OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					
+//					// unlock button was pressed
+//					// setup api call to open door
+//					KisiApi api = new KisiApi(getActivity());
+//
+//					// Add gps coordinates to access request if user has only
+//					// guest key
+//					if (place.getOwnerId() != KisiApi.getUserId()) {
+//						updateLocation();
+//
+//						try {
+//							if ( currentLocation != null ) {
+//								JSONObject location = new JSONObject();
+//								location.put("latitude", currentLocation.getLatitude());
+//								location.put("longitude", currentLocation.getLongitude());
+//								api.addParameter("location", location);
+//							}
+//						} catch (JSONException e) {
+//							e.printStackTrace();
+//						}
+//					}
+//
+//					api.setCallback(new RestCallback() {
+//						public void success(Object obj) {
+//							// change button design
+//							changeButtonStyleToUnlocked(button, lock);
+//						}
+//
+//					});
+//					api.setLoadingMessage(R.string.opening);
+//					api.post(String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId()));
+//				}
+//
+//			});
+//		}
+//		// set unused buttons to gone, so the automatic layout works
+//		for (; i < buttons.length; i++) {
+//			Button button = (Button) layout.findViewById(buttons[i]);
+//
+//			button.setVisibility(View.GONE);
+//
+//		}
+//	}
 
 	private void updateLocation() {
 

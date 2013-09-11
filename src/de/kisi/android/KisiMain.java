@@ -65,6 +65,8 @@ public class KisiMain extends FragmentActivity implements
 				R.layout.window_title);
 
 		pager = (ViewPager) findViewById(R.id.pager);
+	
+		RestCache.clear(this);
 		updatePlaces();
 
 
@@ -96,7 +98,7 @@ public class KisiMain extends FragmentActivity implements
 
 	private void updatePlaces() {
 		KisiApi api = new KisiApi(this);
-		api.setCachePolicy(RestCache.CachePolicy.CACHE_THEN_NETWORK);
+		api.setCachePolicy(RestCache.CachePolicy.CACHE_ELSE_NETWORK);
 		api.setCallback(new RestCallback() {
 			public void success(Object obj) {
 				JSONArray data = (JSONArray) obj;
@@ -113,7 +115,6 @@ public class KisiMain extends FragmentActivity implements
 
 		List<Fragment> fragments = new Vector<Fragment>();
 		places = new SparseArray<Place>();
-
 		try {
 			for (int i = 0, j = 0; i < locations_json.length(); i++) {
 				Place location = new Place(locations_json.getJSONObject(i));

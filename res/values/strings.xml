@@ -34,6 +34,8 @@
     <string name="session_timeout_relogin">Session timeout. Please login again.</string>
     <string name="logout_in_progress">Logging out…</string>
     <string name="logout_successful">Logged out successfully.</string>
+    <string name="setup">Setup KISI device</string>
+    <string name="error_code_401">Access denied: Woring email/password</string>
 
 
 </resources>

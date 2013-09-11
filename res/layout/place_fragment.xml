@@ -7,53 +7,27 @@
     android:layout_gravity="center"
     android:background="@drawable/testbackground" >
 
+<ScrollView
+    android:id="@+id/scroll"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentTop="true" >
+
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_gravity="top|center"
         android:baselineAligned="false"
+        android:gravity="center"
         android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/buttonLockOne"
-            android:layout_width="300sp"
-            android:layout_height="85sp"
-            android:layout_marginTop="20sp"
-            android:background="@drawable/lock_one_button"
-            android:drawableLeft="@drawable/kisi_lock"
-            android:gravity="center"
-            android:paddingLeft="25sp"
-            android:textColor="#ffffff"
-            android:textSize="25sp"
-            android:visibility="invisible" />
+</LinearLayout>
+    
+    
+</ScrollView>
 
-        <Button
-            android:id="@+id/buttonLockTwo"
-            android:layout_width="300sp"
-            android:layout_height="85sp"
-            android:layout_marginTop="20sp"
-            android:background="@drawable/lock_two_button"
-            android:drawableLeft="@drawable/kisi_lock"
-            android:gravity="center"
-            android:paddingLeft="25sp"
-            android:textColor="#ffffff"
-            android:textSize="25sp"
-            android:visibility="invisible" />
-
-        <Button
-            android:id="@+id/buttonLockThree"
-            android:layout_width="300sp"
-            android:layout_height="85sp"
-            android:layout_marginTop="20sp"
-            android:background="@drawable/lock_three_button"
-            android:drawableLeft="@drawable/kisi_lock"
-            android:gravity="center"
-            android:paddingLeft="25sp"
-            android:textColor="#ffffff"
-            android:textSize="25sp"
-            android:visibility="invisible" />
-    </LinearLayout>
 
 </RelativeLayout>
