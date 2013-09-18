@@ -36,6 +36,8 @@
     <string name="logout_successful">Logged out successfully.</string>
     <string name="setup">Setup KISI device</string>
     <string name="error_code_401">Access denied: Woring email/password</string>
+    <string name="blinkup_timeout">Timeout </string>
+    <string name="blinkup_error">Blinkup Errorcode:</string>
 
 
 </resources>

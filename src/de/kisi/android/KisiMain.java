@@ -13,7 +13,6 @@ import com.manavo.rest.RestCallback;
 
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -36,14 +35,20 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+
 import com.electricimp.blinkup.BlinkupController;
 
 
 public class KisiMain extends FragmentActivity implements
 		PopupMenu.OnMenuItemClickListener {
+	
+    private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
+	
 
 	private SparseArray<Place> places;
 	private ViewPager pager;
+	
+	private BlinkupController blinkup;
 
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -179,9 +184,9 @@ public class KisiMain extends FragmentActivity implements
 				editor.putBoolean("toLog", true);
 				editor.commit();
 			}
-			BlinkupController blinkup;
 			blinkup = BlinkupController.getInstance();
-			blinkup.selectWifiAndSetupDevice(this, "08a6dd6db0cd365513df881568c47a1c");
+			blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
+			blinkup.selectWifiAndSetupDevice(this, API_KEY);
 			return true;
 
 		case R.id.logout:
@@ -191,6 +196,16 @@ public class KisiMain extends FragmentActivity implements
 		return false;
 
 	}
+	
+	
+	//callback for blinkup 
+    @Override
+    protected void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        blinkup.handleActivityResult(this, requestCode, resultCode, data);
+    }
+	
+	
 
 	private void logout() {
 		KisiApi api = new KisiApi(this);
