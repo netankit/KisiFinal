@@ -94,8 +94,6 @@ public class PlaceFragment extends Fragment {
 	}
 
 	public void setupButtons(final Place place) {
-		//set old buttons invisible
-
 		
 		Drawable lockIcon= getActivity().getResources().getDrawable(R.drawable.kisi_lock);
 		
@@ -174,73 +172,6 @@ public class PlaceFragment extends Fragment {
 		
 	}
 	
-	
-//	public void setupButtons(final Place place) {
-//		int[] buttons = { R.id.buttonLockOne, R.id.buttonLockTwo,
-//				R.id.buttonLockThree };
-//
-//		Typeface font = Typeface.createFromAsset(getActivity()
-//				.getApplicationContext().getAssets(), "Roboto-Light.ttf");
-//
-//		int i = 0;
-//		for (final Lock lock : place.getLocks()) {
-//			if (i >= buttons.length) {
-//				Log.d("waring", "more locks then buttons!");
-//				break;
-//			}
-//
-//			final Button button = (Button) layout.findViewById(buttons[i]);
-//			button.setText(lock.getName());
-//			button.setTypeface(font);
-//			button.setVisibility(View.VISIBLE);
-//			i++;
-//
-//			button.setOnClickListener(new OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					
-//					// unlock button was pressed
-//					// setup api call to open door
-//					KisiApi api = new KisiApi(getActivity());
-//
-//					// Add gps coordinates to access request if user has only
-//					// guest key
-//					if (place.getOwnerId() != KisiApi.getUserId()) {
-//						updateLocation();
-//
-//						try {
-//							if ( currentLocation != null ) {
-//								JSONObject location = new JSONObject();
-//								location.put("latitude", currentLocation.getLatitude());
-//								location.put("longitude", currentLocation.getLongitude());
-//								api.addParameter("location", location);
-//							}
-//						} catch (JSONException e) {
-//							e.printStackTrace();
-//						}
-//					}
-//
-//					api.setCallback(new RestCallback() {
-//						public void success(Object obj) {
-//							// change button design
-//							changeButtonStyleToUnlocked(button, lock);
-//						}
-//
-//					});
-//					api.setLoadingMessage(R.string.opening);
-//					api.post(String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId()));
-//				}
-//
-//			});
-//		}
-//		// set unused buttons to gone, so the automatic layout works
-//		for (; i < buttons.length; i++) {
-//			Button button = (Button) layout.findViewById(buttons[i]);
-//
-//			button.setVisibility(View.GONE);
-//
-//		}
-//	}
 
 	private void updateLocation() {
 
