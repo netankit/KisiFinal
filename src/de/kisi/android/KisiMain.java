@@ -18,6 +18,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -59,8 +60,7 @@ public class KisiMain extends FragmentActivity implements
 		editor.putBoolean("toLog", false);
 		editor.commit();
 
-		
-		
+
 		// set custom window title
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
@@ -74,7 +74,7 @@ public class KisiMain extends FragmentActivity implements
 		RestCache.clear(this);
 		updatePlaces();
 
-
+		blinkup = BlinkupController.getInstance();
 	}
 
 	// creating popup-menu for settings
@@ -143,53 +143,52 @@ public class KisiMain extends FragmentActivity implements
 
 	@Override
 	public boolean onMenuItemClick(MenuItem item) {
-		//set up 
-		switch (item.getItemId()) {
-		case R.id.refresh:
+		// set up
+		int id = item.getItemId();
+		if (id == R.id.refresh) {
 			RestCache.clear(this);
 			updatePlaces();
 			return true;
-
-		case R.id.share:
+		} else if (id == R.id.share) {
 			Place p = places.valueAt(pager.getCurrentItem());
 
 			if (p.getOwnerId() != KisiApi.getUserId()) {
-				Toast.makeText(this, R.string.share_owner_only , Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.share_owner_only,
+						Toast.LENGTH_LONG).show();
 				return false;
 			} else {
 				// show view with form to select locks + assignee_email
 				buildShareDialog(p);
 				return true;
 			}
-
-		case R.id.showLog:
+		} else if (id == R.id.showLog) {
 			{
-				SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
+				SharedPreferences settings = getSharedPreferences("Config",
+						MODE_PRIVATE);
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putBoolean("toLog", true);
 				editor.commit();
 			}
 			Place place = places.valueAt(pager.getCurrentItem());
-			
+
 			Intent logView = new Intent(getApplicationContext(), LogInfo.class);
 			logView.putExtra("place_id", place.getId());
 			startActivity(logView);
-			
-			return true;
 
-		case R.id.setup:
+			return true;
+		} else if (id == R.id.setup) {
 			{
-				SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
+				SharedPreferences settings = getSharedPreferences("Config",
+						MODE_PRIVATE);
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putBoolean("toLog", true);
 				editor.commit();
 			}
-			blinkup = BlinkupController.getInstance();
-			blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
+			blinkup.intentBlinkupComplete = new Intent(this,
+					BlinkupCompleteActivity.class);
 			blinkup.selectWifiAndSetupDevice(this, API_KEY);
 			return true;
-
-		case R.id.logout:
+		} else if (id == R.id.logout) {
 			logout();
 			return true;
 		}
@@ -202,7 +201,8 @@ public class KisiMain extends FragmentActivity implements
     @Override
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
-        blinkup.handleActivityResult(this, requestCode, resultCode, data);
+    	//TODO: check if blinkup is null
+    	blinkup.handleActivityResult(this, requestCode, resultCode, data);
     }
 	
 	

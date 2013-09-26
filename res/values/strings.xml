@@ -38,6 +38,8 @@
     <string name="error_code_401">Access denied: Woring email/password</string>
     <string name="blinkup_timeout">Timeout </string>
     <string name="blinkup_error">Blinkup Errorcode:</string>
+    <string name="blinkup_setting_up">Setting gateway up</string>
+    <string name="blinkup_success">Gateway is online now!</string>
 
 
 </resources>
