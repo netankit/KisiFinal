@@ -20,7 +20,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -95,7 +94,7 @@ public class PlaceFragment extends Fragment {
 
 	public void setupButtons(final Place place) {
 		
-		Drawable lockIcon= getActivity().getResources().getDrawable(R.drawable.kisi_lock);
+		Drawable lockIcon = getActivity().getResources().getDrawable(R.drawable.kisi_lock);
 		
 		Typeface font = Typeface.createFromAsset(getActivity()
 				.getApplicationContext().getAssets(), "Roboto-Light.ttf");

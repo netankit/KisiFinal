@@ -7,13 +7,15 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.electricimp.blinkup.BlinkupController;
@@ -24,11 +26,15 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 	private LocationManager locationManager;
 	private Location currentLocation;      
 	
+	private ProgressBar progressBar;
+    private TextView status;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.blinkup);  
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        status = (TextView) findViewById(R.id.status);
         blinkup = BlinkupController.getInstance();
         blinkup.getTokenStatus(this);
     }
@@ -39,8 +45,6 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
     	api.setLoadingMessage("Gateway created");
     	updateLocation();
     	JSONObject location = new JSONObject();
-    	//TODO:remove this later
-    	Log.d("Blinkup Location","Latitude: "+ currentLocation.getLatitude() +  "\tLongitude: " + currentLocation.getLongitude());
     	try {
     		location.put("latitude", currentLocation.getLatitude());
 	    	location.put("longitude", currentLocation.getLongitude());
@@ -60,24 +64,24 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 		}
     	api.addParameter("gateway", gateway);
     	api.post("gateways");
-    	Toast.makeText(getApplicationContext(), R.string.blinkup_success, Toast.LENGTH_LONG).show();
-    	finish();	    
+
+    	status.setText(R.string.blinkup_success);
+		progressBar.setVisibility(View.GONE);   
 	}
 
 	@Override
 	public void onError(String errorMsg) {
-		Toast.makeText(getApplicationContext(), R.string.blinkup_error + errorMsg, Toast.LENGTH_LONG).show();
-    	finish();
+		status.setText( R.string.blinkup_error + errorMsg);
+		progressBar.setVisibility(View.GONE);
 	}
 
 	@Override
 	public void onTimeout() {
-		Toast.makeText(getApplicationContext(), R.string.blinkup_timeout , Toast.LENGTH_LONG).show();
-    	finish();
+		status.setText( R.string.blinkup_timeout);
+		progressBar.setVisibility(View.GONE);
 	}                            
 
 	 private void updateLocation() {
-
 			LocationListener locListener = new MyLocationListener();
 			locationManager = (LocationManager) getApplicationContext().getSystemService(
 					Context.LOCATION_SERVICE);
@@ -97,7 +101,7 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 				currentLocation = location;
 			}
 			// TODO What happens if nothing of both is enabled?
-
+			Log.d("updateLocation", "Could not get location");
 		}                             
 
 

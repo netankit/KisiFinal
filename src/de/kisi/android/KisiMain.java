@@ -18,7 +18,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -124,8 +123,9 @@ public class KisiMain extends FragmentActivity implements
 			for (int i = 0, j = 0; i < locations_json.length(); i++) {
 				Place location = new Place(locations_json.getJSONObject(i));
 				// The API returned some locations twice, so let's check if we
-				// already have it or not
-				if (places.indexOfKey(location.getId()) < 0) {
+				// already have it or not also check if the place has a locks 
+				// otherwise just don't show it
+				if ((places.indexOfKey(location.getId()) < 0) && (!locations_json.getJSONObject(i).isNull("locks") )) {
 					places.put(location.getId(), location);
 					fragments.add(PlaceFragment.newInstance(j++));
 				}
@@ -201,7 +201,6 @@ public class KisiMain extends FragmentActivity implements
     @Override
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
-    	//TODO: check if blinkup is null
     	blinkup.handleActivityResult(this, requestCode, resultCode, data);
     }
 	
