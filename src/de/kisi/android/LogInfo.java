@@ -28,7 +28,7 @@ public class LogInfo extends Activity implements OnClickListener {
 		
 		 // gets the previously created intent
 		int place_id = getIntent().getIntExtra("place_id", 0);
-		webView.loadUrl(String.format("https://kisi.de/places/%d/activities?auth_token=%s", 
+		webView.loadUrl(String.format("https://kisi.de/places/%d/events?auth_token=%s", 
 			place_id, KisiApi.getAuthToken())
 		);
 		ImageButton backButton = (ImageButton) findViewById(R.id.back);

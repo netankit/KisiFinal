@@ -137,23 +137,19 @@ public class PlaceFragment extends Fragment {
 					// setup api call to open door
 					KisiApi api = new KisiApi(getActivity());
 
-					// Add gps coordinates to access request if user has only
-					// guest key
-					if (place.getOwnerId() != KisiApi.getUserId()) {
-						updateLocation();
-
-						try {
-							if ( currentLocation != null ) {
-								JSONObject location = new JSONObject();
-								location.put("latitude", currentLocation.getLatitude());
-								location.put("longitude", currentLocation.getLongitude());
-								api.addParameter("location", location);
-							}
-						} catch (JSONException e) {
-							e.printStackTrace();
+					try {
+						if (currentLocation != null) {
+							JSONObject location = new JSONObject();
+							location.put("latitude",
+									currentLocation.getLatitude());
+							location.put("longitude",
+									currentLocation.getLongitude());
+							api.addParameter("location", location);
 						}
+					} catch (JSONException e) {
+						e.printStackTrace();
 					}
-
+				
 					api.setCallback(new RestCallback() {
 						public void success(Object obj) {
 							// change button design
