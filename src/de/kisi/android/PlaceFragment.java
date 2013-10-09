@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 public class PlaceFragment extends Fragment {
 
@@ -107,6 +108,23 @@ public class PlaceFragment extends Fragment {
 		ScrollView sv =  (ScrollView) layout.getChildAt(0);
 		LinearLayout ly = (LinearLayout) sv.getChildAt(0);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
+		
+		 //show a text if there is no lock in a place
+		if(place.getLocks().size() == 0) {
+			final TextView text = new TextView(getActivity());
+			text.setText(R.string.no_lock);
+			text.setTypeface(font);
+			text.setGravity(Gravity.CENTER);
+			text.setWidth(width);
+			text.setHeight(height);
+			text.setTextColor(Color.WHITE);
+			text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+			text.setVisibility(View.VISIBLE);
+			layoutParams.setMargins(margin, margin*2, margin, margin);
+			ly.addView(text, layoutParams);
+			return;
+		}    
+		
 		
 		int i = 0;
 		for (final Lock lock : place.getLocks()) {

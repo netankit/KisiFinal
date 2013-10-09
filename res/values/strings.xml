@@ -40,6 +40,7 @@
     <string name="blinkup_error">Blinkup Errorcode:</string>
     <string name="blinkup_setting_up">Fetching agent URL</string>
     <string name="blinkup_success">Gateway is online now!</string>
+    <string name="no_lock">No locks for this place</string>
 
 
 </resources>
