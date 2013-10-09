@@ -1,20 +1,20 @@
 package com.electricimp.blinkup;
 
 import java.lang.ref.WeakReference;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.TextView;
 
 public class BlinkupController {
@@ -137,10 +137,13 @@ public class BlinkupController {
      *
      * @param activity Originating activity
      * @param apiKey Your api key
+     * @param errorHandler Error handler
      */
-    public void selectWifiAndSetupDevice(Activity activity, String apiKey) {
+    public void selectWifiAndSetupDevice(
+            Activity activity, String apiKey, ServerErrorHandler errorHandler) {
         if (impController.setupToken == null) {
-            Handler handler = new LaunchWifiSelectHandler(activity);
+            Handler handler = new LaunchWifiSelectHandler(
+                    activity, errorHandler);
             impController.acquireSetupToken(apiKey, handler);
         } else {
             selectWifiAndSetupDevice(activity);
@@ -154,12 +157,14 @@ public class BlinkupController {
      * @param ssid SSID for flashing
      * @param password Password for flashing
      * @param apiKey Your api key
+     * @param errorHandler Error handler
      */
     public void setupDevice(
-            Activity activity, String ssid, String password, String apiKey) {
+            Activity activity, String ssid, String password, String apiKey,
+            ServerErrorHandler errorHandler) {
         if (impController.setupToken == null) {
             Handler handler = new LaunchWifiFlashHandler(
-                    activity, ssid, password);
+                    activity, ssid, password, errorHandler);
             impController.acquireSetupToken(apiKey, handler);
         } else {
             setupDeviceInternal(activity, ssid, password);
@@ -196,6 +201,38 @@ public class BlinkupController {
     }
 
     /**
+     * Get the SSID of the connected wifi network
+     *
+     * @param context Originating context
+     * @return Current wifi SSID, or null if not connected
+     */
+    public static String getCurrentWifiSSID(Context context) {
+        ConnectivityManager connManager = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getNetworkInfo(
+                ConnectivityManager.TYPE_WIFI);
+        if (!networkInfo.isConnected()) {
+            return null;
+        }
+
+        try {
+            WifiManager wifiManager = (WifiManager) context.getSystemService(
+                    Context.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            if (wifiInfo != null) {
+                if (wifiInfo.getSSID() != null) {
+                    return wifiInfo.getSSID().replaceAll("\"", "");
+                }
+            }
+        } catch (Exception e) {
+            Log.v(BlinkupController.TAG, "Error getting the current network");
+            Log.v(BlinkupController.TAG, Log.getStackTraceString(e));
+        }
+
+        return null;
+    }
+
+    /**
      * Call this from {@link Activity#onActivityResult(int, int, Intent) onActivityResult}
      * of your activity if you have specified a custom complete activity via
      * {@link #intentBlinkupComplete intentBlinkupComplete} or
@@ -228,7 +265,7 @@ public class BlinkupController {
     }
 
     /**
-     * Fetch the agent url and verified date after BlinkUp.
+     * Fetch the agent url, impee ID and verified date after BlinkUp.
      *
      * @param callback Callback to handle success, error and timeout.
      */
@@ -237,12 +274,42 @@ public class BlinkupController {
     }
 
     /**
-     * Interface to fetch the agent url and verified date after BlinkUp.
+     * Fetch the agent url, impee ID and verified date after BlinkUp.
+     *
+     * @param callback Callback to handle success, error and timeout.
+     * @param timeoutMs timeout in milliseconds.
+     */
+    public void getTokenStatus(TokenStatusCallback callback, long timeoutMs) {
+        impController.getTokenStatus(
+                new TokenStatusHandler(callback), timeoutMs);
+    }
+
+    /**
+     * Stop the current token status fetching.
+     * This will stop the SDK from polling and prevent any more
+     * TokenStatusCallbacks from being sent. Typically done after the end user
+     * has blinked up and is waiting for token status and the end user hits some
+     * kind of cancel or back button.
+     */
+    public void cancelTokenStatusPolling() {
+        impController.cancelTokenStatusPolling();
+    }
+
+    /**
+     * Interface to fetch the agent url, impee ID and verified date after
+     * BlinkUp.
      */
     public interface TokenStatusCallback {
-        public void onSuccess(Date verifiedDate, String agentUrl);
+        public void onSuccess(JSONObject json);
         public void onError(String errorMsg);
         public void onTimeout();
+    }
+
+    /**
+     * Interface to handle api key errors.
+     */
+    public interface ServerErrorHandler {
+        public void onError(String errorMsg);
     }
 
     ///// Package private
@@ -306,9 +373,13 @@ public class BlinkupController {
 
     private static class LaunchWifiSelectHandler extends Handler {
         private WeakReference<Activity> activity;
+        private WeakReference<ServerErrorHandler> errorHandler;
 
-        public LaunchWifiSelectHandler(Activity activity) {
+        public LaunchWifiSelectHandler(
+                Activity activity, ServerErrorHandler errorHandler) {
             this.activity = new WeakReference<Activity>(activity);
+            this.errorHandler
+                = new WeakReference<ServerErrorHandler>(errorHandler);
         }
 
         @Override
@@ -316,20 +387,31 @@ public class BlinkupController {
             if (activity.get() == null) {
                 return;
             }
-            BlinkupController blinkup = getInstance();
-            blinkup.selectWifiAndSetupDevice(activity.get());
+            if (msg.arg1 == BlinkupConstants.RESPONSE_SUCCESS) {
+                BlinkupController blinkup = getInstance();
+                blinkup.selectWifiAndSetupDevice(activity.get());
+            } else {
+                if (errorHandler.get() != null) {
+                    errorHandler.get().onError((String) msg.obj);
+                }
+            }
         }
     }
 
     private static class LaunchWifiFlashHandler extends Handler {
         private WeakReference<Activity> activity;
+        private WeakReference<ServerErrorHandler> errorHandler;
+
         private String ssid = null;
         private String password = null;
         private String wpsPin = null;
 
         public LaunchWifiFlashHandler(
-                Activity activity, String ssid, String password) {
+                Activity activity, String ssid, String password,
+                ServerErrorHandler errorHandler) {
             this.activity = new WeakReference<Activity>(activity);
+            this.errorHandler
+                = new WeakReference<ServerErrorHandler>(errorHandler);
             this.ssid = ssid;
             this.password = password;
         }
@@ -344,23 +426,26 @@ public class BlinkupController {
             if (activity.get() == null) {
                 return;
             }
-            BlinkupController blinkup = getInstance();
-            if (wpsPin != null) {
-                blinkup.setupDeviceInternal(activity.get(), wpsPin);
+            if (msg.arg1 == BlinkupConstants.RESPONSE_SUCCESS) {
+                BlinkupController blinkup = getInstance();
+                if (wpsPin != null) {
+                    blinkup.setupDeviceInternal(activity.get(), wpsPin);
+                } else {
+                    blinkup.setupDeviceInternal(activity.get(), ssid, password);
+                }
             } else {
-                blinkup.setupDeviceInternal(activity.get(), ssid, password);
+                if (errorHandler.get() != null) {
+                    errorHandler.get().onError((String) msg.obj);
+                }
             }
         }
     }
 
     private static class TokenStatusHandler extends Handler {
-        private TokenStatusCallback callback;
-        private SimpleDateFormat dateFormat;
+        private final TokenStatusCallback callback;
 
         public TokenStatusHandler(TokenStatusCallback callback) {
             this.callback = callback;
-            dateFormat = new SimpleDateFormat(
-                    "yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
         }
 
         @Override
@@ -370,7 +455,8 @@ public class BlinkupController {
             }
             switch (msg.arg1) {
             case BlinkupConstants.RESPONSE_SUCCESS:
-                handleSuccess((JSONObject) msg.obj);
+                JSONObject json = (JSONObject) msg.obj;
+                callback.onSuccess(json);
                 break;
             case BlinkupConstants.RESPONSE_ERROR:
                 callback.onError((String) msg.obj);
@@ -378,22 +464,6 @@ public class BlinkupController {
             case BlinkupConstants.RESPONSE_TIMEOUT:
                 callback.onTimeout();
                 break;
-            }
-        }
-
-        private void handleSuccess(JSONObject json) {
-            try {
-                String dateStr = json.getString("claimed_at");
-                dateStr = dateStr.replace("Z", "+0:00");
-                Date claimedAt = dateFormat.parse(dateStr);
-
-                String agentUrl = json.getString("agent_url");
-
-                callback.onSuccess(claimedAt, agentUrl);
-            } catch (JSONException e) {
-                callback.onError(e.getMessage());
-            } catch (ParseException e) {
-                callback.onError(e.getMessage());
             }
         }
     }

@@ -37,6 +37,7 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.electricimp.blinkup.BlinkupController;
+import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 
 
 public class KisiMain extends FragmentActivity implements
@@ -125,7 +126,8 @@ public class KisiMain extends FragmentActivity implements
 				// The API returned some locations twice, so let's check if we
 				// already have it or not also check if the place has a locks 
 				// otherwise just don't show it
-				if ((places.indexOfKey(location.getId()) < 0) && (!locations_json.getJSONObject(i).isNull("locks") )) {
+				//if ((places.indexOfKey(location.getId()) < 0) && (!locations_json.getJSONObject(i).isNull("locks") )) {
+				if (places.indexOfKey(location.getId()) < 0){	
 					places.put(location.getId(), location);
 					fragments.add(PlaceFragment.newInstance(j++));
 				}
@@ -141,6 +143,16 @@ public class KisiMain extends FragmentActivity implements
 		pager.setAdapter(pagerAdapter);
 	}
 
+	
+	//error handler for BlinkUp 
+    private ServerErrorHandler errorHandler = new ServerErrorHandler() {
+        @Override
+        public void onError(String errorMsg) {
+            Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
+        }
+    };   
+	
+	
 	@Override
 	public boolean onMenuItemClick(MenuItem item) {
 		// set up
@@ -186,7 +198,7 @@ public class KisiMain extends FragmentActivity implements
 			}
 			blinkup.intentBlinkupComplete = new Intent(this,
 					BlinkupCompleteActivity.class);
-			blinkup.selectWifiAndSetupDevice(this, API_KEY);
+			blinkup.selectWifiAndSetupDevice(this, API_KEY, errorHandler);
 			return true;
 		} else if (id == R.id.logout) {
 			logout();

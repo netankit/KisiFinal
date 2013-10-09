@@ -40,8 +40,15 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
     }
 
 	@Override
-	public void onSuccess(Date verifiedDate, String agentUrl) {
-	 	KisiApi api = new KisiApi(this);
+	public void onSuccess(JSONObject json) { 
+		String agentUrl = null;
+		try {
+			agentUrl = json.getString("agent_url");
+		} catch (JSONException e2) {
+			e2.printStackTrace();
+		} 
+		
+		KisiApi api = new KisiApi(this);
     	api.setLoadingMessage("Gateway created");
     	updateLocation();
     	JSONObject location = new JSONObject();
@@ -102,7 +109,7 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 			}
 			// TODO What happens if nothing of both is enabled?
 			Log.d("updateLocation", "Could not get location");
-		}                             
+		}
 
 
 

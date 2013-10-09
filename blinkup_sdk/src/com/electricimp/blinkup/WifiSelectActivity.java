@@ -7,12 +7,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -103,20 +100,7 @@ public class WifiSelectActivity extends Activity {
 
     @Override
     public void onResume() {
-        String currentSSID = null;
-        try {
-            WifiManager wifiManager = (WifiManager) getSystemService(
-                    Context.WIFI_SERVICE);
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-            if (wifiInfo != null) {
-                if (wifiInfo.getSSID() != null) {
-                    currentSSID = wifiInfo.getSSID().replaceAll("\"", "");
-                }
-            }
-        } catch (Exception e) {
-            Log.v(BlinkupController.TAG, "Error getting the current network");
-            Log.v(BlinkupController.TAG, Log.getStackTraceString(e));
-        }
+        String currentSSID = BlinkupController.getCurrentWifiSSID(this);
 
         savedNetworks.clear();
         SharedPreferences pref = getSharedPreferences(

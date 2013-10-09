@@ -4,15 +4,16 @@ import java.lang.ref.WeakReference;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.format.DateUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.TextView;
 
 public class BlinkupGLActivity extends Activity {
@@ -31,7 +32,9 @@ public class BlinkupGLActivity extends Activity {
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                             WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().setBackgroundDrawableResource(android.R.color.black);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 
         setContentView(R.layout.__bu_blinkup);
@@ -56,8 +59,14 @@ public class BlinkupGLActivity extends Activity {
 
         // Insert BlinkupSurfaceView behind the countdown panel
         FrameLayout container = (FrameLayout) findViewById(R.id.__bu_container);
-        mGLView = new BlinkupSurfaceView(this, packet);
-        container.addView(mGLView, 0);
+        float maxSize = (float) getResources().getDimensionPixelSize(
+                R.dimen.__bu_blinkup_max_size);
+        mGLView = new BlinkupSurfaceView(this, packet, maxSize);
+        @SuppressWarnings("deprecation")
+        LayoutParams layoutParams = new LayoutParams(
+                LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT,
+                Gravity.CENTER);
+        container.addView(mGLView, 0, layoutParams);
 
         // Start counting down
         mHandler = new BlinkupHandler(this);
@@ -122,19 +131,5 @@ public class BlinkupGLActivity extends Activity {
                 break;
             }
         }
-    }
-}
-
-class BlinkupSurfaceView extends GLSurfaceView {
-    private BlinkupRenderer mRenderer;
-
-    public BlinkupSurfaceView(Activity activity, BlinkupPacket packet) {
-        super(activity);
-        mRenderer = new BlinkupRenderer(activity, packet);
-        setRenderer(mRenderer);
-    }
-
-    public void startTransmitting() {
-        mRenderer.startTransmitting();
     }
 }

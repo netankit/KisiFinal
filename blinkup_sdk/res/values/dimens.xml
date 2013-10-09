@@ -2,4 +2,5 @@
 <resources>
     <dimen name="__bu_lbl_width">128dp</dimen>
     <dimen name="__bu_padding">8dp</dimen>
+    <dimen name="__bu_blinkup_max_size">640dp</dimen>
 </resources>

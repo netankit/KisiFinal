@@ -3,3 +3,4 @@ gen/
 
 /gen/com/example/kisibox/R.java
 .DS_Store
+lint.xml
