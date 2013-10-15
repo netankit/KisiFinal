@@ -20,6 +20,7 @@ import android.widget.TextView;
 public class WifiActivity extends PreBlinkUpActivity {
     private String token;
     private String siteids;
+    private String apiKey;
 
     private String oldSSID;
 
@@ -74,6 +75,7 @@ public class WifiActivity extends PreBlinkUpActivity {
         Bundle bundle = getIntent().getExtras();
         token = bundle.getString("token");
         siteids = bundle.getString("siteid");
+        apiKey = bundle.getString("apiKey");
 
         String ssid = bundle.getString("ssid");
         oldSSID = ssid;
@@ -139,6 +141,7 @@ public class WifiActivity extends PreBlinkUpActivity {
         intent.putExtra("pwd", pwd);
         intent.putExtra("token", token);
         intent.putExtra("siteid", siteids);
+        intent.putExtra("apiKey", apiKey);
 
         return intent;
     }

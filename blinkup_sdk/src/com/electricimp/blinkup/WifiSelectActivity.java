@@ -23,6 +23,7 @@ import android.widget.TextView;
 public class WifiSelectActivity extends Activity {
     private String setupToken;
     private String planID;
+    private String apiKey;
 
     private BlinkupController blinkup;
 
@@ -48,6 +49,7 @@ public class WifiSelectActivity extends Activity {
 
         setupToken = bundle.getString("setupToken");
         planID = bundle.getString("planID");
+        apiKey = bundle.getString("apiKey");
         preferenceFile = bundle.getString("preferenceFile");
 
         BlinkupController blinkup = BlinkupController.getInstance();
@@ -176,6 +178,7 @@ public class WifiSelectActivity extends Activity {
             intent.putExtra("ssid", ssid);
         }
         intent.putExtra("siteid", planID);
+        intent.putExtra("apiKey", apiKey);
 
         intent.putStringArrayListExtra("savedNetworks", savedNetworks);
         intent.putExtra("preferenceFile", preferenceFile);
@@ -187,6 +190,7 @@ public class WifiSelectActivity extends Activity {
         Intent myIntent = new Intent();
         myIntent.putExtra("token", setupToken);
         myIntent.putExtra("siteid", planID);
+        myIntent.putExtra("apiKey", apiKey);
 
         myIntent.setClass(this, WPSActivity.class);
         startActivityForResult(myIntent, BlinkupController.WPS_REQUEST_CODE);

@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class BlinkupController {
     /**
@@ -87,31 +88,6 @@ public class BlinkupController {
     }
 
     /**
-     * Check if there is a recent blinkup for resending.
-     *
-     * @return true if there is a recent flash
-     */
-    public boolean canResendLastBlinkUp() {
-        return (lastPacket != null);
-    }
-
-    /**
-     * Resend the most recent blinkup. Does nothing if no recent flash.
-     *
-     * @param context Context to launch blinkup
-     */
-    public void resendLastBlinkUp(Context context) {
-        if (!canResendLastBlinkUp()) {
-            return;
-        }
-        Intent intent = new Intent();
-        intent.putExtra("bitStream", lastPacket.toString());
-        intent.putExtra(BlinkupPacket.FIELD_MODE, lastMode);
-        intent.setClass(context, BlinkupGLActivity.class);
-        context.startActivity(intent);
-    }
-
-    /**
      * Clear cached and persistent data (saved passwords, most recent blinkup,
      * etc)
      *
@@ -124,7 +100,6 @@ public class BlinkupController {
         editor.clear();
         editor.commit();
 
-        lastPacket = null;
         lastMode = null;
 
         impController.setupToken = null;
@@ -141,12 +116,12 @@ public class BlinkupController {
      */
     public void selectWifiAndSetupDevice(
             Activity activity, String apiKey, ServerErrorHandler errorHandler) {
-        if (impController.setupToken == null) {
+        if (impController.planID == null) {
             Handler handler = new LaunchWifiSelectHandler(
-                    activity, errorHandler);
-            impController.acquireSetupToken(apiKey, handler);
+                    activity, apiKey, errorHandler);
+            impController.acquirePlanId(apiKey, handler);
         } else {
-            selectWifiAndSetupDevice(activity);
+            selectWifiAndSetupDevice(activity, apiKey);
         }
     }
 
@@ -162,12 +137,12 @@ public class BlinkupController {
     public void setupDevice(
             Activity activity, String ssid, String password, String apiKey,
             ServerErrorHandler errorHandler) {
-        if (impController.setupToken == null) {
+        if (impController.planID == null) {
             Handler handler = new LaunchWifiFlashHandler(
-                    activity, ssid, password, errorHandler);
-            impController.acquireSetupToken(apiKey, handler);
+                    activity, ssid, password, apiKey, errorHandler);
+            impController.acquirePlanId(apiKey, handler);
         } else {
-            setupDeviceInternal(activity, ssid, password);
+            setupDeviceSsid(activity, ssid, password, apiKey);
         }
     }
 
@@ -177,15 +152,18 @@ public class BlinkupController {
      * @param activity Originating activity
      * @param wpsPin WPS pin for flashing
      * @param apiKey Your api key
+     * @param errorHandler Error handler
      */
     public void setupDevice(
-            Activity activity, String wpsPin, String apiKey) {
-        if (impController.setupToken == null) {
-            Handler handler = new LaunchWifiFlashHandler(activity, wpsPin);
-            impController.acquireSetupToken(apiKey, handler);
-        } else {
-            setupDeviceInternal(activity, wpsPin);
-        }
+            Activity activity, String wpsPin, String apiKey,
+            ServerErrorHandler errorHandler) {
+         if (impController.planID == null) {
+             Handler handler = new LaunchWifiFlashHandler(
+                     activity, wpsPin, apiKey, errorHandler);
+             impController.acquireSetupToken(apiKey, handler);
+         } else {
+             setupDeviceWpsPin(activity, wpsPin, apiKey);
+         }
     }
 
     /**
@@ -327,12 +305,22 @@ public class BlinkupController {
             Activity activity, String setupToken, String planID) {
         impController.setupToken = setupToken;
         impController.planID = planID;
-        selectWifiAndSetupDevice(activity);
+        selectWifiAndSetupDevice(activity, null);
     }
 
-    void savePacketForResend(BlinkupPacket packet, String mode) {
-        lastPacket = packet;
+    void saveLastMode(String mode) {
         lastMode = mode;
+    }
+
+    void acquireSetupToken(Activity activity, String apiKey,
+            SetupTokenHandler setupTokenHandler) {
+        Handler handler = new AcquireSetupTokenHandler(
+                activity, setupTokenHandler);
+        impController.acquireSetupToken(apiKey, handler);
+    }
+
+    interface SetupTokenHandler {
+        public void onSuccess(String setupToken);
     }
 
     static void setText(TextView view, String str, int defaultResId) {
@@ -358,7 +346,6 @@ public class BlinkupController {
     ///// Private
     private ImpController impController;
 
-    private BlinkupPacket lastPacket = null;
     private String lastMode = null;
 
     private static final String DEFAULT_BASE_URL
@@ -372,14 +359,18 @@ public class BlinkupController {
     }
 
     private static class LaunchWifiSelectHandler extends Handler {
-        private WeakReference<Activity> activity;
-        private WeakReference<ServerErrorHandler> errorHandler;
+        private final WeakReference<Activity> activity;
+        private final WeakReference<ServerErrorHandler> errorHandler;
+        private final String apiKey;
 
         public LaunchWifiSelectHandler(
-                Activity activity, ServerErrorHandler errorHandler) {
+                Activity activity,
+                String apiKey,
+                ServerErrorHandler errorHandler) {
             this.activity = new WeakReference<Activity>(activity);
             this.errorHandler
                 = new WeakReference<ServerErrorHandler>(errorHandler);
+            this.apiKey = apiKey;
         }
 
         @Override
@@ -389,7 +380,7 @@ public class BlinkupController {
             }
             if (msg.arg1 == BlinkupConstants.RESPONSE_SUCCESS) {
                 BlinkupController blinkup = getInstance();
-                blinkup.selectWifiAndSetupDevice(activity.get());
+                blinkup.selectWifiAndSetupDevice(activity.get(), apiKey);
             } else {
                 if (errorHandler.get() != null) {
                     errorHandler.get().onError((String) msg.obj);
@@ -399,26 +390,34 @@ public class BlinkupController {
     }
 
     private static class LaunchWifiFlashHandler extends Handler {
-        private WeakReference<Activity> activity;
-        private WeakReference<ServerErrorHandler> errorHandler;
+        private final WeakReference<Activity> activity;
+        private final WeakReference<ServerErrorHandler> errorHandler;
 
         private String ssid = null;
         private String password = null;
         private String wpsPin = null;
 
+        private final String apiKey;
+
         public LaunchWifiFlashHandler(
-                Activity activity, String ssid, String password,
+                Activity activity, String ssid, String password, String apiKey,
                 ServerErrorHandler errorHandler) {
             this.activity = new WeakReference<Activity>(activity);
             this.errorHandler
                 = new WeakReference<ServerErrorHandler>(errorHandler);
             this.ssid = ssid;
             this.password = password;
+            this.apiKey = apiKey;
         }
 
-        public LaunchWifiFlashHandler(Activity activity, String wpsPin) {
+        public LaunchWifiFlashHandler(
+                Activity activity, String wpsPin, String apiKey,
+                ServerErrorHandler errorHandler) {
             this.activity = new WeakReference<Activity>(activity);
+            this.errorHandler
+                = new WeakReference<ServerErrorHandler>(errorHandler);
             this.wpsPin = wpsPin;
+            this.apiKey = apiKey;
         }
 
         @Override
@@ -429,9 +428,10 @@ public class BlinkupController {
             if (msg.arg1 == BlinkupConstants.RESPONSE_SUCCESS) {
                 BlinkupController blinkup = getInstance();
                 if (wpsPin != null) {
-                    blinkup.setupDeviceInternal(activity.get(), wpsPin);
+                    blinkup.setupDeviceWpsPin(activity.get(), wpsPin, apiKey);
                 } else {
-                    blinkup.setupDeviceInternal(activity.get(), ssid, password);
+                    blinkup.setupDeviceSsid(
+                            activity.get(), ssid, password, apiKey);
                 }
             } else {
                 if (errorHandler.get() != null) {
@@ -468,8 +468,39 @@ public class BlinkupController {
         }
     }
 
-    private void setupDeviceInternal(
-            Activity activity, String ssid, String password) {
+    private static class AcquireSetupTokenHandler extends Handler {
+        private WeakReference<Activity> activity;
+        private WeakReference<SetupTokenHandler> setupTokenHandler;
+
+        public AcquireSetupTokenHandler(
+                Activity activity,
+                SetupTokenHandler setupTokenHandler) {
+            this.activity = new WeakReference<Activity>(activity);
+            this.setupTokenHandler
+                = new WeakReference<SetupTokenHandler>(setupTokenHandler);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            if (activity.get() == null) {
+                return;
+            }
+            if (msg.arg1 == BlinkupConstants.RESPONSE_SUCCESS) {
+                if (setupTokenHandler.get() != null) {
+                    setupTokenHandler.get().onSuccess((String) msg.obj);
+                }
+            } else {
+                String errorMsg = (String) msg.obj;
+                Toast.makeText(
+                        activity.get(), errorMsg, Toast.LENGTH_LONG).show();
+                Log.e(BlinkupController.TAG,
+                        "Error getting setup token: " + errorMsg);
+            }
+        }
+    }
+
+    private void setupDeviceSsid(
+            Activity activity, String ssid, String password, String apiKey) {
         if (ssid == null || ssid.length() == 0) {
             return;
         }
@@ -480,28 +511,35 @@ public class BlinkupController {
         intent.putExtra("pwd", password);
         intent.putExtra("token", impController.setupToken);
         intent.putExtra("siteid", impController.planID);
+        intent.putExtra("apiKey", apiKey);
         addBlinkupIntentFields(activity, intent);
 
         activity.startActivityForResult(intent, DIRECT_BLINKUP_REQUEST_CODE);
     }
 
-    private void setupDeviceInternal(Activity activity, String wpsPin) {
+    private void setupDeviceWpsPin(
+            Activity activity, String wpsPin, String apiKey) {
         Intent intent = new Intent();
         intent.putExtra("mode", "wps");
         intent.putExtra("pin", wpsPin);
         intent.putExtra("token", impController.setupToken);
         intent.putExtra("siteid", impController.planID);
+        intent.putExtra("apiKey", apiKey);
         addBlinkupIntentFields(activity, intent);
         activity.startActivityForResult(intent, DIRECT_BLINKUP_REQUEST_CODE);
     }
 
-    private void selectWifiAndSetupDevice(Activity activity) {
+    private void selectWifiAndSetupDevice(Activity activity, String apiKey) {
         Intent intent = new Intent();
         intent.setClass(activity, WifiSelectActivity.class);
 
         intent.putExtra("setupToken", impController.setupToken);
         intent.putExtra("planID", impController.planID);
         intent.putExtra("preferenceFile", preferenceFile);
+
+        if (apiKey != null) {
+            intent.putExtra("apiKey", apiKey);
+        }
 
         activity.startActivityForResult(intent, NETWORK_LIST_REQUEST_CODE);
     }

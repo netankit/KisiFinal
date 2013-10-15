@@ -8,6 +8,7 @@ import android.widget.EditText;
 public class WPSActivity extends PreBlinkUpActivity {
     private String token;
     private String siteids;
+    private String apiKey;
 
     private EditText wpsPinView;
 
@@ -24,6 +25,7 @@ public class WPSActivity extends PreBlinkUpActivity {
         Bundle bundle = getIntent().getExtras();
         token = bundle.getString("token");
         siteids = bundle.getString("siteid");
+        apiKey = bundle.getString("apiKey");
     }
 
     @Override
@@ -50,6 +52,7 @@ public class WPSActivity extends PreBlinkUpActivity {
         intent.putExtra("pin", pin);
         intent.putExtra("token", token);
         intent.putExtra("siteid", siteids);
+        intent.putExtra("apiKey", apiKey);
 
         return intent;
     }
