@@ -11,7 +11,6 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,7 +26,7 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 	private ProgressBar progressBar;
     private TextView status;
     
-    private long delay = 2000;
+    private final static long delay = 2000;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {

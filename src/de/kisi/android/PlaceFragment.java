@@ -153,6 +153,7 @@ public class PlaceFragment extends Fragment {
 				@Override
 				public void onClick(View v) {
 					
+					updateLocation();
 					// unlock button was pressed
 					// setup api call to open door
 					KisiApi api = new KisiApi(getActivity());
@@ -174,10 +175,10 @@ public class PlaceFragment extends Fragment {
 						public void success(Object obj) {
 							JSONObject json = (JSONObject) obj;
 							String message = null;
-							if(json.has("success")) {
+							if(json.has("notice")) {
 								// change button design
 								try {
-									message = json.getString("success");
+									message = json.getString("notice");
 								} catch (JSONException e) {
 									e.printStackTrace();
 								}	
