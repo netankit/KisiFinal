@@ -1,7 +1,5 @@
 package de.kisi.android;
 
-import java.util.Date;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.electricimp.blinkup.BlinkupController;
 import com.electricimp.blinkup.BlinkupController.TokenStatusCallback;
@@ -36,14 +33,23 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         status = (TextView) findViewById(R.id.status);
         blinkup = BlinkupController.getInstance();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         blinkup.getTokenStatus(this);
     }
 
 	@Override
 	public void onSuccess(JSONObject json) { 
 		String agentUrl = null;
+		String impeeId = null;
+		String planId = null;
 		try {
 			agentUrl = json.getString("agent_url");
+			impeeId = json.getString("impeeId");
+			planId = json.getString("planId");
 		} catch (JSONException e2) {
 			e2.printStackTrace();
 		} 
@@ -65,6 +71,8 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 			gateway.put("plattform_name", "Android");
 			gateway.put("plattform_version", Build.VERSION.RELEASE);
 			gateway.put("blinked", true);
+			gateway.put("ei_impee_id", impeeId);
+			gateway.put("ei_plan_id", planId);
 			gateway.put("location", location);
 		} catch (JSONException e) {
 			e.printStackTrace();

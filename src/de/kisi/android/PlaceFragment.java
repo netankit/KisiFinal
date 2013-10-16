@@ -109,7 +109,7 @@ public class PlaceFragment extends Fragment {
 		LinearLayout ly = (LinearLayout) sv.getChildAt(0);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 		
-		 //show a text if there is no lock in a place
+		 //show a text if there is no lock for a place
 		if(place.getLocks().size() == 0) {
 			final TextView text = new TextView(getActivity());
 			text.setText(R.string.no_lock);
@@ -170,8 +170,11 @@ public class PlaceFragment extends Fragment {
 				
 					api.setCallback(new RestCallback() {
 						public void success(Object obj) {
-							// change button design
-							changeButtonStyleToUnlocked(button, lock);
+							JSONObject json = (JSONObject) obj;
+							if(json.has("success")) {
+								// change button design
+								changeButtonStyleToUnlocked(button, lock);
+							}
 						}
 
 					});
