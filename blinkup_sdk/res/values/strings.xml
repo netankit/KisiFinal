@@ -37,4 +37,10 @@
     <string name="__bu_logo_desc">Electric Imp Logo</string>
     <string name="__bu_interstitial_image">Interstitial Image</string>
     <string name="__bu_next">Next</string>
+    <string name="__bu_low_frame_rate_title">Low frame rate</string>
+    <string name="__bu_low_frame_rate_desc">
+        Make sure power saving is off.
+    </string>
+    <string name="__bu_low_frame_rate_go_to_settings">Go to settings</string>
+    <string name="__bu_low_frame_rate_proceed_anyway">Proceed anyway</string>
 </resources>

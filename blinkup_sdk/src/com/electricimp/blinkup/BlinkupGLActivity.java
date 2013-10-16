@@ -3,7 +3,10 @@ package com.electricimp.blinkup;
 import java.lang.ref.WeakReference;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -20,6 +23,8 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.TextView;
 
 public class BlinkupGLActivity extends Activity {
+    private static final int DIALOG_LOW_FRAME_RATE = 0;
+
     private BlinkupSurfaceView mGLView;
 
     private View mCountdownPanel;
@@ -88,10 +93,16 @@ public class BlinkupGLActivity extends Activity {
             finish();
         }
 
-        // Start counting down
         mHandler = new BlinkupHandler(this, packet);
-        mHandler.sendEmptyMessageDelayed(BlinkupHandler.UPDATE_COUNTDOWN,
+        if (blinkup.shouldCheckFrameRate(this)) {
+            mHandler.sendEmptyMessageDelayed(
+                BlinkupHandler.MEASURE_FRAME_RATE,
                 DateUtils.SECOND_IN_MILLIS);
+        } else {
+            mHandler.sendEmptyMessageDelayed(
+                    BlinkupHandler.UPDATE_COUNTDOWN,
+                    DateUtils.SECOND_IN_MILLIS);
+        }
     }
 
     @Override
@@ -129,15 +140,48 @@ public class BlinkupGLActivity extends Activity {
         }
     }
 
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        if (id != DIALOG_LOW_FRAME_RATE) {
+            return null;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.__bu_low_frame_rate_title);
+        builder.setMessage(R.string.__bu_low_frame_rate_desc);
+        builder.setCancelable(false);
+        builder.setPositiveButton(R.string.__bu_low_frame_rate_go_to_settings,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                goToSettings();
+                finish();
+            }
+        });
+        builder.setNegativeButton(R.string.__bu_low_frame_rate_proceed_anyway,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                updateCountdown();
+                dialog.cancel();
+            }
+        });
+        return builder.create();
+    }
+
+    private void goToSettings() {
+        Intent intent = new Intent(android.provider.Settings.ACTION_SETTINGS);
+        startActivity(intent);
+    }
+
     private static class BlinkupHandler extends Handler {
         public static final int UPDATE_COUNTDOWN = 0;
         public static final int START_TRANSMITTING = 1;
+        public static final int MEASURE_FRAME_RATE = 2;
 
         private WeakReference<BlinkupGLActivity> mActivity;
         private BlinkupPacket mPacket;
 
         public BlinkupHandler(
-                BlinkupGLActivity activity, BlinkupPacket packet) {
+                BlinkupGLActivity activity,
+                BlinkupPacket packet) {
             mActivity = new WeakReference<BlinkupGLActivity>(activity);
             mPacket = packet;
         }
@@ -154,6 +198,15 @@ public class BlinkupGLActivity extends Activity {
                 break;
             case START_TRANSMITTING:
                 activity.mGLView.startTransmitting(mPacket);
+                break;
+            case MEASURE_FRAME_RATE:
+                float framerate = activity.mGLView.getFrameRate();
+                BlinkupController blinkup = BlinkupController.getInstance();
+                if (blinkup.isFrameRateTooLow(framerate)) {
+                    activity.showDialog(DIALOG_LOW_FRAME_RATE);
+                } else {
+                    sendEmptyMessage(UPDATE_COUNTDOWN);
+                }
                 break;
             }
         }

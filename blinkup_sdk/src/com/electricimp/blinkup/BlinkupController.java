@@ -15,6 +15,8 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -160,7 +162,7 @@ public class BlinkupController {
          if (impController.planID == null) {
              Handler handler = new LaunchWifiFlashHandler(
                      activity, wpsPin, apiKey, errorHandler);
-             impController.acquireSetupToken(apiKey, handler);
+             impController.acquirePlanId(apiKey, handler);
          } else {
              setupDeviceWpsPin(activity, wpsPin, apiKey);
          }
@@ -343,6 +345,27 @@ public class BlinkupController {
         }
     }
 
+    private boolean frameRateCheckEnabled = true;
+
+    boolean shouldCheckFrameRate(Context context) {
+        if (!frameRateCheckEnabled) {
+            return false;
+        }
+
+        WindowManager wm = (WindowManager) context.getSystemService(
+                Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        return (display.getRefreshRate() >= FRAME_RATE_THRESHOLD);
+    }
+
+    boolean isFrameRateTooLow(float framerate) {
+        if (framerate >= FRAME_RATE_THRESHOLD) {
+            return false;
+        }
+        frameRateCheckEnabled = false;
+        return true;
+    }
+
     ///// Private
     private ImpController impController;
 
@@ -352,6 +375,7 @@ public class BlinkupController {
         = "https://api.electricimp.com/v1";
     private static final String PREFERENCE_FILE_DEFAULT = "eimpPreferences";
     private String preferenceFile = PREFERENCE_FILE_DEFAULT;
+    private static final float FRAME_RATE_THRESHOLD = 45;
 
     private static BlinkupController instance = null;
     private BlinkupController(String baseUrl) {

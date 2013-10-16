@@ -75,6 +75,7 @@ public class KisiMain extends FragmentActivity implements
 		updatePlaces();
 
 		blinkup = BlinkupController.getInstance();
+		blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
 	}
 
 	// creating popup-menu for settings
@@ -126,6 +127,7 @@ public class KisiMain extends FragmentActivity implements
 				// The API returned some locations twice, so let's check if we
 				// already have it or not also check if the place has a locks 
 				// otherwise just don't show it
+				// this doesnt work until the backend supports it !!!!
 				//if ((places.indexOfKey(location.getId()) < 0) && (!locations_json.getJSONObject(i).isNull("locks") )) {
 				if (places.indexOfKey(location.getId()) < 0){	
 					places.put(location.getId(), location);
@@ -196,8 +198,6 @@ public class KisiMain extends FragmentActivity implements
 				editor.putBoolean("toLog", true);
 				editor.commit();
 			}
-			blinkup.intentBlinkupComplete = new Intent(this,
-					BlinkupCompleteActivity.class);
 			blinkup.selectWifiAndSetupDevice(this, API_KEY, errorHandler);
 			return true;
 		} else if (id == R.id.logout) {
