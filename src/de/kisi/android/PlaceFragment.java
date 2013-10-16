@@ -177,20 +177,11 @@ public class PlaceFragment extends Fragment {
 							if(json.has("success")) {
 								// change button design
 								try {
-									message = json.getString("notice");
+									message = json.getString("success");
 								} catch (JSONException e) {
 									e.printStackTrace();
 								}	
 								changeButtonStyleToUnlocked(button, lock, message);
-								return;
-							}
-							if(json.has("alert")) {
-								try {
-									message = json.getString("alert");
-								} catch (JSONException e) {
-									e.printStackTrace();
-								}	
-								changeButtonStyleToFailure(button, lock, message);
 								return;
 							}
 						}	

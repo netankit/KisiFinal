@@ -10,6 +10,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -25,6 +26,8 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 	
 	private ProgressBar progressBar;
     private TextView status;
+    
+    private long delay = 2000;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +51,14 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 		String planId = null;
 		try {
 			agentUrl = json.getString("agent_url");
-			impeeId = json.getString("impeeId");
-			planId = json.getString("planId");
+			impeeId = json.getString("impee_id");
+			planId = json.getString("plan_id");
 		} catch (JSONException e2) {
 			e2.printStackTrace();
 		} 
-		
+		//impeeId contains white spaces in the end, remove them
+        if (impeeId != null) 
+            impeeId = impeeId.trim();
 		KisiApi api = new KisiApi(this);
     	api.setLoadingMessage("Gateway created");
     	updateLocation();
@@ -81,18 +86,24 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
     	api.post("gateways");
 
     	status.setText(R.string.blinkup_success);
-		progressBar.setVisibility(View.GONE);   
+		progressBar.setVisibility(View.GONE);
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			public void run() {
+				finish();
+			}
+		}, delay);
 	}
 
 	@Override
 	public void onError(String errorMsg) {
-		status.setText( R.string.blinkup_error + errorMsg);
+		status.setText(getResources().getString(R.string.blinkup_error) + " " + errorMsg);
 		progressBar.setVisibility(View.GONE);
 	}
 
 	@Override
 	public void onTimeout() {
-		status.setText( R.string.blinkup_timeout);
+		status.setText(getResources().getString(R.string.blinkup_timeout) );
 		progressBar.setVisibility(View.GONE);
 	}                            
 
