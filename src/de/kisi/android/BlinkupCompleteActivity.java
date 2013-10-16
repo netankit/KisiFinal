@@ -70,7 +70,7 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 			gateway.put("uri", agentUrl);
 			gateway.put("plattform_name", "Android");
 			gateway.put("plattform_version", Build.VERSION.RELEASE);
-			gateway.put("blinked", true);
+			gateway.put("blinked_up", true);
 			gateway.put("ei_impee_id", impeeId);
 			gateway.put("ei_plan_id", planId);
 			gateway.put("location", location);
@@ -115,8 +115,7 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 				Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 				currentLocation = location;
 			}
-			// TODO What happens if nothing of both is enabled?
-			Log.d("updateLocation", "Could not get location");
+			// TODO What happens if nothing of both is enabled
 		}
 
 

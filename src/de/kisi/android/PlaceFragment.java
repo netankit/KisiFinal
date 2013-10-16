@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import com.manavo.rest.RestCache;
 import com.manavo.rest.RestCallback;
+import com.manavo.rest.RestErrorCallback;
 
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -32,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PlaceFragment extends Fragment {
 
@@ -171,13 +173,51 @@ public class PlaceFragment extends Fragment {
 					api.setCallback(new RestCallback() {
 						public void success(Object obj) {
 							JSONObject json = (JSONObject) obj;
+							String message = null;
 							if(json.has("success")) {
 								// change button design
-								changeButtonStyleToUnlocked(button, lock);
+								try {
+									message = json.getString("notice");
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}	
+								changeButtonStyleToUnlocked(button, lock, message);
+								return;
 							}
-						}
-
+							if(json.has("alert")) {
+								try {
+									message = json.getString("alert");
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}	
+								changeButtonStyleToFailure(button, lock, message);
+								return;
+							}
+						}	
 					});
+					api.setErrorCallback(new RestErrorCallback () {
+
+						@Override
+						public void error(String message) {
+							//change RestApi to avoid json parsing here?
+							JSONObject json = null;
+							try {
+								json = new JSONObject(message);
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
+							if(json.has("alert")) {
+								String alertMsg = null;
+								try {
+									alertMsg = json.getString("alert");
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
+								changeButtonStyleToFailure(button, lock, alertMsg);
+								return;
+							}
+	
+						}});
 					api.setLoadingMessage(R.string.opening);
 					api.post(String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId()));
 				}
@@ -213,7 +253,8 @@ public class PlaceFragment extends Fragment {
 
 	}
 
-	public void changeButtonStyleToUnlocked(Button button, Lock lock) {
+	public void changeButtonStyleToUnlocked(Button button, Lock lock, String message) {
+		Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
 		// save button design
 		final Drawable currentBackground = button.getBackground();
 		final Button currentButton = button;
@@ -251,5 +292,45 @@ public class PlaceFragment extends Fragment {
 		}, delay);
 
 	}
+	
+	
+	public void changeButtonStyleToFailure(Button button, Lock lock, String message) {
+		Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
+		// save button design
+		final Drawable currentBackground = button.getBackground();
+		final Button currentButton = button;
+		final String currentText = (String) button.getText();
+		final int actualPadding = currentButton.getPaddingLeft();
+		final float density = getActivity().getResources().getDisplayMetrics().density;
+		final int shift = (int) (138 * density); // 95
+
+		// change to failure design
+
+		currentButton.setBackgroundDrawable(getActivity().getResources()
+				.getDrawable(R.drawable.lockfailure));
+		currentButton.setPadding(shift, 0, 0, 0);
+		currentButton.setText("");
+
+		// disable click
+		currentButton.setClickable(false);
+
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			public void run() {
+
+				// after delay back to old design re-enable click
+				currentButton.setBackgroundDrawable(currentBackground);
+				currentButton.setCompoundDrawablesWithIntrinsicBounds(
+						R.drawable.kisi_lock, 0, 0, 0);
+				currentButton.setPadding(actualPadding, 0, 0, 0);
+				currentButton.setText(currentText);
+				currentButton.setClickable(true);
+
+			}
+		}, delay);
+
+	}
+	
+	
 
 }
