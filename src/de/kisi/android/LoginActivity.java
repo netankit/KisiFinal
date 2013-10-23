@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.manavo.rest.RestCallback;
+import com.manavo.rest.RestErrorCallback;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -142,8 +143,23 @@ public class LoginActivity extends Activity implements OnClickListener {
 				}
 			}
 		});
-		// TODO set error handler
-
+		api.setErrorCallback(new RestErrorCallback () {
+			@Override
+			public void error(String message) {
+				JSONObject json = null;
+				String errormessage = null;
+				try {
+					json = new JSONObject(message);
+					errormessage = json.getString("error");
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				Toast.makeText(activity, errormessage, Toast.LENGTH_LONG).show();
+				passwordField.setText("");
+				return;
+			}} );
+		
+		
 		if (savePassword.isChecked()) {
 			// save login credentials
 			editor = settings.edit();

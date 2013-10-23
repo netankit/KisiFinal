@@ -188,7 +188,6 @@ public class PlaceFragment extends Fragment {
 						}	
 					});
 					api.setErrorCallback(new RestErrorCallback () {
-
 						@Override
 						public void error(String message) {
 							//change RestApi to avoid json parsing here?
