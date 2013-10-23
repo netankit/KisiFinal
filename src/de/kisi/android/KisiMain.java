@@ -336,6 +336,7 @@ public class KisiMain extends FragmentActivity implements
 	public SparseArray<Place> getPlaces() {
 		if (places == null) {
 			Log.d("KisiMain", "places is null");
+			RestCache.clear(this);
 			updatePlaces();
 		}
 		return places;

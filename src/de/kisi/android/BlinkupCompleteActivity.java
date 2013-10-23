@@ -76,23 +76,16 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 			gateway.put("plattform_version", Build.VERSION.RELEASE);
 			gateway.put("blinked_up", true);
 			gateway.put("ei_impee_id", impeeId);
-			//gateway.put("ei_plan_id", planId);
+			gateway.put("device_model", Build.MANUFACTURER + " " + Build.MODEL);
+			gateway.put("ei_plan_id", planId);
 			gateway.put("location", location);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		api.addParameter("planId", planId);
     	api.addParameter("gateway", gateway);
     	api.post("gateways");
-
     	status.setText(R.string.blinkup_success);
 		progressBar.setVisibility(View.GONE);
-		Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			public void run() {
-				finish();
-			}
-		}, delay);
 	}
 
 	@Override
