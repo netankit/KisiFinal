@@ -164,32 +164,46 @@ public class KisiMain extends FragmentActivity implements
 			updatePlaces();
 			return true;
 		} else if (id == R.id.share) {
-			Place p = places.valueAt(pager.getCurrentItem());
-
-			if (p.getOwnerId() != KisiApi.getUserId()) {
-				Toast.makeText(this, R.string.share_owner_only,
-						Toast.LENGTH_LONG).show();
-				return false;
-			} else {
-				// show view with form to select locks + assignee_email
-				buildShareDialog(p);
+			// check if user has a place
+			if (places.size() == 0) {
+				Toast.makeText(this, R.string.share_empty_place_error, Toast.LENGTH_LONG).show();
 				return true;
+			} else {
+
+				Place p = places.valueAt(pager.getCurrentItem());
+
+				if (p.getOwnerId() != KisiApi.getUserId()) {
+					Toast.makeText(this, R.string.share_owner_only,
+							Toast.LENGTH_LONG).show();
+					return false;
+				} else {
+					// show view with form to select locks + assignee_email
+					buildShareDialog(p);
+					return true;
+				}
 			}
 		} else if (id == R.id.showLog) {
-			{
-				SharedPreferences settings = getSharedPreferences("Config",
-						MODE_PRIVATE);
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putBoolean("toLog", true);
-				editor.commit();
+			// check if user has a place
+			if (places.size() == 0) {
+				Toast.makeText(this, R.string.log_empty_place_error, Toast.LENGTH_LONG).show();
+				return true;
+			} else {
+				{
+					SharedPreferences settings = getSharedPreferences("Config",
+							MODE_PRIVATE);
+					SharedPreferences.Editor editor = settings.edit();
+					editor.putBoolean("toLog", true);
+					editor.commit();
+				}
+				Place place = places.valueAt(pager.getCurrentItem());
+
+				Intent logView = new Intent(getApplicationContext(),
+						LogInfo.class);
+				logView.putExtra("place_id", place.getId());
+				startActivity(logView);
+
+				return true;
 			}
-			Place place = places.valueAt(pager.getCurrentItem());
-
-			Intent logView = new Intent(getApplicationContext(), LogInfo.class);
-			logView.putExtra("place_id", place.getId());
-			startActivity(logView);
-
-			return true;
 		} else if (id == R.id.setup) {
 			{
 				SharedPreferences settings = getSharedPreferences("Config",

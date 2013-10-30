@@ -40,6 +40,8 @@
     <string name="blinkup_setting_up">Fetching agent URL</string>
     <string name="blinkup_success">Gateway is online now!</string>
     <string name="no_lock">No locks for this place</string>
+    <string name="share_empty_place_error">You can not share an empty place!</string>
+    <string name="log_empty_place_error">You can not see the log of an empty place</string>
 
 
 </resources>
