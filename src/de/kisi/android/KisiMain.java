@@ -205,13 +205,15 @@ public class KisiMain extends FragmentActivity implements
 				return true;
 			}
 		} else if (id == R.id.setup) {
+			SharedPreferences settings = getSharedPreferences("Config",
+					MODE_PRIVATE);
 			{
-				SharedPreferences settings = getSharedPreferences("Config",
-						MODE_PRIVATE);
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putBoolean("toLog", true);
 				editor.commit();
 			}
+			if(settings.contains("ei_plan_id"))
+				blinkup.setPlanID(settings.getString("ei_plan_id", null));
 			blinkup.selectWifiAndSetupDevice(this, API_KEY, errorHandler);
 			return true;
 		} else if (id == R.id.logout) {

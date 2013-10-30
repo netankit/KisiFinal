@@ -202,11 +202,11 @@ public class RestRequest {
                 for (Map.Entry<String, ?> p : map.entrySet() ) {
                     data.put(p.getKey(), p.getValue());
                 }
-
-                // don't log login data
-                if ( !map.containsKey("user") ) {
-                    Log.e("RestRequestSending", data.toString());
-                }
+                //TODO: Remove log for release 
+//				don't log login data
+//                if ( !map.containsKey("user") ) {
+//                    Log.e("RestRequestSending", data.toString());
+//                }
 
                 StringEntity se = new StringEntity(data.toString());
                 se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));

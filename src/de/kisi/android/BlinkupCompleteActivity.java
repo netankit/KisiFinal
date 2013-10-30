@@ -59,12 +59,17 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
         if (impeeId != null) 
             impeeId = impeeId.trim();
 		KisiApi api = new KisiApi(this);
-    	api.setLoadingMessage("Gateway created");
+		api.setLoadingMessage(null);
     	updateLocation();
     	JSONObject location = new JSONObject();
     	try {
-    		location.put("latitude", currentLocation.getLatitude());
-	    	location.put("longitude", currentLocation.getLongitude());
+    		if(currentLocation != null) {
+    			location.put("latitude", currentLocation.getLatitude());
+    			location.put("longitude", currentLocation.getLongitude());
+    		} else { //send 0.0 if location permission is revoked 
+    			location.put("latitude", 0.0);
+    			location.put("longitude", 0.0);
+    		}
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
@@ -121,7 +126,6 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 			}
 			// TODO What happens if nothing of both is enabled
 		}
-
 
 
 }

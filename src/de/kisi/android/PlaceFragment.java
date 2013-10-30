@@ -166,6 +166,11 @@ public class PlaceFragment extends Fragment {
 							location.put("longitude",
 									currentLocation.getLongitude());
 							api.addParameter("location", location);
+						}else { //send 0.0 if location permission is revoked
+							JSONObject location = new JSONObject();
+							location.put("latitude", 0.0);
+							location.put("longitude", 0.0);
+							api.addParameter("location", location);
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -239,6 +244,7 @@ public class PlaceFragment extends Fragment {
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, locListener);
 			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			currentLocation = location;
+			
 		}
 		// TODO What happens if nothing of both is enabled?
 

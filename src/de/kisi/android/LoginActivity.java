@@ -132,6 +132,10 @@ public class LoginActivity extends Activity implements OnClickListener {
 					editor = settings.edit();
 					editor.putString("authentication_token", data.getString("authentication_token"));
 					editor.putInt("user_id", data.getInt("id"));
+					String plan_id =  data.getString("ei_plan_id");
+					//backend returns "null"
+					if(plan_id != "null")
+						editor.putString("ei_plan_id", plan_id);
 					editor.commit();
 					Toast.makeText(activity, R.string.login_success, Toast.LENGTH_LONG).show();
 					
