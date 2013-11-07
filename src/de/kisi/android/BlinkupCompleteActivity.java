@@ -43,6 +43,7 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
         blinkup.getTokenStatus(this);
     }
 
+    //TODO: tk: Override when implementing an interface? Is this really correct?
 	@Override
 	public void onSuccess(JSONObject json) { 
 		String agentUrl = null;
@@ -93,12 +94,14 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 		progressBar.setVisibility(View.GONE);
 	}
 
+	//TODO: tk: Override when implementing an interface? Is this really correct?
 	@Override
 	public void onError(String errorMsg) {
 		status.setText(getResources().getString(R.string.blinkup_error) + " " + errorMsg);
 		progressBar.setVisibility(View.GONE);
 	}
 
+	//TODO: tk: Override when implementing an interface? Is this really correct?
 	@Override
 	public void onTimeout() {
 		status.setText(getResources().getString(R.string.blinkup_timeout) );

@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+//TODO: tk: libraries like Lombok simplify with automating getter & setter creation
+//TODO: tk: Google's gson is a more full-featured JSON handler org.json
+//e.g., it automates object creation from JSON strings
 public class Place {
 	private int id;
 	private String name;
