@@ -111,6 +111,8 @@ public class PlaceFragment extends Fragment {
 		LinearLayout ly = (LinearLayout) sv.getChildAt(0);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 		
+		ly.removeAllViews();
+		
 		 //show a text if there is no lock for a place
 		if(place.getLocks().size() == 0) {
 			final TextView text = new TextView(getActivity());

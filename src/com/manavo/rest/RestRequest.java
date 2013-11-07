@@ -203,7 +203,7 @@ public class RestRequest {
                     data.put(p.getKey(), p.getValue());
                 }
                 //TODO: Remove log for release 
-//				don't log login data
+                //don't log login data
 //                if ( !map.containsKey("user") ) {
 //                    Log.e("RestRequestSending", data.toString());
 //                }

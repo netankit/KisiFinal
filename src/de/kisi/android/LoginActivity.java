@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import com.manavo.rest.RestCallback;
 import com.manavo.rest.RestErrorCallback;
+import com.newrelic.agent.android.NewRelic;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -22,6 +23,9 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.newrelic.agent.android.NewRelic;
+
 
 public class LoginActivity extends Activity implements OnClickListener {
 
@@ -72,6 +76,10 @@ public class LoginActivity extends Activity implements OnClickListener {
 		forgotPw = (TextView) findViewById(R.id.forgot);
 		forgotPw.setText(Html.fromHtml("<a href=\"https://www.kisi.de/users/password/new\">Forgot your password?</a> "));
 		forgotPw.setMovementMethod(LinkMovementMethod.getInstance());
+		
+		NewRelic.withApplicationToken(
+				"AAe80044cf73854b68f6e83881c9e61c0df9d92e56"
+				).start(this.getApplication());
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import com.manavo.rest.RestCache;
 import com.manavo.rest.RestCallback;
+import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -38,6 +39,9 @@ import android.widget.Toast;
 
 import com.electricimp.blinkup.BlinkupController;
 import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
+
+import com.newrelic.agent.android.NewRelic;
+
 
 
 public class KisiMain extends FragmentActivity implements
@@ -70,12 +74,15 @@ public class KisiMain extends FragmentActivity implements
 				R.layout.window_title);
 
 		pager = (ViewPager) findViewById(R.id.pager);
-	
-		RestCache.clear(this);
+
 		updatePlaces();
 
 		blinkup = BlinkupController.getInstance();
 		blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
+		
+		NewRelic.withApplicationToken(
+				"AAe80044cf73854b68f6e83881c9e61c0df9d92e56"
+				).start(this.getApplication());
 	}
 
 	// creating popup-menu for settings
@@ -104,7 +111,7 @@ public class KisiMain extends FragmentActivity implements
 
 	private void updatePlaces() {
 		KisiApi api = new KisiApi(this);
-		api.setCachePolicy(RestCache.CachePolicy.CACHE_ELSE_NETWORK);
+		api.setCachePolicy(RestCache.CachePolicy.CACHE_THEN_NETWORK);
 		api.setCallback(new RestCallback() {
 			public void success(Object obj) {
 				JSONArray data = (JSONArray) obj;
@@ -298,6 +305,12 @@ public class KisiMain extends FragmentActivity implements
 						if(sendlocks.isEmpty()){
 							Toast.makeText(getApplicationContext(), R.string.share_error, Toast.LENGTH_LONG).show();
 							arg0.dismiss();
+							return;
+						}
+						if(email.isEmpty()) {
+							Toast.makeText(getApplicationContext(), R.string.share_error_empty_email, Toast.LENGTH_LONG).show();
+							arg0.dismiss();
+							return;
 						}
 
 						else if (createNewKey(currentPlace, email, sendlocks) == false) {
@@ -352,7 +365,6 @@ public class KisiMain extends FragmentActivity implements
 	public SparseArray<Place> getPlaces() {
 		if (places == null) {
 			Log.d("KisiMain", "places is null");
-			RestCache.clear(this);
 			updatePlaces();
 		}
 		return places;
