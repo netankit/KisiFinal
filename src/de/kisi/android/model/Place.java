@@ -131,7 +131,8 @@ public class Place {
 	public int getOwnerId() {
 		return owner_id;
 	}
-
+	
+	//TODO: tk: I would like to see some form of data layer that handles this 1:N relation in a clean way
 	public void setLocks(JSONArray data) {
 		locks = new ArrayList<Lock>();
 		try {

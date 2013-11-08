@@ -5,6 +5,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 
+//TODO: tk: why this boiler plate location listener?
 public class MyLocationListener implements LocationListener {
 
 	@Override

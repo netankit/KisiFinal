@@ -106,8 +106,9 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 	public void onTimeout() {
 		status.setText(getResources().getString(R.string.blinkup_timeout) );
 		progressBar.setVisibility(View.GONE);
-	}                            
-
+	} 
+	
+	//TODO: tk: copy-paste code. Please unify in separate class.
 	 private void updateLocation() {
 			LocationListener locListener = new MyLocationListener();
 			locationManager = (LocationManager) getApplicationContext().getSystemService(

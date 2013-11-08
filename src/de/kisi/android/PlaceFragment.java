@@ -52,7 +52,8 @@ public class PlaceFragment extends Fragment {
 
 		return f;
 	}
-
+	
+	//TODO: tk: the API and data management stuff needs improvement here.
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		if (container == null) {
@@ -95,6 +96,7 @@ public class PlaceFragment extends Fragment {
 		return layout;
 	}
 
+	//TODO: tk: separate button class, please.
 	public void setupButtons(final Place place) {
 		
 		Drawable lockIcon = getActivity().getResources().getDrawable(R.drawable.kisi_lock);
@@ -226,7 +228,8 @@ public class PlaceFragment extends Fragment {
 		
 	}
 	
-
+	//TODO: tk: put this is a separate class, please. Does this actually work?
+	//I would expect the lastKnownLocation to be null if it is fetched right after initialization.
 	private void updateLocation() {
 
 		LocationListener locListener = new MyLocationListener();
@@ -252,6 +255,7 @@ public class PlaceFragment extends Fragment {
 
 	}
 
+	//TODO: tk: put the next two methods in a separate button class.
 	public void changeButtonStyleToUnlocked(Button button, Lock lock, String message) {
 		Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
 		// save button design

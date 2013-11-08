@@ -8,8 +8,8 @@ import com.manavo.rest.RestApi;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
-
-
+//TODO: tk: I would like to see an API class that is a singleton and that is not re-instantiated for every call
+//TODO: tk: I NEED to see an API class that does not take strings from outside as request paths
 public class KisiApi extends RestApi {
 	
 	private static String authToken;
@@ -24,6 +24,8 @@ public class KisiApi extends RestApi {
 
 		this.BASE_URL = "https://www.kisi.de/";
 		this.urlSuffix = ".json" + ( KisiApi.authToken != null ? "?auth_token=" + KisiApi.authToken : "" );
+		//TODO: tk: why these next two lines? This is both already in the BASE_URL.
+		//Is this REST library that bad or does it need proper usage?
 		this.rest.setHost("www.kisi.de");
 		this.rest.setPort(443);
 		this.setUserAgent("AKey");

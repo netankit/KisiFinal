@@ -6,6 +6,8 @@ import android.webkit.WebViewClient;
 
 // from http://stackoverflow.com/questions/14423981/android-webview-display-only-some-part-of-website
 
+//TODO: tk: this needs to become a proper part of the app. no webviews.
+//...though this hack at the bottom is awesome.
 public class WebClient extends WebViewClient {
 
 	@Override

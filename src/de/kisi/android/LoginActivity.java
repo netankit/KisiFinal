@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 import com.newrelic.agent.android.NewRelic;
 
-
+//TODO: tk: all this editor code needs to go somewhere else. separate datamanager, for example.
 public class LoginActivity extends Activity implements OnClickListener {
 
 	private Button loginButton;
