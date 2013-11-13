@@ -362,7 +362,7 @@ public class KisiMain extends FragmentActivity implements
 		return true;
 	}
 	
-	//TODO: tk: I NEED this to go out of the Activity. Either the singletonizedª API class serves
+	//TODO: tk: I NEED this to go out of the Activity. Either the singletonized API class serves
 	//as cache or some other new class takes over data handling.
 	public SparseArray<Place> getPlaces() {
 		if (places == null) {

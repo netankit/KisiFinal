@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -42,10 +43,18 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
         super.onResume();
         blinkup.getTokenStatus(this);
     }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        blinkup.cancelTokenStatusPolling();
+    }  
+    
 
-    //TODO: tk: Override when implementing an interface? Is this really correct?
-	@Override
+
 	public void onSuccess(JSONObject json) { 
+		//prevent that blickup sdk calls onSuccess twice
+		blinkup.cancelTokenStatusPolling();
 		String agentUrl = null;
 		String impeeId = null;
 		String planId = null;
@@ -91,18 +100,17 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
     	api.addParameter("ei_plan_id", planId);
     	api.post("gateways");
     	status.setText(R.string.blinkup_success);
-		progressBar.setVisibility(View.GONE);
+		status.setGravity(Gravity.CENTER);
+    	progressBar.setVisibility(View.GONE);
 	}
 
-	//TODO: tk: Override when implementing an interface? Is this really correct?
-	@Override
+
 	public void onError(String errorMsg) {
 		status.setText(getResources().getString(R.string.blinkup_error) + " " + errorMsg);
 		progressBar.setVisibility(View.GONE);
 	}
 
-	//TODO: tk: Override when implementing an interface? Is this really correct?
-	@Override
+
 	public void onTimeout() {
 		status.setText(getResources().getString(R.string.blinkup_timeout) );
 		progressBar.setVisibility(View.GONE);
