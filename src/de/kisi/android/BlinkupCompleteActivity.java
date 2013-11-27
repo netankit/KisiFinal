@@ -118,13 +118,11 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 	
 	//TODO: tk: copy-paste code. Please unify in separate class.
 	 private void updateLocation() {
-			LocationListener locListener = new MyLocationListener();
 			locationManager = (LocationManager) getApplicationContext().getSystemService(
 					Context.LOCATION_SERVICE);
 			// first check Network Connection
 			if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) { 
 				locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, locListener);
 				Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 				currentLocation = location;
 
@@ -132,7 +130,6 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 			// then the GPS Connection
 			else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { 
 				locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, locListener);
 				Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 				currentLocation = location;
 			}

@@ -1,6 +1,7 @@
 package de.kisi.android.model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 //import com.google.android.maps.GeoPoint;
@@ -8,6 +9,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
 
 //TODO: tk: libraries like Lombok simplify with automating getter & setter creation
 //TODO: tk: Google's gson is a more full-featured JSON handler org.json
@@ -32,10 +35,6 @@ public class Place {
 			name 			= json.getString("name");
 			locks 			= null;
 			updated_at 		= json.getString("updated_at"); // "2013-06-26T15:53:42Z"
-			/*location = new GeoPoint(
-						(int)(json.getDouble("latitude") *1000000.0), 
-						(int)(json.getDouble("longitude")*1000000.0))
-			);*/
 			try {
 				latitude 		= json.getDouble("latitude");
 				longitude 		= json.getDouble("longitude");
@@ -54,9 +53,9 @@ public class Place {
 			//additionalInformation = json.getString("additional_information");
 			owner_id 		= json.getInt("user_id");
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		locks = new LinkedList<Lock>();
 	}
 	
 	public int getId() {

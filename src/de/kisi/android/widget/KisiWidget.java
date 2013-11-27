@@ -8,6 +8,11 @@ import android.content.Intent;
 public class KisiWidget extends AppWidgetProvider {
 
 	@Override
+	public void onReceive(Context context, Intent intent) 
+	{
+	}
+
+	@Override
 	public void  onUpdate(Context context, AppWidgetManager manager, int[] widgets)
 	{
 	}
@@ -24,11 +29,6 @@ public class KisiWidget extends AppWidgetProvider {
 	
 	@Override
 	public void onDisabled(Context context)
-	{
-	}
-	
-	@Override
-	public void onReceive(Context context, Intent intent) 
 	{
 	}
 }

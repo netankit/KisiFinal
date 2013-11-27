@@ -10,7 +10,6 @@ import org.json.JSONObject;
 
 import com.manavo.rest.RestCache;
 import com.manavo.rest.RestCallback;
-import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -40,8 +39,6 @@ import android.widget.Toast;
 import com.electricimp.blinkup.BlinkupController;
 import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 
-import com.newrelic.agent.android.NewRelic;
-
 
 
 public class KisiMain extends FragmentActivity implements
@@ -59,6 +56,7 @@ public class KisiMain extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		
 		SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putBoolean("toLog", false);
@@ -80,9 +78,9 @@ public class KisiMain extends FragmentActivity implements
 		blinkup = BlinkupController.getInstance();
 		blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
 		
-		NewRelic.withApplicationToken(
-				"AAe80044cf73854b68f6e83881c9e61c0df9d92e56"
-				).start(this.getApplication());
+		
+		
+		de.kisi.android.vicinity.manager.GeofenceManager.initialize(getApplicationContext());
 	}
 
 	// creating popup-menu for settings

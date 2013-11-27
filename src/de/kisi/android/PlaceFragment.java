@@ -232,13 +232,11 @@ public class PlaceFragment extends Fragment {
 	//I would expect the lastKnownLocation to be null if it is fetched right after initialization.
 	private void updateLocation() {
 
-		LocationListener locListener = new MyLocationListener();
 		locationManager = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
 		// first check Network Connection
 		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) { 
 			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, locListener);
 			Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 			currentLocation = location;
 
@@ -246,7 +244,6 @@ public class PlaceFragment extends Fragment {
 		// then the GPS Connection
 		else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { 
 			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, locListener);
 			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			currentLocation = location;
 			
