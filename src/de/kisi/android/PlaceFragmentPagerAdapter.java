@@ -2,6 +2,7 @@ package de.kisi.android;
 
 import java.util.List;
 
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Place;
 
 import android.support.v4.app.Fragment;
@@ -10,15 +11,13 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 public class PlaceFragmentPagerAdapter extends FragmentPagerAdapter {
 
-	int PAGE_COUNT;
+	private int PAGE_COUNT;
 	private List<Fragment> fragments;
-	private KisiMain activity;
 
 	/** Constructor of the class */
-	public PlaceFragmentPagerAdapter(FragmentManager fm, List<Fragment> fragments, KisiMain activity) {
+	public PlaceFragmentPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
 		super(fm);
 		this.fragments = fragments;
-		this.activity = activity;
 		PAGE_COUNT = fragments.size();
 	}
 
@@ -37,7 +36,7 @@ public class PlaceFragmentPagerAdapter extends FragmentPagerAdapter {
 	
 	@Override
 	public CharSequence getPageTitle(int num) {
-		Place l = activity.getPlaces().valueAt(num);
+		Place l = KisiAPI.getInstance().getPlaceAt(num);
 		return l.getName();
 	}
 }

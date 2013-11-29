@@ -46,7 +46,6 @@ public class KisiApi extends RestApi {
 			data.put("password", password);
 			this.addParameter("user", (Object) data);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}

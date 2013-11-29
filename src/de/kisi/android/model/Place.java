@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
 
 //TODO: tk: libraries like Lombok simplify with automating getter & setter creation
 //TODO: tk: Google's gson is a more full-featured JSON handler org.json
@@ -19,9 +18,10 @@ public class Place {
 	private int id;
 	private String name;
 	private List<Lock> locks;
+	private boolean locksLoaded;
 	private String updated_at;
-	//private GeoPoint location;
-	private double latitude, longitude;
+	private double latitude;
+	private double longitude;
 	/*private String streetName, streetNumber;
 	private String zip, city;
 	private String state, country;
@@ -56,6 +56,7 @@ public class Place {
 			e.printStackTrace();
 		}
 		locks = new LinkedList<Lock>();
+		locksLoaded = false;
 	}
 	
 	public int getId() {
@@ -65,10 +66,10 @@ public class Place {
 		return name;
 	}
 
+	public boolean areLocksLoaded(){
+		return locksLoaded;
+	}
 	public List<Lock> getLocks() {
-		if ( locks == null ) {
-			// TODO
-		}
 		return locks;
 	}
 
@@ -133,6 +134,7 @@ public class Place {
 	
 	//TODO: tk: I would like to see some form of data layer that handles this 1:N relation in a clean way
 	public void setLocks(JSONArray data) {
+		locksLoaded = true;
 		locks = new ArrayList<Lock>();
 		try {
 			for (int i=0; i<data.length(); i++) {
@@ -145,5 +147,9 @@ public class Place {
 		}
 	}
 	
+	@Override
+	public String toString(){
+		return name+" "+id;
+	}
 
 }

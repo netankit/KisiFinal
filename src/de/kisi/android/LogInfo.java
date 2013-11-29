@@ -19,8 +19,7 @@ public class LogInfo extends Activity implements OnClickListener {
 
 		setContentView(R.layout.loginfo);
 
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
-				R.layout.log_title);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.log_title);
 
 		WebView webView = (WebView) findViewById(R.id.webView);
 		webView.getSettings().setJavaScriptEnabled(true);
@@ -31,33 +30,24 @@ public class LogInfo extends Activity implements OnClickListener {
 		webView.loadUrl(String.format("https://kisi.de/places/%d/events?auth_token=%s", 
 			place_id, KisiApi.getAuthToken())
 		);
-		ImageButton backButton = (ImageButton) findViewById(R.id.back);
 
+		ImageButton backButton = (ImageButton) findViewById(R.id.back);
 		backButton.setOnClickListener(this);
 	}
 
-	public void onPause() { // sends user back to Login Screen if he didn't
-		// choose remember me
-		SharedPreferences settings = getSharedPreferences("Config",
-				MODE_PRIVATE);
-		if (!settings.getBoolean("saved", false)) {
-			if (settings.getBoolean("toLog", true)) {
-				Intent loginScreen = new Intent(getApplicationContext(),
-						LoginActivity.class);
-				startActivity(loginScreen);
-			}
+	@Override
+	public void onPause() { 
+		// sends user back to Login Screen if he didn't choose remember me
+		SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
+		if (settings.getString("password", "").isEmpty()) {
+			Intent loginScreen = new Intent(getApplicationContext(), LoginActivity.class);
+			startActivity(loginScreen);
 		}
 		super.onPause();
 	}
 
 	@Override
 	public void onClick(View v) {
-		SharedPreferences settings = getSharedPreferences("Config",
-				MODE_PRIVATE);
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putBoolean("toLog", false);
-		editor.commit();
-		this.finish();
-
+		finish();
 	}
 }

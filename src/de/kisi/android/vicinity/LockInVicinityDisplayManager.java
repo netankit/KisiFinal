@@ -14,7 +14,7 @@ public class LockInVicinityDisplayManager {
 		mContext = context;
 	}
 	
-	public static void instanciate(Context context){
+	public static void initialize(Context context){
 		instance = new LockInVicinityDisplayManager(context);
 	}
 	public void notifyOnEntry(int placeID){

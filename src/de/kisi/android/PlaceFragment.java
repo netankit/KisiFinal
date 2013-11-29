@@ -1,27 +1,18 @@
 package de.kisi.android;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.manavo.rest.RestCache;
-import com.manavo.rest.RestCallback;
-import com.manavo.rest.RestErrorCallback;
-
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -30,17 +21,14 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class PlaceFragment extends Fragment {
 
-	private RelativeLayout layout;
+	private ScrollView layout;
 	private final static long delay = 3000;
-	private Location currentLocation;
-	private LocationManager locationManager;
 
 	static PlaceFragment newInstance(int index) {
 		// Fragments must not have a custom constructor
@@ -53,69 +41,58 @@ public class PlaceFragment extends Fragment {
 		return f;
 	}
 	
-	//TODO: tk: the API and data management stuff needs improvement here.
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		if (container == null) {
 			return null;
 		}
 
-		layout = (RelativeLayout) inflater.inflate(R.layout.place_fragment,
-				container, false);
+		layout = (ScrollView) inflater.inflate(R.layout.place_fragment, container, false);
 		
 		
 		int index = getArguments().getInt("index");
-		KisiMain activity = ((KisiMain) getActivity());
-		SparseArray<Place> places = activity.getPlaces();
+		Place[] places = KisiAPI.getInstance().getPlaces();
 		// Workaround for crash when starting app from background
 		if (places == null) {
 			return layout;
 		}
-		final Place place = places.valueAt(index);
-
+		
+		final Place place = KisiAPI.getInstance().getPlaceAt(index);
 		// get locks from api, if not already available
-		if (place.getLocks() == null) {
-			KisiApi api = new KisiApi(this.getActivity());
-
-			api.setCallback(new RestCallback() {
-				public void success(Object obj) {
-					JSONArray data = (JSONArray) obj;
-
-					place.setLocks(data);
+		if (place.areLocksLoaded())
+			setupButtons(place);
+		else {
+			KisiAPI.getInstance().registerOnPlaceChangedListener(new OnPlaceChangedListener(){
+				@Override
+				public void onPlaceChanged(Place[] newPlaces) {
+					KisiAPI.getInstance().unregisterOnPlaceChangedListener(this);
 					setupButtons(place);
 				}
-
 			});
-			api.setCachePolicy(RestCache.CachePolicy.CACHE_THEN_NETWORK);
-			api.setLoadingMessage(null);
-			api.get("places/" + String.valueOf(place.getId()) + "/locks");
-		} else {
-			setupButtons(place);
+			KisiAPI.getInstance().updateLocks(getActivity(), place);
 		}
 
 		return layout;
 	}
 
-	//TODO: tk: separate button class, please.
-	public void setupButtons(final Place place) {
+	private void setupButtons(final Place place) {
 		
 		Drawable lockIcon = getActivity().getResources().getDrawable(R.drawable.kisi_lock);
 		
-		Typeface font = Typeface.createFromAsset(getActivity()
-				.getApplicationContext().getAssets(), "Roboto-Light.ttf");
+		Typeface font = Typeface.createFromAsset(getActivity().getApplicationContext().getAssets(), "Roboto-Light.ttf");
 		//Getting px form Scale-independent Pixels
 		Resources r = getResources();
 		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 350, r.getDisplayMetrics());
 		int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 85, r.getDisplayMetrics());
 		int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15, r.getDisplayMetrics());
 		
-		ScrollView sv =  (ScrollView) layout.getChildAt(0);
-		LinearLayout ly = (LinearLayout) sv.getChildAt(0);
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
-		
+		LinearLayout ly = (LinearLayout) layout.getChildAt(0);
 		ly.removeAllViews();
-		
-		 //show a text if there is no lock for a place
+
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
+		layoutParams.setMargins(margin, margin, margin, margin);
+
+		//show a text if there is no lock for a place
 		if(place.getLocks().size() == 0) {
 			final TextView text = new TextView(getActivity());
 			text.setText(R.string.no_lock);
@@ -126,13 +103,11 @@ public class PlaceFragment extends Fragment {
 			text.setTextColor(Color.WHITE);
 			text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 			text.setVisibility(View.VISIBLE);
-			layoutParams.setMargins(margin, margin*2, margin, margin);
 			ly.addView(text, layoutParams);
 			return;
 		}    
 		
 		
-		int i = 0;
 		for (final Lock lock : place.getLocks()) {
 			
 			final Button button = new Button(getActivity());
@@ -145,114 +120,31 @@ public class PlaceFragment extends Fragment {
 			button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 			button.setCompoundDrawablesWithIntrinsicBounds(lockIcon, null, null, null);
 			button.setVisibility(View.VISIBLE);
-		
-			if(i == 0)
-				layoutParams.setMargins(margin, margin*2, margin, margin);
-			else
-				layoutParams.setMargins(margin, margin, margin, margin);
-			ly.addView(button, layoutParams);
-			i++;
 
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					
-					updateLocation();
-					// unlock button was pressed
-					// setup api call to open door
-					KisiApi api = new KisiApi(getActivity());
+					KisiAPI.getInstance().unlock(lock, getActivity(), new UnlockCallback(){
 
-					try {
-						if (currentLocation != null) {
-							JSONObject location = new JSONObject();
-							location.put("latitude",
-									currentLocation.getLatitude());
-							location.put("longitude",
-									currentLocation.getLongitude());
-							api.addParameter("location", location);
-						}else { //send 0.0 if location permission is revoked
-							JSONObject location = new JSONObject();
-							location.put("latitude", 0.0);
-							location.put("longitude", 0.0);
-							api.addParameter("location", location);
-						}
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-				
-					api.setCallback(new RestCallback() {
-						public void success(Object obj) {
-							JSONObject json = (JSONObject) obj;
-							String message = null;
-							if(json.has("notice")) {
-								// change button design
-								try {
-									message = json.getString("notice");
-								} catch (JSONException e) {
-									e.printStackTrace();
-								}	
-								changeButtonStyleToUnlocked(button, lock, message);
-								return;
-							}
-						}	
-					});
-					api.setErrorCallback(new RestErrorCallback () {
 						@Override
-						public void error(String message) {
-							//change RestApi to avoid json parsing here?
-							JSONObject json = null;
-							try {
-								json = new JSONObject(message);
-							} catch (JSONException e) {
-								e.printStackTrace();
-							}
-							if(json.has("alert")) {
-								String alertMsg = null;
-								try {
-									alertMsg = json.getString("alert");
-								} catch (JSONException e) {
-									e.printStackTrace();
-								}
-								changeButtonStyleToFailure(button, lock, alertMsg);
-								return;
-							}
-	
-						}});
-					api.setLoadingMessage(R.string.opening);
-					api.post(String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId()));
-				}
+						public void onUnlockSuccess(String message) {
+							changeButtonStyleToUnlocked(button, lock, message);
+						}
 
+						@Override
+						public void onUnlockFail(String alertMsg) {
+							changeButtonStyleToFailure(button, lock, alertMsg);
+						}});
+				}
 			});
+			ly.addView(button, layoutParams);
 		}
 
 		
 	}
 	
-	//TODO: tk: put this is a separate class, please. Does this actually work?
-	//I would expect the lastKnownLocation to be null if it is fetched right after initialization.
-	private void updateLocation() {
 
-		locationManager = (LocationManager) getActivity().getSystemService(
-				Context.LOCATION_SERVICE);
-		// first check Network Connection
-		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) { 
-			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-			Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-			currentLocation = location;
-
-		}
-		// then the GPS Connection
-		else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { 
-			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-			currentLocation = location;
-			
-		}
-		// TODO What happens if nothing of both is enabled?
-
-	}
-
-	//TODO: tk: put the next two methods in a separate button class.
+	@SuppressWarnings("deprecation")
 	public void changeButtonStyleToUnlocked(Button button, Lock lock, String message) {
 		Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
 		// save button design
@@ -269,7 +161,7 @@ public class PlaceFragment extends Fragment {
 				.getDrawable(R.drawable.unlocked));
 		currentButton.setPadding(shift, 0, 0, 0);
 		currentButton.setText("");
-		// TODO localize?
+
 		currentButton.setCompoundDrawablesWithIntrinsicBounds(
 				R.drawable.kisi_lock_open2, 0, 0, 0);
 
@@ -294,6 +186,7 @@ public class PlaceFragment extends Fragment {
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	public void changeButtonStyleToFailure(Button button, Lock lock, String message) {
 		Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
 		// save button design

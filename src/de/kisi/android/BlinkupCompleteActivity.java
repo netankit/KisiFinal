@@ -6,11 +6,9 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -27,8 +25,6 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 	private ProgressBar progressBar;
     private TextView status;
     
-    private final static long delay = 2000;
-	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

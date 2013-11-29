@@ -1,23 +1,21 @@
 package de.kisi.android;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.manavo.rest.RestCallback;
-import com.manavo.rest.RestErrorCallback;
 import com.newrelic.agent.android.NewRelic;
+
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.LoginCallback;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
-import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -25,57 +23,40 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-//TODO: tk: all this editor code needs to go somewhere else. separate datamanager, for example.
-public class LoginActivity extends Activity implements OnClickListener {
+public class LoginActivity extends Activity implements OnClickListener,LoginCallback {
 
-	private Button loginButton;
 	private EditText userNameField;
 	private EditText passwordField;
 	private CheckBox savePassword;
 
-	private TextView newUser;
-	private TextView forgotPw;
-	private TextView slogan;
-
 	private SharedPreferences settings;
-	private SharedPreferences.Editor editor;
-
-	private String email;
-	private String password;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.login_activity);
 
-		loginButton = (Button) findViewById(R.id.loginButton);
+		Button loginButton = (Button) findViewById(R.id.loginButton);
 		loginButton.setOnClickListener(this);
-		loginButton.getBackground().setAlpha(185);
-		
-
-		settings = getSharedPreferences("Config", MODE_PRIVATE);
 
 		userNameField = (EditText) findViewById(R.id.email);
 		passwordField = (EditText) findViewById(R.id.password);
 		passwordField.setTypeface(Typeface.DEFAULT);
+
 		savePassword = (CheckBox) findViewById(R.id.rememberCheckBox);
 
-		newUser = (TextView) findViewById(R.id.registerText);
-
-		newUser.setText(Html.fromHtml("New? "
-				+ "<a href=\"https://www.kisi.de/users/sign_up\">Get started on our website</a> "));
-		newUser.setMovementMethod(LinkMovementMethod.getInstance());
-
-		slogan = (TextView) findViewById(R.id.Slogan);
+		TextView slogan = (TextView) findViewById(R.id.Slogan);
 		Typeface font = Typeface.createFromAsset(getAssets(), "Roboto-Light.ttf");
 		slogan.setTypeface(font);
 		
-		forgotPw = (TextView) findViewById(R.id.forgot);
-		forgotPw.setText(Html.fromHtml("<a href=\"https://www.kisi.de/users/password/new\">Forgot your password?</a> "));
-		forgotPw.setMovementMethod(LinkMovementMethod.getInstance());
+
+		TextView newUser = (TextView) findViewById(R.id.registerText);
+		newUser.setMovementMethod(LinkMovementMethod.getInstance());
 		
+		TextView forgotPw = (TextView) findViewById(R.id.forgot);
+		forgotPw.setMovementMethod(LinkMovementMethod.getInstance());
+
 		NewRelic.withApplicationToken(
 				"AAe80044cf73854b68f6e83881c9e61c0df9d92e56"
 				).start(this.getApplication());
@@ -90,8 +71,11 @@ public class LoginActivity extends Activity implements OnClickListener {
 
 	@Override
 	protected void onStart() {
-		email = settings.getString("email", "");
-		password = settings.getString("password", "");
+		super.onStart();
+
+		settings = getSharedPreferences("Config", MODE_PRIVATE);
+		String email = settings.getString("email", "");
+		String password = settings.getString("password", "");
 
 		if (!email.isEmpty()) {
 			userNameField.setText(email);
@@ -102,7 +86,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 				savePassword.setChecked(true);
 			}
 		}
-		super.onStart();
 	}
 
 	@Override
@@ -117,80 +100,46 @@ public class LoginActivity extends Activity implements OnClickListener {
 		// user touched the login botton: gather all informations and send to next view
 		
 		// clear auth token
-		editor = settings.edit();
+		Editor editor = settings.edit();
 		editor.remove("authentication_token");
 		editor.commit();
 
-		email = userNameField.getText().toString(); // get Text of
-		password = passwordField.getText().toString();
+		String email = userNameField.getText().toString();
+		String password = passwordField.getText().toString();
 		
-		KisiApi api = new KisiApi(this);
-
-		api.authorize(email, password);
-		api.setLoadingMessage("Logging in...");
-		
-		final LoginActivity activity = this;
-		
-		api.setCallback(new RestCallback() {
-			public void success(Object obj) {
-				JSONObject data = (JSONObject)obj;
-
-				try {
-					editor = settings.edit();
-					editor.putString("authentication_token", data.getString("authentication_token"));
-					editor.putInt("user_id", data.getInt("id"));
-					String plan_id =  data.getString("ei_plan_id");
-					//backend returns "null"
-					if(plan_id != "null")
-						editor.putString("ei_plan_id", plan_id);
-					editor.commit();
-					Toast.makeText(activity, R.string.login_success, Toast.LENGTH_LONG).show();
-					
-					Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
-					startActivity(mainScreen);
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
-		api.setErrorCallback(new RestErrorCallback () {
-			@Override
-			public void error(String message) {
-				JSONObject json = null;
-				String errormessage = null;
-				try {
-					json = new JSONObject(message);
-					errormessage = json.getString("error");
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				Toast.makeText(activity, errormessage, Toast.LENGTH_LONG).show();
-				passwordField.setText("");
-				return;
-			}} );
-		
-		
-		if (savePassword.isChecked()) {
-			// save login credentials
-			editor = settings.edit();
-			editor.putString("email", email);
-			editor.putString("password", password);
-			editor.putBoolean("saved", true);
-			editor.commit();
-
-		} else {
-			deleteLogin();
+		// test for complete login data
+		if(email.contains("@") && !password.isEmpty()){
+			KisiAPI.getInstance().login(email, password, this, this);
+		}else{
+			Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.missing_login_data), Toast.LENGTH_SHORT).show();
+			return;
 		}
-		api.post("users/sign_in");
+		
 	}
 
-	private void deleteLogin() {
-		editor = settings.edit();
-		//editor.remove("email"); // email should stay
-		editor.remove("password");;
-		editor.remove("saved");
+
+	@Override
+	public void onLoginSuccess() {
+		// Save login credentials
+		Editor editor = settings.edit();
+		editor.putString("email", userNameField.getText().toString());
+		if (savePassword.isChecked())
+			// TODO: never save the password on the phone
+			// especially not in plain text
+			editor.putString("password", passwordField.getText().toString());
+		else
+			editor.remove("password");;
 		editor.commit();
+		
+		// Switch the activity to internal Views
+		Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
+		startActivity(mainScreen);
+
+	}
+
+	@Override
+	public void onLoginFail() {
+		passwordField.setText("");
 	}
 
 

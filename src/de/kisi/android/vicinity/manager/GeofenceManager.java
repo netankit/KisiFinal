@@ -103,14 +103,15 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 
 		// Use high accuracy
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        // Set the update interval to 5 seconds
+        // Set the update interval to 15 seconds
         mLocationRequest.setInterval(15000);
         // Set the fastest update interval to 1 second
         mLocationRequest.setFastestInterval(1000);
         
+        // Show interest on any change of the Places
         KisiAPI.getInstance().registerOnPlaceChangedListener(this);
-        Place[] places = KisiAPI.getInstance().getPlaces();
-        registerGeofences(places);
+        // Register Places as Geofences
+        registerGeofences(KisiAPI.getInstance().getPlaces());
 		
 	
 	}
@@ -133,8 +134,10 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	@Override
 	public void onPlaceChanged(Place[] newPlaces) {
 		if(initialized){
-			mLocationClient.removeGeofences(geofenceIds, null);
-			geofenceIds.clear();
+			if(geofenceIds.size()>0){
+				mLocationClient.removeGeofences(geofenceIds, null);
+				geofenceIds.clear();
+			}
 			registerGeofences(newPlaces);
 		}else{
 			mLocationClient.connect();
@@ -142,6 +145,10 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	}
 
 	private void registerGeofences(Place[] places){
+		// If there are no Places to register, don't register any places
+		if(places.length==0)
+			return;
+		
         List<Geofence> fences = new LinkedList<Geofence>();
 
         // Create a Geofence for every Place

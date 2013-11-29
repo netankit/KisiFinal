@@ -107,6 +107,7 @@ public class RestCache {
 		return cachePath+"/"+hash;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private static String getRequestHash(RestApi api) {
 		List<NameValuePair> params = RestRequest.mapToPairs(api.getParameters());
 		
