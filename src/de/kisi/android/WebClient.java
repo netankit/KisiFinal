@@ -1,5 +1,6 @@
 package de.kisi.android;
 
+import de.kisi.android.api.KisiAPI;
 import android.graphics.Bitmap;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -26,7 +27,7 @@ public class WebClient extends WebViewClient {
 	public boolean shouldOverrideUrlLoading(WebView view, String url) {
 		if ( url.indexOf("https://kisi.de/") == 0 ) {
 			url += url.contains("?") ? "&" : "?";
-			url += "auth_token=" + KisiApi.getAuthToken();
+			url += "auth_token=" + KisiAPI.getInstance().getAuthToken();
 		}
 		view.loadUrl(url);
 		return true;

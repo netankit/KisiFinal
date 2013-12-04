@@ -8,6 +8,7 @@ public class Lock {
 	private String name;
 	private int place_id;
 	private String updated_at;
+	private String last_accessed_at;
 	
 	public Lock(JSONObject json) {
 		try {

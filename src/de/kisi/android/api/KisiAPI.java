@@ -1,5 +1,6 @@
 package de.kisi.android.api;
 
+
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,26 +13,33 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 import android.widget.Toast;
 
-import com.manavo.rest.RestCache;
-import com.manavo.rest.RestCallback;
-import com.manavo.rest.RestErrorCallback;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.TextHttpResponseHandler;
 
-import de.kisi.android.KisiApi;
 import de.kisi.android.R;
-import de.kisi.android.model.*;
+import de.kisi.android.model.Lock;
+import de.kisi.android.model.Place;
+
+
+
+import com.google.gson.Gson;
 
 // TODO: Create a real API
 public class KisiAPI {
 
 	private static KisiAPI instance;  
 	
+	
 	private Place[] places = new Place[0];
 	private List<OnPlaceChangedListener> registeredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> unregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> newregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	
+	private int UserId;
+
 	private Context context;
 	
 	public static void initialize(Context context){
@@ -44,68 +52,33 @@ public class KisiAPI {
 	private KisiAPI(Context context){
 		this.context = context;
 	}
-	/*
-	private void createFakePlaces(){
-		places = new Place[4];
-		try {
-			JSONObject jo = new JSONObject();
-			jo.put("id",1);
-			jo.put("name", "Interim A");
-			jo.put("updated_at", "");
-			jo.put("user_id", "0");
-			jo.put("latitude", 48.26335);
-			jo.put("longitude", 11.66973);
-			places[0]= new Place(jo);
-			
-			jo = new JSONObject();
-			jo.put("id",2);
-			jo.put("name", "MW B");
-			jo.put("updated_at", "");
-			jo.put("user_id", "0");
-			jo.put("latitude", 48.26574);
-			jo.put("longitude", 11.67103);
-			places[1]= new Place(jo);		
 
-			jo = new JSONObject();
-			jo.put("id",3);
-			jo.put("name", "Hochbrück");
-			jo.put("updated_at", "");
-			jo.put("user_id", "0");
-			jo.put("latitude", 48.24694);
-			jo.put("longitude", 11.63062);
-			places[2]= new Place(jo);		
-
-			jo = new JSONObject();
-			jo.put("id",87);
-			jo.put("name", "MW A");
-			jo.put("user_id", "0");
-			jo.put("updated_at", "");
-			jo.put("latitude", 48.26562);
-			jo.put("longitude", 11.66956);
-			places[3]= new Place(jo);		
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		notifyAllOnPlaceChangedListener();
-	}
-	*/
 	
 	public void login(String login, String password, final LoginCallback callback, Activity activity){
 		
-		KisiApi api = new KisiApi(activity);
-		api.authorize(login, password);
-		api.setLoadingMessage("Logging in...");
-		
-		
-		api.setCallback(new RestCallback() {
-			public void success(Object obj) {
-				JSONObject data = (JSONObject)obj;
 
+		
+
+		JSONObject login_data = new JSONObject();
+		JSONObject login_user = new JSONObject();
+		try {
+			login_data.put("email", login);
+			login_data.put("password", password);
+			login_user.put("user", login_data);
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+
+		KisiRestClient.post(context, "users/sign_in", login_user,  new JsonHttpResponseHandler() {
+			
+			 public void onSuccess(org.json.JSONObject response) {
 				try {
 					Editor editor = context.getSharedPreferences("Config", Context.MODE_PRIVATE).edit();
-					editor.putString("authentication_token", data.getString("authentication_token"));
-					editor.putInt("user_id", data.getInt("id"));
-					String plan_id =  data.getString("ei_plan_id");
+					editor.putString("authentication_token", response.getString("authentication_token"));
+					editor.putInt("user_id", response.getInt("id"));
+					UserId = response.getInt("id");
+					
+					String plan_id =  response.getString("ei_plan_id");
 					//backend returns "null"
 					if(plan_id != "null")
 						editor.putString("ei_plan_id", plan_id);
@@ -115,43 +88,34 @@ public class KisiAPI {
 				}
 				callback.onLoginSuccess();
 			}
-		});
-		api.setErrorCallback(new RestErrorCallback () {
-			@Override
-			public void error(String message) {
-				JSONObject json = null;
+			
+			 public void onFailure(Throwable e, JSONObject response) {
 				String errormessage = null;
 				try {
-					json = new JSONObject(message);
-					errormessage = json.getString("error");
-				} catch (JSONException e) {
-					e.printStackTrace();
+					errormessage = response.getString("error");
+				} catch (JSONException ej) {
+					ej.printStackTrace();
 				}
-				Toast.makeText(context, errormessage, Toast.LENGTH_LONG).show();
-				callback.onLoginFail();
-			}} );
+				callback.onLoginFail(errormessage);
+			};
+			
+		});
 		
 		
-		api.post("users/sign_in");
+		
+
 	}
 	
 	public void logout(Activity activity){
-		KisiApi api = new KisiApi(activity);
-		
-		api.setLoadingMessage(R.string.logout_in_progress);
-		api.setCallback(new RestCallback() {
-			public void success(Object obj) {
+		KisiRestClient.delete("/users/sign_out",  new TextHttpResponseHandler() {
+			public void onSuccess(String msg) {
 				SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
 				SharedPreferences.Editor editor = settings.edit();
 				editor = settings.edit();
 				editor.remove("authentication_token");
-				editor.commit();
-				
-				Toast.makeText(context, R.string.logout_successful, Toast.LENGTH_LONG).show();
+				editor.commit();	
 			}
 		});
-		api.delete("users/sign_out");
-
 	}
 	
 	/**
@@ -176,18 +140,14 @@ public class KisiAPI {
 	}
 	
 	public void updatePlaces(Activity activity) {
-		RestCache.clear(activity);
-
-		KisiApi api = new KisiApi(activity);
-		api.setCachePolicy(RestCache.CachePolicy.CACHE_THEN_NETWORK);
-		api.setCallback(new RestCallback() {
-			public void success(Object obj) {
-				JSONArray locations_json = (JSONArray) obj;
-
+		
+		KisiRestClient.get(context, "places",  new JsonHttpResponseHandler() { 
+			
+			public void onSuccess(JSONArray response) {
 				Hashtable<Integer,Place> placesHash = new Hashtable<Integer,Place>();
 				try {
-					for (int i = 0; i < locations_json.length(); i++) {
-						Place location = new Place(locations_json.getJSONObject(i));
+					for (int i = 0; i < response.length(); i++) {
+						Place location = new Place(response.getJSONObject(i));
 						// The API returned some locations twice, so let's check if we
 						// already have it or not also check if the place has a locks 
 						// otherwise just don't show it
@@ -205,51 +165,52 @@ public class KisiAPI {
 				for(Place p : placesHash.values())
 					places[i++]=p;
 				notifyAllOnPlaceChangedListener();
+				
 			}
-
+			
 		});
-		api.get("places");
 
 	}
 	
-	public void updateLocks(Activity activity, final Place place){
-		KisiApi api = new KisiApi(activity);
-
-		api.setCallback(new RestCallback() {
-			public void success(Object obj) {
-				JSONArray data = (JSONArray) obj;
-
-				place.setLocks(data);
+	
+	//TODO: security
+	public String getAuthToken() {
+		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
+		return settings.getString("authentication_token", "" );
+	}
+	
+	
+	public void updateLocks(Activity activity, final Place place) {
+		
+		KisiRestClient.get(context, "places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
+			public void onSuccess(JSONArray response) {
+				place.setLocks(response);
 				notifyAllOnPlaceChangedListener();
 			}
-
 		});
-		api.setCachePolicy(RestCache.CachePolicy.CACHE_THEN_NETWORK);
-		api.setLoadingMessage(null);
-		api.get("places/" + String.valueOf(place.getId()) + "/locks");
 	}
 	
 
 	public boolean createNewKey(Place p, String email, List<Lock> locks, final Activity activity) {
-
-		KisiApi api = new KisiApi(activity);
 
 		JSONArray lock_ids = new JSONArray();
 		for (Lock l : locks) {
 			lock_ids.put(l.getId());
 		}
 		JSONObject key = new JSONObject();
+		JSONObject data = new JSONObject();
 		try {
 			key.put("lock_ids", lock_ids);
 			key.put("assignee_email", email);
+			data.put("key", key);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		api.addParameter("key", (Object) key);
-
-		api.setCallback(new RestCallback() {
-			public void success(Object obj) {
-				JSONObject data = (JSONObject) obj;
+		String url = "places/" + String.valueOf(p.getId()) + "/keys";
+		
+		KisiRestClient.post(context, url, data, new JsonHttpResponseHandler() {
+			
+			public void onSuccess(JSONObject data) {
 				try {
 					Toast.makeText(
 							activity,
@@ -260,9 +221,8 @@ public class KisiAPI {
 					e.printStackTrace();
 				}
 			}
-
-		});
-		api.post("places/" + String.valueOf(p.getId()) + "/keys");
+			
+		});	
 		return true;
 	}
 	/**
@@ -297,62 +257,116 @@ public class KisiAPI {
 			listener.onPlaceChanged(places);
 	}
 	
+	
+	//TODO fix this 
 	public boolean userIsOwner(Place place){
-		return place.getOwnerId()==KisiApi.getUserId();
+		return place.getOwnerId()==this.UserId;
 	}
 	
 	public void unlock(Lock lock, Activity activity, final UnlockCallback callback){
-		KisiApi api = new KisiApi(activity);
 		// TODO: Does the server really have to know where we are
 		// we sent so far always only (0,0)
+		JSONObject location = new JSONObject();
+		JSONObject data = new JSONObject();;
 		try {
-			JSONObject location = new JSONObject();
 			location.put("latitude", 0.0);
 			location.put("longitude", 0.0);
-			api.addParameter("location", location);
+			data.put("location", location);
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-	
-		api.setCallback(new RestCallback() {
-			public void success(Object obj) {
-				JSONObject json = (JSONObject) obj;
+		String url = String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId());
+		
+		KisiRestClient.post(context, url, data,  new JsonHttpResponseHandler() {
+			
+			public void onSuccess(JSONObject response) {
 				String message = null;
-				if(json.has("notice")) {
+				if(response.has("notice")) {
 					// change button design
 					try {
-						message = json.getString("notice");
+						message = response.getString("notice");
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}	
-					callback.onUnlockSuccess(message);
-					return;
 				}
-			}	
-		});
-		api.setErrorCallback(new RestErrorCallback () {
-			@Override
-			public void error(String message) {
-				//change RestApi to avoid json parsing here?
-				JSONObject json = null;
-				try {
-					json = new JSONObject(message);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				if(json.has("alert")) {
-					String alertMsg = null;
+				callback.onUnlockSuccess(message);
+			}
+			
+			public void onFailure(Throwable e, JSONObject errorResponse) {
+				String alertMsg = null;
+				if(errorResponse.has("alert")) {
 					try {
-						alertMsg = json.getString("alert");
-					} catch (JSONException e) {
+						alertMsg = errorResponse.getString("alert");
+					} catch (JSONException je) {
 						e.printStackTrace();
 					}
-					callback.onUnlockFail(alertMsg);
-					return;
 				}
+				callback.onUnlockFail(alertMsg);
+			}	
+		});
+	}
+	
+	
+	
 
-			}});
-		api.setLoadingMessage(R.string.opening);
-		api.post(String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId()));	}
+	public void createGateway(JSONObject blinkUpResponse) {	
+		String agentUrl = null;
+		String impeeId = null;
+		String planId = null;
+		try {
+			agentUrl = blinkUpResponse.getString("agent_url");
+			impeeId = blinkUpResponse.getString("impee_id");
+			planId = blinkUpResponse.getString("plan_id");
+		} catch (JSONException e2) {
+			e2.printStackTrace();
+		} 
+		//impeeId contains white spaces in the end, remove them
+        if (impeeId != null) 
+            impeeId = impeeId.trim();
+    	//TODO:implement location
+        JSONObject location = new JSONObject();
+    	try {
+//    		if(currentLocation != null) {
+//    			location.put("latitude", currentLocation.getLatitude());
+//    			location.put("longitude", currentLocation.getLongitude());
+//    		} else { //send 0.0 if location permission is revoked 
+    			location.put("latitude", 0.0);
+    			location.put("longitude", 0.0);
+//    		}
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+    	JSONObject gateway = new JSONObject();
+		try {
+			gateway.put("name", "Gateway");
+			gateway.put("uri", agentUrl);
+			gateway.put("plattform_name", "Android");
+			gateway.put("plattform_version", Build.VERSION.RELEASE);
+			gateway.put("blinked_up", true);
+			gateway.put("ei_impee_id", impeeId);
+			gateway.put("device_model", Build.MANUFACTURER + " " + Build.MODEL);
+			gateway.put("location", location);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+    	
+		
+		JSONObject data = new JSONObject();
+		
+		try {
+			data.put("gateway", gateway);
+			data.put("ei_plan_id", planId);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		//TODO: Implement a proper handler
+		KisiRestClient.post(context, "gateways", data, new JsonHttpResponseHandler() {});
+		
+		
+		
+	}
+	
 }

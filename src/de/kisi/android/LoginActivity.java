@@ -5,7 +5,6 @@ import com.newrelic.agent.android.NewRelic;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
-
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -138,7 +137,8 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 	}
 
 	@Override
-	public void onLoginFail() {
+	public void onLoginFail(String errormessage) {
+		Toast.makeText(getApplicationContext(), errormessage, Toast.LENGTH_SHORT).show();
 		passwordField.setText("");
 	}
 
