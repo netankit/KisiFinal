@@ -24,6 +24,7 @@ public class KisiApplication extends Application{
 		*/
 		
 		de.kisi.android.api.KisiAPI.initialize(this);
+		de.kisi.android.api.KisiLocationManager.initialize(this);
 		de.kisi.android.vicinity.manager.GeofenceManager.initialize(this);
 		de.kisi.android.vicinity.LockInVicinityDisplayManager.initialize(this);
 	}

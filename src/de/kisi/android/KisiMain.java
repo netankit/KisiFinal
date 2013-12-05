@@ -27,7 +27,7 @@ import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 
 
 public class KisiMain extends FragmentActivity implements
-		PopupMenu.OnMenuItemClickListener, OnPlaceChangedListener {
+		PopupMenu.OnMenuItemClickListener {
 	
     private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
 
@@ -48,8 +48,15 @@ public class KisiMain extends FragmentActivity implements
 		pager = (ViewPager) findViewById(R.id.pager);
 		
 		kisiAPI = KisiAPI.getInstance();
-		kisiAPI.registerOnPlaceChangedListener(this);
-		kisiAPI.updatePlaces(this);
+		kisiAPI.updatePlaces(new OnPlaceChangedListener() {
+
+			@Override
+			public void onPlaceChanged(Place[] newPlaces) {
+				setupView(newPlaces);
+				
+			}
+			
+		});
 
 	}
 
@@ -83,7 +90,15 @@ public class KisiMain extends FragmentActivity implements
 		switch(item.getItemId())
 		{
 			case R.id.refresh:
-				kisiAPI.updatePlaces(this);
+				kisiAPI.updatePlaces(new OnPlaceChangedListener() {
+
+					@Override
+					public void onPlaceChanged(Place[] newPlaces) {
+						// TODO Auto-generated method stub
+						setupView(newPlaces );
+					}
+					
+				});
 				return true;
 			
 			case R.id.share:
@@ -161,10 +176,7 @@ public class KisiMain extends FragmentActivity implements
 	}
 
 
-	@Override
-	public void onPlaceChanged(Place[] newPlaces) {
-		setupView(newPlaces);
-	}
+
 
 	private void setupView(Place[] places) {
 

@@ -29,7 +29,8 @@ public class PlaceFragment extends Fragment {
 
 	private ScrollView layout;
 	private final static long delay = 3000;
-
+	private int index;
+	
 	static PlaceFragment newInstance(int index) {
 		// Fragments must not have a custom constructor
 		PlaceFragment f = new PlaceFragment();
@@ -50,7 +51,7 @@ public class PlaceFragment extends Fragment {
 		layout = (ScrollView) inflater.inflate(R.layout.place_fragment, container, false);
 		
 		
-		int index = getArguments().getInt("index");
+		index = getArguments().getInt("index");
 		Place[] places = KisiAPI.getInstance().getPlaces();
 		// Workaround for crash when starting app from background
 		if (places == null) {
@@ -62,14 +63,14 @@ public class PlaceFragment extends Fragment {
 		if (place.areLocksLoaded())
 			setupButtons(place);
 		else {
-			KisiAPI.getInstance().registerOnPlaceChangedListener(new OnPlaceChangedListener(){
+			KisiAPI.getInstance().updateLocks(place, new OnPlaceChangedListener() {
+
 				@Override
 				public void onPlaceChanged(Place[] newPlaces) {
-					KisiAPI.getInstance().unregisterOnPlaceChangedListener(this);
 					setupButtons(place);
 				}
+			
 			});
-			KisiAPI.getInstance().updateLocks(getActivity(), place);
 		}
 
 		return layout;
