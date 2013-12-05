@@ -1,26 +1,17 @@
 package de.kisi.android.model;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+
+
  
 public class Lock {
 	private int id;
 	private String name;
 	private int place_id;
-	private String updated_at;
-	private String last_accessed_at;
+//	@SerializedName("updated_at")
+//	private Date updatedAt;
+//	@SerializedName("last_accessed_at")
+//	private Date lastAccessedAt;
 	
-	public Lock(JSONObject json) {
-		try {
-			id = json.getInt("id");
-			name = json.getString("name");
-			place_id = json.getInt("place_id");
-			updated_at = json.getString("updated_at");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	
 	public int getId() {
 		return id;
@@ -32,8 +23,21 @@ public class Lock {
 		return place_id;
 	}
 
-	public String getUpdatedAt() {
-		return updated_at;
+	public int getPlace_id() {
+		return place_id;
+	}
+
+	public void setPlace_id(int place_id) {
+		this.place_id = place_id;
+	}
+
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

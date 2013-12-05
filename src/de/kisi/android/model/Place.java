@@ -1,14 +1,9 @@
 package de.kisi.android.model;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-//import com.google.android.maps.GeoPoint;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.annotations.SerializedName;
 
 
 //TODO: tk: libraries like Lombok simplify with automating getter & setter creation
@@ -19,45 +14,27 @@ public class Place {
 	private String name;
 	private List<Lock> locks;
 	private boolean locksLoaded;
-	private String updated_at;
 	private double latitude;
 	private double longitude;
-	/*private String streetName, streetNumber;
-	private String zip, city;
-	private String state, country;
-	private String additionalInformation; */
+	@SerializedName("street_name")
+	private String streetName;
+	@SerializedName("street_number")
+	private String streetNumber;
+	private String zip;
+	private String city;
+	private String state;
+	private String country;
+	private String additionalInformation; 
+	@SerializedName("user_id")
 	private int owner_id;
+//	@SerializedName("updated_at")
+//	private Date updatedAt;
 
 	
-	public Place(JSONObject json) {
-		try {
-			id 				= json.getInt("id");
-			name 			= json.getString("name");
-			locks 			= null;
-			updated_at 		= json.getString("updated_at"); // "2013-06-26T15:53:42Z"
-			try {
-				latitude 		= json.getDouble("latitude");
-				longitude 		= json.getDouble("longitude");
-			}
-			catch (JSONException e) {
-				latitude = 0;
-				longitude = 0;
-			}
-			
-			//streetName 		= json.getString("street_name");
-			//streetNumber	= json.getString("street_number");
-			//zip 			= json.getString("zip");
-			//city 			= json.getString("city");
-			//country 		= json.getString("country");
-			//state 			= json.getString("state");
-			//additionalInformation = json.getString("additional_information");
-			owner_id 		= json.getInt("user_id");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		locks = new LinkedList<Lock>();
-		locksLoaded = false;
+	public Place () {	
+		locks = new ArrayList<Lock>();
 	}
+	
 	
 	public int getId() {
 		return id;
@@ -72,10 +49,7 @@ public class Place {
 	public List<Lock> getLocks() {
 		return locks;
 	}
-
-	public String getUpdatedAt() {
-		return updated_at;
-	}
+	
 
 	public double getLatitude() {
 		return latitude;
@@ -85,7 +59,7 @@ public class Place {
 		return longitude;
 	}
 
-	/*
+	
 	public String getAddress() {
 		return getStreetName() + ", " + getCity();
 	}
@@ -127,25 +101,19 @@ public class Place {
 	public String getAdditionalInformation() {
 		return additionalInformation;
 	}
-	*/
+
 	public int getOwnerId() {
 		return owner_id;
 	}
 	
-	//TODO: tk: I would like to see some form of data layer that handles this 1:N relation in a clean way
-	public void setLocks(JSONArray data) {
+	
+	public void setLock(Lock[] data) {
 		locksLoaded = true;
-		locks = new ArrayList<Lock>();
-		try {
-			for (int i=0; i<data.length(); i++) {
-				Lock lock = new Lock(data.getJSONObject(i));
-				locks.add(lock);
-			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for(int i=0; i < data.length; i++) {
+			locks.add(data[i]);
 		}
 	}
+	
 	
 	@Override
 	public String toString(){

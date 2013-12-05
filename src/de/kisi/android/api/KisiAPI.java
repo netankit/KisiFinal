@@ -1,7 +1,6 @@
 package de.kisi.android.api;
 
 
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,11 +22,11 @@ import de.kisi.android.R;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
-
+import de.kisi.android.model.User;
 
 import com.google.gson.Gson;
 
-// TODO: Create a real API
+
 public class KisiAPI {
 
 	private static KisiAPI instance;  
@@ -38,7 +37,7 @@ public class KisiAPI {
 	private List<OnPlaceChangedListener> unregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> newregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	
-	private int UserId;
+	private User user;
 
 	private Context context;
 	
@@ -76,12 +75,10 @@ public class KisiAPI {
 					Editor editor = context.getSharedPreferences("Config", Context.MODE_PRIVATE).edit();
 					editor.putString("authentication_token", response.getString("authentication_token"));
 					editor.putInt("user_id", response.getInt("id"));
-					UserId = response.getInt("id");
+									
+					Gson gson = new Gson();
+					user = gson.fromJson(response.toString(), User.class);
 					
-					String plan_id =  response.getString("ei_plan_id");
-					//backend returns "null"
-					if(plan_id != "null")
-						editor.putString("ei_plan_id", plan_id);
 					editor.commit();
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -113,7 +110,8 @@ public class KisiAPI {
 				SharedPreferences.Editor editor = settings.edit();
 				editor = settings.edit();
 				editor.remove("authentication_token");
-				editor.commit();	
+				editor.commit();
+				user = null;
 			}
 		});
 	}
@@ -139,33 +137,42 @@ public class KisiAPI {
 		return null;
 	}
 	
+	
+	public User getUser() {
+		return user;
+	}
+
+	
 	public void updatePlaces(Activity activity) {
 		
 		KisiRestClient.get(context, "places",  new JsonHttpResponseHandler() { 
 			
 			public void onSuccess(JSONArray response) {
-				Hashtable<Integer,Place> placesHash = new Hashtable<Integer,Place>();
-				try {
-					for (int i = 0; i < response.length(); i++) {
-						Place location = new Place(response.getJSONObject(i));
-						// The API returned some locations twice, so let's check if we
-						// already have it or not also check if the place has a locks 
-						// otherwise just don't show it
-						// this doesnt work until the backend supports it !!!!
-						//if ((places.indexOfKey(location.getId()) < 0) && (!locations_json.getJSONObject(i).isNull("locks") )) {
-						if (!placesHash.containsKey(location.getId())){	
-							placesHash.put(location.getId(), location);
-						}
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				places = new Place[placesHash.values().size()];
-				int i=0;
-				for(Place p : placesHash.values())
-					places[i++]=p;
+				Gson gson = new Gson();
+				places = gson.fromJson(response.toString(), Place[].class);
 				notifyAllOnPlaceChangedListener();
-				
+//				Hashtable<Integer,Place> placesHash = new Hashtable<Integer,Place>();
+//				
+//				
+//				
+//				try {
+//					for (int i = 0; i < response.length(); i++) {
+//						Place location = new Place(response.getJSONObject(i));
+//						// The API returned some locations twice, so let's check if we
+//						// already have it or not also check if the place has a locks 
+//						// otherwise just don't show it
+//						//if ((places.indexOfKey(location.getId()) < 0) && (!locations_json.getJSONObject(i).isNull("locks") )) {
+//						if (!placesHash.containsKey(location.getId())){	
+//							placesHash.put(location.getId(), location);
+//						}
+//					}
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
+//				places = new Place[placesHash.values().size()];
+//				int i=0;
+//				for(Place p : placesHash.values())
+//					places[i++]=p;				
 			}
 			
 		});
@@ -181,10 +188,11 @@ public class KisiAPI {
 	
 	
 	public void updateLocks(Activity activity, final Place place) {
-		
 		KisiRestClient.get(context, "places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
 			public void onSuccess(JSONArray response) {
-				place.setLocks(response);
+				Gson gson = new Gson();
+				Lock[] lock = gson.fromJson(response.toString(), Lock[].class);
+				place.setLock(lock);
 				notifyAllOnPlaceChangedListener();
 			}
 		});
@@ -258,9 +266,8 @@ public class KisiAPI {
 	}
 	
 	
-	//TODO fix this 
 	public boolean userIsOwner(Place place){
-		return place.getOwnerId()==this.UserId;
+		return place.getOwnerId()==this.user.getId();
 	}
 	
 	public void unlock(Lock lock, Activity activity, final UnlockCallback callback){

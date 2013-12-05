@@ -125,8 +125,9 @@ public class KisiMain extends FragmentActivity implements
 
 				SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
 				
-				if(settings.contains("ei_plan_id"))
+				if(kisiAPI.getUser().getEiPlanId() != null)
 					blinkup.setPlanID(settings.getString("ei_plan_id", null));
+				
 				
 				blinkup.selectWifiAndSetupDevice(this, API_KEY, new ServerErrorHandler() {
 			        @Override

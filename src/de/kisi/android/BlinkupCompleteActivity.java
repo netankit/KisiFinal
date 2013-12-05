@@ -19,8 +19,7 @@ import de.kisi.android.api.KisiAPI;
 
 public class BlinkupCompleteActivity extends Activity implements TokenStatusCallback {
 	private BlinkupController blinkup;
-	private LocationManager locationManager;
-	private Location currentLocation;      
+	private LocationManager locationManager; 
 	
 	private ProgressBar progressBar;
     private TextView status;
