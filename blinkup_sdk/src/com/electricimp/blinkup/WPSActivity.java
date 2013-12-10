@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class WPSActivity extends PreBlinkUpActivity {
     private String token;
@@ -20,7 +21,13 @@ public class WPSActivity extends PreBlinkUpActivity {
         init();
 
         wpsPinView = (EditText) findViewById(R.id.__bu_wps_pin_optional);
+        BlinkupController.setHint(wpsPinView, blinkup.stringIdWpsPinHint,
+                R.string.__bu_wps_pin);
         wpsPinView.setTypeface(Typeface.DEFAULT);
+
+        TextView wpsInfo = (TextView) findViewById(R.id.__bu_wps_info);
+        BlinkupController.setText(wpsInfo, blinkup.stringIdWpsInfo,
+                R.string.__bu_wps_info);
 
         Bundle bundle = getIntent().getExtras();
         token = bundle.getString("token");

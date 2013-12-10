@@ -25,13 +25,13 @@ import android.widget.TextView;
 public class BlinkupGLActivity extends Activity {
     private static final int DIALOG_LOW_FRAME_RATE = 0;
 
-    private BlinkupSurfaceView mGLView;
+    private BlinkupSurfaceView surfaceView;
 
-    private View mCountdownPanel;
-    private TextView mCountdownView;
+    private View countdownPanel;
+    private TextView countdownView;
 
-    private BlinkupHandler mHandler;
-    private PowerManager.WakeLock mWakeLock;
+    private BlinkupHandler handler;
+    private PowerManager.WakeLock wakeLock;
 
     private int countdownCounter = 3;
 
@@ -50,12 +50,23 @@ public class BlinkupGLActivity extends Activity {
 
         setContentView(R.layout.__bu_blinkup);
 
-        mCountdownPanel = findViewById(R.id.__bu_countdown_panel);
-        mCountdownView = (TextView) findViewById(R.id.__bu_countdown);
-        mCountdownView.setText(String.valueOf(countdownCounter));
+        BlinkupController blinkup = BlinkupController.getInstance();
 
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "BrightWhileBlinking");
+        countdownPanel = findViewById(R.id.__bu_countdown_panel);
+
+        countdownView = (TextView) findViewById(R.id.__bu_countdown);
+        countdownView.setText(String.valueOf(countdownCounter));
+
+        TextView countdownDescView = (TextView) findViewById(
+                R.id.__bu_countdown_desc);
+        BlinkupController.setText(countdownDescView,
+                blinkup.stringIdCountdownDesc, R.string.__bu_countdown_desc);
+
+        PowerManager pm = (PowerManager) getSystemService(
+                Context.POWER_SERVICE);
+        wakeLock = pm.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
+                PowerManager.ACQUIRE_CAUSES_WAKEUP, "BrightWhileBlinking");
 
         // Set screen brightness to 100%
         WindowManager.LayoutParams params = getWindow().getAttributes();
@@ -66,16 +77,15 @@ public class BlinkupGLActivity extends Activity {
         FrameLayout container = (FrameLayout) findViewById(R.id.__bu_container);
         float maxSize = (float) getResources().getDimensionPixelSize(
                 R.dimen.__bu_blinkup_max_size);
-        mGLView = new BlinkupSurfaceView(this, maxSize);
+        surfaceView = new BlinkupSurfaceView(this, maxSize);
         @SuppressWarnings("deprecation")
         LayoutParams layoutParams = new LayoutParams(
                 LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT,
                 Gravity.CENTER);
-        container.addView(mGLView, 0, layoutParams);
+        container.addView(surfaceView, 0, layoutParams);
 
         String apiKey = getIntent().getExtras().getString("apiKey");
         if (apiKey != null) {
-            BlinkupController blinkup = BlinkupController.getInstance();
             setupTokenHandler = new SetupTokenHandler();
             blinkup.acquireSetupToken(this, apiKey, setupTokenHandler);
         } else {
@@ -93,13 +103,13 @@ public class BlinkupGLActivity extends Activity {
             finish();
         }
 
-        mHandler = new BlinkupHandler(this, packet);
+        handler = new BlinkupHandler(this, packet);
         if (blinkup.shouldCheckFrameRate(this)) {
-            mHandler.sendEmptyMessageDelayed(
+            handler.sendEmptyMessageDelayed(
                 BlinkupHandler.MEASURE_FRAME_RATE,
                 DateUtils.SECOND_IN_MILLIS);
         } else {
-            mHandler.sendEmptyMessageDelayed(
+            handler.sendEmptyMessageDelayed(
                     BlinkupHandler.UPDATE_COUNTDOWN,
                     DateUtils.SECOND_IN_MILLIS);
         }
@@ -112,30 +122,30 @@ public class BlinkupGLActivity extends Activity {
         // If your OpenGL application is memory intensive,
         // you should consider de-allocating objects that
         // consume significant memory here.
-        mGLView.onPause();
+        surfaceView.onPause();
 
-        mWakeLock.release();
+        wakeLock.release();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mWakeLock.acquire();
+        wakeLock.acquire();
         // The following call resumes a paused rendering thread.
         // If you de-allocated graphic objects for onPause()
         // this is a good place to re-allocate them.
-        mGLView.onResume();
+        surfaceView.onResume();
     }
 
     private void updateCountdown() {
         countdownCounter--;
-        mCountdownView.setText(String.valueOf(countdownCounter));
+        countdownView.setText(String.valueOf(countdownCounter));
         if (countdownCounter > 0) {
-            mHandler.sendEmptyMessageDelayed(BlinkupHandler.UPDATE_COUNTDOWN,
+            handler.sendEmptyMessageDelayed(BlinkupHandler.UPDATE_COUNTDOWN,
                     DateUtils.SECOND_IN_MILLIS);
         } else {
-            mCountdownPanel.setVisibility(View.GONE);
-            mHandler.sendEmptyMessageDelayed(BlinkupHandler.START_TRANSMITTING,
+            countdownPanel.setVisibility(View.GONE);
+            handler.sendEmptyMessageDelayed(BlinkupHandler.START_TRANSMITTING,
                     250);
         }
     }
@@ -145,18 +155,29 @@ public class BlinkupGLActivity extends Activity {
         if (id != DIALOG_LOW_FRAME_RATE) {
             return null;
         }
+        BlinkupController blinkup = BlinkupController.getInstance();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.__bu_low_frame_rate_title);
-        builder.setMessage(R.string.__bu_low_frame_rate_desc);
+        builder.setTitle(BlinkupController.getCustomStringOrDefault(this,
+                blinkup.stringIdLowFrameRateTitle,
+                R.string.__bu_low_frame_rate_title));
+        builder.setMessage(BlinkupController.getCustomStringOrDefault(this,
+                blinkup.stringIdLowFrameRateDesc,
+                R.string.__bu_low_frame_rate_desc));
         builder.setCancelable(false);
-        builder.setPositiveButton(R.string.__bu_low_frame_rate_go_to_settings,
+        builder.setPositiveButton(BlinkupController.getCustomStringOrDefault(
+                this,
+                blinkup.stringIdLowFrameRateGoToSettings,
+                R.string.__bu_low_frame_rate_go_to_settings),
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 goToSettings();
                 finish();
             }
         });
-        builder.setNegativeButton(R.string.__bu_low_frame_rate_proceed_anyway,
+        builder.setNegativeButton(BlinkupController.getCustomStringOrDefault(
+                this,
+                blinkup.stringIdLowFrameRateProceedAnyway,
+                R.string.__bu_low_frame_rate_proceed_anyway),
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 updateCountdown();
@@ -176,34 +197,33 @@ public class BlinkupGLActivity extends Activity {
         public static final int START_TRANSMITTING = 1;
         public static final int MEASURE_FRAME_RATE = 2;
 
-        private WeakReference<BlinkupGLActivity> mActivity;
-        private BlinkupPacket mPacket;
+        private WeakReference<BlinkupGLActivity> activity;
+        private BlinkupPacket packet;
 
         public BlinkupHandler(
                 BlinkupGLActivity activity,
                 BlinkupPacket packet) {
-            mActivity = new WeakReference<BlinkupGLActivity>(activity);
-            mPacket = packet;
+            this.activity = new WeakReference<BlinkupGLActivity>(activity);
+            this.packet = packet;
         }
 
         @Override
         public void handleMessage(Message msg) {
-            BlinkupGLActivity activity = mActivity.get();
-            if (activity == null) {
+            if (activity.get() == null) {
                 return;
             }
             switch (msg.what) {
             case UPDATE_COUNTDOWN:
-                activity.updateCountdown();
+                activity.get().updateCountdown();
                 break;
             case START_TRANSMITTING:
-                activity.mGLView.startTransmitting(mPacket);
+                activity.get().surfaceView.startTransmitting(packet);
                 break;
             case MEASURE_FRAME_RATE:
-                float framerate = activity.mGLView.getFrameRate();
+                float framerate = activity.get().surfaceView.getFrameRate();
                 BlinkupController blinkup = BlinkupController.getInstance();
                 if (blinkup.isFrameRateTooLow(framerate)) {
-                    activity.showDialog(DIALOG_LOW_FRAME_RATE);
+                    activity.get().showDialog(DIALOG_LOW_FRAME_RATE);
                 } else {
                     sendEmptyMessage(UPDATE_COUNTDOWN);
                 }

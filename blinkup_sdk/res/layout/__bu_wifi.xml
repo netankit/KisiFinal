@@ -22,14 +22,14 @@
         </EditText>
 
         <EditText
-            android:id="@+id/__bu_wifi_pw"
+            android:id="@+id/__bu_wifi_password"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="@string/__bu_password"
             android:inputType="textPassword" />
 
         <CheckBox
-            android:id="@+id/__bu_remember_pw"
+            android:id="@+id/__bu_remember_password"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:checked="false"

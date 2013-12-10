@@ -24,7 +24,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.newrelic.agent.android.NewRelic;
+
 
 //TODO: tk: all this editor code needs to go somewhere else. separate datamanager, for example.
 public class LoginActivity extends Activity implements OnClickListener {
@@ -160,11 +160,16 @@ public class LoginActivity extends Activity implements OnClickListener {
 			public void error(String message) {
 				JSONObject json = null;
 				String errormessage = null;
-				try {
-					json = new JSONObject(message);
-					errormessage = json.getString("error");
-				} catch (JSONException e) {
-					e.printStackTrace();
+				if(message.contains("Unable to resolve host")){
+					errormessage = activity.getString(R.string.no_network_error);
+				}
+				else{	
+					try {
+						json = new JSONObject(message);
+						errormessage = json.getString("error");
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
 				}
 				Toast.makeText(activity, errormessage, Toast.LENGTH_LONG).show();
 				passwordField.setText("");

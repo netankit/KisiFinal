@@ -9,7 +9,6 @@ import org.json.JSONException;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -132,12 +131,16 @@ public class WifiSelectActivity extends Activity {
                     .add(new NetworkItem(NetworkItem.Type.NETWORK, s));
         }
 
-        Resources res = getResources();
-        networkListStrings.add(new NetworkItem(NetworkItem.Type.CHANGE_NETWORK,
-                res.getString(R.string.__bu_change_network)));
+        String changeNetwork = (blinkup.stringIdChangeNetwork != null) ?
+                blinkup.stringIdChangeNetwork :
+                getString(R.string.__bu_change_network);
         networkListStrings.add(new NetworkItem(
-                NetworkItem.Type.CONNECT_USING_WPS, res
-                        .getString(R.string.__bu_connect_using_wps)));
+                NetworkItem.Type.CHANGE_NETWORK, changeNetwork));
+        String connectUsingWps = (blinkup.stringIdConnectUsingWps != null) ?
+                blinkup.stringIdConnectUsingWps :
+                getString(R.string.__bu_connect_using_wps);
+        networkListStrings.add(new NetworkItem(
+                NetworkItem.Type.CONNECT_USING_WPS, connectUsingWps));
 
         String clearSettingsText = blinkup.stringIdClearDeviceSettings;
         if (clearSettingsText == null) {

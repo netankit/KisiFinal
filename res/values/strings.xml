@@ -43,6 +43,7 @@
     <string name="share_empty_place_error">You can not share an empty place!</string>
     <string name="log_empty_place_error">You can not see the log of an empty place</string>
 	<string name="share_error_empty_email">You have to enter an email address to share a lock!</string>
+	<string name="no_network_error">No network connectivity</string>
 
 
 </resources>
