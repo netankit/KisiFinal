@@ -61,8 +61,17 @@ public class WifiActivity extends PreBlinkUpActivity {
         sharedPreferences = getSharedPreferences(filename, MODE_PRIVATE);
 
         ssidView = (EditText) findViewById(R.id.__bu_wifi_ssid);
-        passwordView = (EditText) findViewById(R.id.__bu_wifi_pw);
-        rememberCheckBox = (CheckBox) findViewById(R.id.__bu_remember_pw);
+        BlinkupController.setHint(ssidView, blinkup.stringIdSsidHint,
+                R.string.__bu_ssid);
+
+        passwordView = (EditText) findViewById(R.id.__bu_wifi_password);
+        BlinkupController.setHint(passwordView, blinkup.stringIdPasswordHint,
+                R.string.__bu_password);
+
+        rememberCheckBox = (CheckBox) findViewById(R.id.__bu_remember_password);
+        BlinkupController.setText(rememberCheckBox,
+                blinkup.stringIdRememberPassword,
+                R.string.__bu_remember_password);
 
         passwordView.setTypeface(Typeface.DEFAULT);
         blinkupButton.setEnabled(false);

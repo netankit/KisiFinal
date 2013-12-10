@@ -34,8 +34,11 @@ public abstract class PreBlinkUpActivity extends Activity {
 
     protected void init() {
         blinkupButton = (Button) findViewById(R.id.__bu_blinkup_button);
+
         legacyModeCheckBox = (CheckBox) findViewById(
                 R.id.__bu_legacy_mode_checkbox);
+        BlinkupController.setText(legacyModeCheckBox,
+                blinkup.stringIdLegacyMode, R.string.__bu_legacy_mode);
 
         TextView blinkupDesc = (TextView) findViewById(R.id.__bu_blinkup_desc);
         if (blinkupDesc != null) {
@@ -44,7 +47,8 @@ public abstract class PreBlinkUpActivity extends Activity {
         }
 
         if (blinkup.drawableIdInterstitial > 0) {
-            blinkupButton.setText(R.string.__bu_next);
+            BlinkupController.setText(blinkupButton, blinkup.stringIdNext,
+                    R.string.__bu_next);
         } else {
             BlinkupController.setText(blinkupButton, blinkup.stringIdSendBlinkUp,
                     R.string.__bu_send_blinkup);
@@ -77,9 +81,14 @@ public abstract class PreBlinkUpActivity extends Activity {
     protected Dialog onCreateDialog(int id) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         if (id == LEGACY_MODE_DIALOG) {
-            builder.setTitle(R.string.__bu_legacy_mode);
-            builder.setMessage(R.string.__bu_legacy_mode_desc);
-            builder.setNeutralButton(R.string.__bu_ok, new OnClickListener() {
+            builder.setTitle(BlinkupController.getCustomStringOrDefault(this,
+                    blinkup.stringIdLegacyMode, R.string.__bu_legacy_mode));
+            builder.setMessage(BlinkupController.getCustomStringOrDefault(this,
+                    blinkup.stringIdLegacyModeDesc,
+                    R.string.__bu_legacy_mode_desc));
+            builder.setNeutralButton(BlinkupController.getCustomStringOrDefault(
+                    this, blinkup.stringIdOk, R.string.__bu_ok),
+                    new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();

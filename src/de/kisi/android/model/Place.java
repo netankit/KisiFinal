@@ -4,17 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+
 
 
 //TODO: tk: libraries like Lombok simplify with automating getter & setter creation
 //TODO: tk: Google's gson is a more full-featured JSON handler org.json
 //e.g., it automates object creation from JSON strings
+@DatabaseTable(tableName = "Places")
 public class Place {
+	@DatabaseField(id = true)
 	private int id;
+	@DatabaseField
 	private String name;
+	
 	private List<Lock> locks;
 	private boolean locksLoaded;
+	@DatabaseField
 	private double latitude;
+	@DatabaseField
 	private double longitude;
 	@SerializedName("street_name")
 	private String streetName;
@@ -25,8 +35,9 @@ public class Place {
 	private String state;
 	private String country;
 	private String additionalInformation; 
+	@DatabaseField
 	@SerializedName("user_id")
-	private int owner_id;
+	private int ownerId;
 //	@SerializedName("updated_at")
 //	private Date updatedAt;
 
@@ -103,7 +114,7 @@ public class Place {
 	}
 
 	public int getOwnerId() {
-		return owner_id;
+		return ownerId;
 	}
 	
 	

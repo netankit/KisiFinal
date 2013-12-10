@@ -20,6 +20,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import de.kisi.android.R;
+import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
@@ -145,12 +146,19 @@ public class KisiAPI {
 
 	
 	public void updatePlaces(final OnPlaceChangedListener listener) {
+		places = DataManager.getInstance().getAllPlacesArray();
+		
+		if(places != null) {
+			listener.onPlaceChanged(places);
+		}
 		
 		KisiRestClient.get(context, "places",  new JsonHttpResponseHandler() { 
 			
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
-				places = gson.fromJson(response.toString(), Place[].class);
+				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
+				DataManager.getInstance().savePlaces(pl);
+				places = DataManager.getInstance().getAllPlacesArray();
 				listener.onPlaceChanged(places);
 				notifyAllOnPlaceChangedListener();		
 			}
@@ -171,8 +179,14 @@ public class KisiAPI {
 		KisiRestClient.get(context, "places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
-				Lock[] lock = gson.fromJson(response.toString(), Lock[].class);
-				place.setLock(lock);
+				Lock[] locks = gson.fromJson(response.toString(), Lock[].class);
+				for(Lock l: locks) {
+					l.setPlace(instance.getPlaceById(l.getPlaceId()));
+				}
+				place.setLock(locks);
+				DataManager.getInstance().saveLocks(locks);
+				List<Place> pl = DataManager.getInstance().getAllPlaces();
+				List<Lock> ll = DataManager.getInstance().getAllLocks();
 				listener.onPlaceChanged(places);
 				notifyAllOnPlaceChangedListener();
 			}
