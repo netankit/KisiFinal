@@ -2,11 +2,10 @@ package de.kisi.android.model;
 
 import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
 
 
 
-@DatabaseTable(tableName = "Locks") 
+//@DatabaseTable
 public class Lock {
 	@DatabaseField(id = true)
 	private int id;
@@ -15,13 +14,14 @@ public class Lock {
 	@DatabaseField
 	@SerializedName("place_id")
 	private int placeId;
-	@DatabaseField(foreign = true, foreignAutoRefresh=true)
+	@DatabaseField(foreign = true, foreignAutoRefresh=true, maxForeignAutoRefreshLevel=1)
 	private Place place;
 //	@SerializedName("updated_at")
 //	private Date updatedAt;
 //	@SerializedName("last_accessed_at")
 //	private Date lastAccessedAt;
 	
+	public Lock() {};
 	
 	public int getId() {
 		return id;

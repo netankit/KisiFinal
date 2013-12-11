@@ -48,6 +48,8 @@ public class KisiMain extends FragmentActivity implements
 		pager = (ViewPager) findViewById(R.id.pager);
 		
 		kisiAPI = KisiAPI.getInstance();
+		setupView(kisiAPI.getPlaces());
+		
 		kisiAPI.updatePlaces(new OnPlaceChangedListener() {
 
 			@Override
@@ -70,6 +72,8 @@ public class KisiMain extends FragmentActivity implements
 		popup.show();
 	}
 
+	
+	//TODO:remove this !!
 	@Override
 	public void onPause() { 
 		// sends user back to Login Screen if he didn't choose remember me

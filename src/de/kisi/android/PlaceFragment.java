@@ -59,11 +59,12 @@ public class PlaceFragment extends Fragment {
 		}
 		
 		final Place place = KisiAPI.getInstance().getPlaceAt(index);
+		setupButtons(place);
 		// get locks from api, if not already available
-		if (place.areLocksLoaded())
-			setupButtons(place);
-		else {
-			KisiAPI.getInstance().updateLocks(place, new OnPlaceChangedListener() {
+//		if (place.areLocksLoaded())
+//			setupButtons(place);
+//		else {
+		KisiAPI.getInstance().updateLocks(place, new OnPlaceChangedListener() {
 
 				@Override
 				public void onPlaceChanged(Place[] newPlaces) {
@@ -71,7 +72,7 @@ public class PlaceFragment extends Fragment {
 				}
 			
 			});
-		}
+//		}
 
 		return layout;
 	}

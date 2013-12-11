@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -80,6 +81,12 @@ public class KisiAPI {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				
+				//TODO: DB 
+//				DataManager.getInstance().getAllPlacesArray();
+				places = DataManager.getInstance().getAllPlacesArray();
+				
+				
 				callback.onLoginSuccess();
 			}
 			
@@ -114,6 +121,8 @@ public class KisiAPI {
 				editor.remove("authentication_token");
 				editor.commit();
 				user = null;
+				
+				DataManager.getInstance().deleteDB();
 			}
 		});
 	}
@@ -146,11 +155,7 @@ public class KisiAPI {
 
 	
 	public void updatePlaces(final OnPlaceChangedListener listener) {
-		places = DataManager.getInstance().getAllPlacesArray();
-		
-		if(places != null) {
-			listener.onPlaceChanged(places);
-		}
+	
 		
 		KisiRestClient.get(context, "places",  new JsonHttpResponseHandler() { 
 			
@@ -164,6 +169,11 @@ public class KisiAPI {
 			}
 			
 		});
+		
+		
+//		if(places != null) {
+//			listener.onPlaceChanged(places);
+//		}
 
 	}
 	
@@ -176,6 +186,10 @@ public class KisiAPI {
 	
 	
 	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {
+		
+		long time= System.currentTimeMillis();	
+//		places = DataManager.getInstance().getAllPlacesArray();
+	
 		KisiRestClient.get(context, "places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
@@ -183,14 +197,14 @@ public class KisiAPI {
 				for(Lock l: locks) {
 					l.setPlace(instance.getPlaceById(l.getPlaceId()));
 				}
-				place.setLock(locks);
 				DataManager.getInstance().saveLocks(locks);
-				List<Place> pl = DataManager.getInstance().getAllPlaces();
-				List<Lock> ll = DataManager.getInstance().getAllLocks();
 				listener.onPlaceChanged(places);
 				notifyAllOnPlaceChangedListener();
 			}
 		});
+//		listener.onPlaceChanged(places);
+		
+		
 	}
 	
 
@@ -266,8 +280,6 @@ public class KisiAPI {
 	}
 	
 	public void unlock(Lock lock, Activity activity, final UnlockCallback callback){
-		// TODO: Does the server really have to know where we are
-		// we sent so far always only (0,0)
         KisiLocationManager locationManager = KisiLocationManager.getInstance();
 		Location currentLocation = locationManager.getCurrentLocation();;
 		JSONObject location = new JSONObject();

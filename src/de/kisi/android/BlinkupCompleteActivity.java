@@ -3,9 +3,6 @@ package de.kisi.android;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;

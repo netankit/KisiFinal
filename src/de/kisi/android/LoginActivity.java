@@ -56,9 +56,10 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 		TextView forgotPw = (TextView) findViewById(R.id.forgot);
 		forgotPw.setMovementMethod(LinkMovementMethod.getInstance());
 
-		NewRelic.withApplicationToken(
-				"AAe80044cf73854b68f6e83881c9e61c0df9d92e56"
-				).start(this.getApplication());
+//		NewRelic.withApplicationToken(
+//				"AAe80044cf73854b68f6e83881c9e61c0df9d92e56"
+//				).start(this.getApplication());
+
 	}
 
 	@Override
