@@ -76,13 +76,13 @@ public class KisiMain extends FragmentActivity implements
 	//TODO:remove this !!
 	@Override
 	public void onPause() { 
-		// sends user back to Login Screen if he didn't choose remember me
-		SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
-		if (settings.getString("password", "").isEmpty()) {
-			Intent loginScreen = new Intent(getApplicationContext(), LoginActivity.class);
-			startActivity(loginScreen);
-		}
 		super.onPause();
+		// sends user back to Login Screen if he didn't choose remember me
+//		SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
+//		if (settings.getString("password", "").isEmpty()) {
+//			Intent loginScreen = new Intent(getApplicationContext(), LoginActivity.class);
+//			startActivity(loginScreen);
+//		}
 	}
 
 	
@@ -94,11 +94,10 @@ public class KisiMain extends FragmentActivity implements
 		switch(item.getItemId())
 		{
 			case R.id.refresh:
-				kisiAPI.updatePlaces(new OnPlaceChangedListener() {
+				kisiAPI.refresh(new OnPlaceChangedListener() {
 
 					@Override
 					public void onPlaceChanged(Place[] newPlaces) {
-						// TODO Auto-generated method stub
 						setupView(newPlaces );
 					}
 					

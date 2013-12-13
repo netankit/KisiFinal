@@ -28,4 +28,10 @@ public class KisiApplication extends Application{
 		de.kisi.android.vicinity.manager.GeofenceManager.initialize(this);
 		de.kisi.android.vicinity.LockInVicinityDisplayManager.initialize(this);
 	}
+	
+	@Override
+	public void onTerminate () {
+		super.onTerminate();
+		de.kisi.android.db.DataManager.getInstance().close();
+	}
 }

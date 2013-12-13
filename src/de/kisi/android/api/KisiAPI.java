@@ -66,7 +66,7 @@ public class KisiAPI {
 			e1.printStackTrace();
 		}
 
-		KisiRestClient.post(context, "users/sign_in", login_user,  new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().post(context, "users/sign_in", login_user,  new JsonHttpResponseHandler() {
 			
 			 public void onSuccess(org.json.JSONObject response) {
 				try {
@@ -81,18 +81,20 @@ public class KisiAPI {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				
-				//TODO: DB 
-//				DataManager.getInstance().getAllPlacesArray();
-				places = DataManager.getInstance().getAllPlacesArray();
-				
-				
+				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 				callback.onLoginSuccess();
 			}
 			
-			 public void onFailure(Throwable e, JSONObject response) {
-				String errormessage = null;
-				if(response != null) {
+			 public void onFailure(int statusCode, Throwable e, JSONObject response) {
+				 String errormessage = null;
+				 //no network connectivity
+				 if(statusCode == 0) {
+					 errormessage = context.getResources().getString(R.string.no_network);
+					 callback.onLoginFail(errormessage);
+					 return;
+				 }
+	
+				 if(response != null) {
 					try {
 						errormessage = response.getString("error");
 					} catch (JSONException ej) {
@@ -103,6 +105,7 @@ public class KisiAPI {
 					errormessage = "Error!";
 				}
 				callback.onLoginFail(errormessage);
+				return;
 			};
 			
 		});
@@ -113,7 +116,7 @@ public class KisiAPI {
 	}
 	
 	public void logout(Activity activity){
-		KisiRestClient.delete("/users/sign_out",  new TextHttpResponseHandler() {
+		KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
 			public void onSuccess(String msg) {
 				SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
 				SharedPreferences.Editor editor = settings.edit();
@@ -121,6 +124,7 @@ public class KisiAPI {
 				editor.remove("authentication_token");
 				editor.commit();
 				user = null;
+				places = null;
 				
 				DataManager.getInstance().deleteDB();
 			}
@@ -155,26 +159,19 @@ public class KisiAPI {
 
 	
 	public void updatePlaces(final OnPlaceChangedListener listener) {
-	
-		
-		KisiRestClient.get(context, "places",  new JsonHttpResponseHandler() { 
+		KisiRestClient.getInstance().get(context, "places",  new JsonHttpResponseHandler() { 
 			
 			public void onSuccess(JSONArray response) {
+				Log.i("Get request msg:", response.toString());
 				Gson gson = new Gson();
 				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
 				DataManager.getInstance().savePlaces(pl);
-				places = DataManager.getInstance().getAllPlacesArray();
+				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 				listener.onPlaceChanged(places);
 				notifyAllOnPlaceChangedListener();		
 			}
 			
 		});
-		
-		
-//		if(places != null) {
-//			listener.onPlaceChanged(places);
-//		}
-
 	}
 	
 	
@@ -185,12 +182,9 @@ public class KisiAPI {
 	}
 	
 	
-	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {
-		
-		long time= System.currentTimeMillis();	
-//		places = DataManager.getInstance().getAllPlacesArray();
-	
-		KisiRestClient.get(context, "places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
+	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {	
+		KisiRestClient.getInstance().get(context, "places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
+			
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
 				Lock[] locks = gson.fromJson(response.toString(), Lock[].class);
@@ -201,10 +195,7 @@ public class KisiAPI {
 				listener.onPlaceChanged(places);
 				notifyAllOnPlaceChangedListener();
 			}
-		});
-//		listener.onPlaceChanged(places);
-		
-		
+		});		
 	}
 	
 
@@ -225,7 +216,7 @@ public class KisiAPI {
 		}
 		String url = "places/" + String.valueOf(p.getId()) + "/keys";
 		
-		KisiRestClient.post(context, url, data, new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().post(context, url, data, new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONObject data) {
 				try {
@@ -305,7 +296,7 @@ public class KisiAPI {
 		}
 		String url = String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId());
 		
-		KisiRestClient.post(context, url, data,  new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().post(context, url, data,  new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONObject response) {
 				String message = null;
@@ -339,6 +330,11 @@ public class KisiAPI {
 		});
 	}
 	
+	
+	public void refresh(OnPlaceChangedListener listener) {
+		DataManager.getInstance().deleteDB();
+		this.updatePlaces(listener);
+	}
 	
 	
 
@@ -396,7 +392,7 @@ public class KisiAPI {
 		}
 	
 		//TODO: Implement a proper handler
-		KisiRestClient.post(context, "gateways", data, new JsonHttpResponseHandler() {});	
+		KisiRestClient.getInstance().post(context, "gateways", data, new JsonHttpResponseHandler() {});	
 		
 	}
 	

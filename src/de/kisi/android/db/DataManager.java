@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -26,15 +25,16 @@ public class DataManager {
 	
 	
 	private DatabaseHelper db;
-    private Dao<Lock, Integer> locksDao;
+    private Dao<Lock, Integer> lockDao;
     private Dao<Place, Integer> placeDao;
+    private DatabaseManager dbManager;
  
     private DataManager(Context ctx)
     {
         try {
-            DatabaseManager dbManager = new DatabaseManager();
+            dbManager = new DatabaseManager();
             db = dbManager.getHelper(ctx);
-            locksDao = db.getLockDao();
+            lockDao = db.getLockDao();
             placeDao = db.gePlaceDao();
         }catch (SQLException e) {
             e.printStackTrace();
@@ -44,18 +44,14 @@ public class DataManager {
     }
     
     public void saveLocks(final Lock[] locks) {    	 
-		final long time = System.currentTimeMillis();
 		try {
-			locksDao.callBatchTasks(new Callable<Void>() {
+			lockDao.callBatchTasks(new Callable<Void>() {
 
 				@Override
 				public Void call() throws Exception {
 					for (Lock l : locks) {
-						locksDao.createOrUpdate(l);
+						lockDao.createOrUpdate(l);
 					}
-					Log.e("saveLocks",
-							String.valueOf(System.currentTimeMillis() - time)
-									+ " ms");
 					return null;
 
 				}
@@ -67,8 +63,6 @@ public class DataManager {
     }
     
     public void savePlaces(final Place[] places) {
-    	final long time= System.currentTimeMillis();
-
 		try {
 			//put the hole operation into one transaction
 			placeDao.callBatchTasks(new Callable<Void>() {
@@ -79,7 +73,6 @@ public class DataManager {
 					for (Place p : places) {
 						placeDao.createOrUpdate(p);
 					}
-					Log.e("savePlaces", String.valueOf(System.currentTimeMillis()-time) + " ms");
 					return null;
 				}
 
@@ -93,44 +86,37 @@ public class DataManager {
     }
     
     public List<Place> getAllPlaces() {
+    	List<Place> result = null;
     	try {
-			return placeDao.queryForAll();
+    		result = placeDao.queryForAll();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
     	
-    	return null;
+    	return result;
     }
     
-    
-    public Place[] getAllPlacesArray() {
-    	List<Place> pl = null;
-    	long time= System.currentTimeMillis();
-    	try {
-    		pl = placeDao.queryForAll();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-    	Log.e("getAllPlacesArray queryForAll()", String.valueOf(System.currentTimeMillis()-time) + " ms");
-    	return pl.toArray(new Place[0]);
-    }
+
     
     
     public List<Lock> getAllLocks() {
+    	List<Lock> result = null;
     	try {
-			return locksDao.queryForAll();
+    		result =  lockDao.queryForAll();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-    	return null;
+    	return result;
     }
     
  
     
-    //TODO: implement 
     public void deleteDB() {
-    	
-    	DatabaseManager dbManager = new DatabaseManager();
+    	db.clear();
+    }
+    
+    public void close() {
+    	db.close();
     	dbManager.releaseHelper(db);
     }
     

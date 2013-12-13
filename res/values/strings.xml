@@ -47,4 +47,5 @@
 	<string name="new_user_html">New? <a href="https://www.kisi.de/users/sign_up">Get started on our website</a></string>
 	<string name="forgot_html"><a href="https://www.kisi.de/users/password/new">Forgot your password?</a></string>
 	<string name="missing_login_data">Please type in EMail and Password first</string>
+	<string name="no_network">No network connectivity</string>
 </resources>

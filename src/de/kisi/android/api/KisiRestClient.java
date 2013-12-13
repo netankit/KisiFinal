@@ -9,18 +9,33 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.loopj.android.http.*;
 
 public class KisiRestClient {
 
+	private static KisiRestClient instance =  new KisiRestClient();
+	
 	private static final String BASE_URL = "https://www.kisi.de/";
 	private static final String URL_SUFFIX = ".json";
 	
+	private  AsyncHttpClient client;
 	
-	private static AsyncHttpClient client = new AsyncHttpClient();
+	public static KisiRestClient getInstance() {
+		return instance;
+	}
+	
+	private KisiRestClient() {
+		 client = new AsyncHttpClient();
+		 client.setCookieStore(new BlackholeCookieStore());
+		 client.setUserAgent("Android_Kisi");
+	}
 
-	public static void get(Context context, String url, AsyncHttpResponseHandler responseHandler) {
+
+
+	public void get(Context context, String url, AsyncHttpResponseHandler responseHandler) {
+
 		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
 		String authToken = settings.getString("authentication_token", "");
 		if(authToken != null) 
@@ -29,7 +44,7 @@ public class KisiRestClient {
 			client.get(getAbsoluteUrl(url), responseHandler);
 	}
 
-	public static void post(Context context, String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
+	public void post(Context context, String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
 		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
 		String authToken = settings.getString("authentication_token", "");
 		if(authToken != null) 
@@ -39,19 +54,19 @@ public class KisiRestClient {
 	}
 	
 	
-	public static void delete(String url, AsyncHttpResponseHandler responseHandler) {
+	public  void delete(String url, AsyncHttpResponseHandler responseHandler) {
 		client.delete(getAbsoluteUrl(url),  responseHandler);
 	}
 
-	private static String getAbsoluteUrl(String relativeUrl) {
+	private  String getAbsoluteUrl(String relativeUrl) {
 		return BASE_URL + relativeUrl + URL_SUFFIX;
 	}
 	
-	private static String getAbsoluteUrl(String relativeUrl, String authToken) {
+	private  String getAbsoluteUrl(String relativeUrl, String authToken) {
 		return BASE_URL + relativeUrl + URL_SUFFIX + "?auth_token=" + authToken;
 	}
 
-	private static StringEntity JSONtoStringEntity (JSONObject json) {
+	private  StringEntity JSONtoStringEntity (JSONObject json) {
 		StringEntity entity = null;
         try {
 			entity = new StringEntity(json.toString());
@@ -62,3 +77,7 @@ public class KisiRestClient {
         return entity;
 	}
 }
+
+
+
+

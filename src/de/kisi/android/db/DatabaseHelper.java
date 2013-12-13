@@ -33,6 +33,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	
     private Dao<Place, Integer> placeDao = null;
     private RuntimeExceptionDao<Place, Integer> placeRuntimeDao = null;
+
     
 	
 	public DatabaseHelper(Context context) {
@@ -126,6 +127,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		return placeRuntimeDao;
 	}
 
+
+	public void clear() {
+		try {
+			TableUtils.clearTable(connectionSource, Place.class);
+			TableUtils.clearTable(connectionSource, Lock.class);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	
 
@@ -136,5 +147,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	public void close() {
 		super.close();
 		lockRuntimeDao = null;
+		placeRuntimeDao = null;
 	}
 }
