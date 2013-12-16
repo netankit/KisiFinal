@@ -46,7 +46,7 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
     }  
     
 
-
+    @Override
 	public void onSuccess(JSONObject json) { 
 		//prevent that blickup sdk calls onSuccess twice
 		blinkup.cancelTokenStatusPolling();
@@ -57,13 +57,13 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
     	progressBar.setVisibility(View.GONE);
 	}
 
-
+    @Override
 	public void onError(String errorMsg) {
 		status.setText(getResources().getString(R.string.blinkup_error) + " " + errorMsg);
 		progressBar.setVisibility(View.GONE);
 	}
 
-
+    @Override
 	public void onTimeout() {
 		status.setText(getResources().getString(R.string.blinkup_timeout) );
 		progressBar.setVisibility(View.GONE);

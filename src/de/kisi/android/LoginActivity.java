@@ -7,6 +7,7 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -27,7 +28,8 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 	private EditText userNameField;
 	private EditText passwordField;
 	private CheckBox savePassword;
-
+	private ProgressDialog progressDialog;
+	
 	private SharedPreferences settings;
 
 	@Override
@@ -97,8 +99,11 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 
 	@Override
 	public void onClick(View arg0) {
+		progressDialog = new ProgressDialog(this);
+		progressDialog.setMessage(getString(R.string.login_loading_message));
+		progressDialog.setCancelable(false);
+		progressDialog.show();
 		// user touched the login botton: gather all informations and send to next view
-		
 		// clear auth token
 		Editor editor = settings.edit();
 		editor.remove("authentication_token");
@@ -131,6 +136,8 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 			editor.remove("password");;
 		editor.commit();
 		
+		progressDialog.dismiss();
+		
 		// Switch the activity to internal Views
 		Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
 		startActivity(mainScreen);
@@ -139,6 +146,7 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 
 	@Override
 	public void onLoginFail(String errormessage) {
+		progressDialog.dismiss();
 		Toast.makeText(getApplicationContext(), errormessage, Toast.LENGTH_SHORT).show();
 		passwordField.setText("");
 	}

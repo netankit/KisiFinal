@@ -54,33 +54,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 			throw new RuntimeException(e);
 		}
-
-//		// here we try inserting data in the on-create as a test
-//		RuntimeExceptionDao<SimpleData, Integer> dao = getSimpleDataDao();
-//		long millis = System.currentTimeMillis();
-//		// create some entries in the onCreate
-//		SimpleData simple = new SimpleData(millis);
-//		dao.create(simple);
-//		simple = new SimpleData(millis + 1);
-//		dao.create(simple);
-//		Log.i(DatabaseHelper.class.getName(), "created new entries in onCreate: " + millis);
 	}
 
 	/**
 	 * This is called when your application is upgraded and it has a higher version number. This allows you to adjust
 	 * the various data to match the new version number.
+	 * TODO: Implement this in a later version
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
-//		try {
-//			Log.i(DatabaseHelper.class.getName(), "onUpgrade");
-//			TableUtils.dropTable(connectionSource, SimpleData.class, true);
-//			// after we drop the old databases, we create the new ones
-//			onCreate(db, connectionSource);
-//		} catch (SQLException e) {
-//			Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
-//			throw new RuntimeException(e);
-//		}
 	}
 
 	/**
@@ -109,7 +91,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	 * Returns the Database Access Object (DAO) for our Place class. It will create it or just give the cached
 	 * value.
 	 */
-	public Dao<Place, Integer> gePlaceDao() throws SQLException {
+	public Dao<Place, Integer> getPlaceDao() throws SQLException {
 		if (placeDao == null) {
 			placeDao = getDao(Place.class);
 		}
@@ -133,7 +115,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			TableUtils.clearTable(connectionSource, Place.class);
 			TableUtils.clearTable(connectionSource, Lock.class);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

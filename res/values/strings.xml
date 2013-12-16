@@ -48,4 +48,5 @@
 	<string name="forgot_html"><a href="https://www.kisi.de/users/password/new">Forgot your password?</a></string>
 	<string name="missing_login_data">Please type in EMail and Password first</string>
 	<string name="no_network">No network connectivity</string>
+	<string name="login_loading_message">Loggin in...</string>
 </resources>

@@ -14,7 +14,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.os.Build;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -162,7 +161,6 @@ public class KisiAPI {
 		KisiRestClient.getInstance().get(context, "places",  new JsonHttpResponseHandler() { 
 			
 			public void onSuccess(JSONArray response) {
-				Log.i("Get request msg:", response.toString());
 				Gson gson = new Gson();
 				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
 				DataManager.getInstance().savePlaces(pl);

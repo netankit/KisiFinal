@@ -73,17 +73,6 @@ public class KisiMain extends FragmentActivity implements
 	}
 
 	
-	//TODO:remove this !!
-	@Override
-	public void onPause() { 
-		super.onPause();
-		// sends user back to Login Screen if he didn't choose remember me
-//		SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
-//		if (settings.getString("password", "").isEmpty()) {
-//			Intent loginScreen = new Intent(getApplicationContext(), LoginActivity.class);
-//			startActivity(loginScreen);
-//		}
-	}
 
 	
 	@Override
@@ -178,8 +167,15 @@ public class KisiMain extends FragmentActivity implements
 		finish();
 	}
 
+	public void onBackPressed() {
+		 moveTaskToBack(true);
+	}
 
-
+	@Override
+	public  void onDestroy () {
+		super.onDestroy();
+		logout();
+	}
 
 	private void setupView(Place[] places) {
 

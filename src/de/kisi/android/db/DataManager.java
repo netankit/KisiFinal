@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -29,13 +30,13 @@ public class DataManager {
     private Dao<Place, Integer> placeDao;
     private DatabaseManager dbManager;
  
-    private DataManager(Context ctx)
+    private DataManager(Context context)
     {
         try {
             dbManager = new DatabaseManager();
-            db = dbManager.getHelper(ctx);
+            db = dbManager.getHelper(context);
             lockDao = db.getLockDao();
-            placeDao = db.gePlaceDao();
+            placeDao = db.getPlaceDao();
         }catch (SQLException e) {
             e.printStackTrace();
         }
@@ -44,7 +45,7 @@ public class DataManager {
     }
     
     public void saveLocks(final Lock[] locks) {    	 
-		try {
+    	try {
 			lockDao.callBatchTasks(new Callable<Void>() {
 
 				@Override
@@ -53,7 +54,6 @@ public class DataManager {
 						lockDao.createOrUpdate(l);
 					}
 					return null;
-
 				}
 
 			});
@@ -63,7 +63,7 @@ public class DataManager {
     }
     
     public void savePlaces(final Place[] places) {
-		try {
+    	try {
 			//put the hole operation into one transaction
 			placeDao.callBatchTasks(new Callable<Void>() {
 
@@ -92,13 +92,10 @@ public class DataManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-    	
     	return result;
     }
     
 
-    
-    
     public List<Lock> getAllLocks() {
     	List<Lock> result = null;
     	try {
