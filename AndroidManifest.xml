@@ -23,7 +23,7 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/CustomTheme" >
+            android:theme="@style/CustomThemeLogin" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

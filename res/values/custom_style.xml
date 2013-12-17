@@ -10,5 +10,9 @@
         <item name="android:windowNoTitle">false</item>
         <item name="android:windowTitleBackgroundStyle">@style/CustomWindowTitleBackground</item>
     </style>
+    
+     <style name="CustomThemeLogin" parent="android:Theme.Holo.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
 </resources>

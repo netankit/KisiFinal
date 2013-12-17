@@ -18,3 +18,12 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+
+# for new relic        
+-keep class com.newrelic.** { *; }
+-dontwarn com.newrelic.**
+-keepattributes Exceptions, Signature, InnerClasses 
+       
+# for the callback of the blinkUp SDK
+-keep public class de.kisi.android.KisiMain
