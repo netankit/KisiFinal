@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     
     <application
         android:allowBackup="true"
@@ -104,7 +106,25 @@
 	        </intent-filter>
 		</receiver>  
 		<receiver android:name="de.kisi.android.vicinity.manager.GeofenceUpdateLocationReceiver">
-		</receiver>      
-</application>
+		</receiver>
+		      
+        <service
+            android:name="de.kisi.android.vicinity.manager.BluetoothLEService"
+            android:enabled="true"
+            android:exported="false"
+            android:isolatedProcess="false"
+            >
+        </service>
+        <service
+            android:name="com.radiusnetworks.ibeacon.service.IBeaconService"
+            android:enabled="true"
+            android:exported="false"
+            android:isolatedProcess="false"
+            android:label="iBeacon" >
+        </service>
+        <service
+            android:name="com.radiusnetworks.ibeacon.IBeaconIntentProcessor"
+            android:enabled="true" >
+        </service></application>
 
 </manifest>

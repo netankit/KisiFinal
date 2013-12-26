@@ -106,7 +106,7 @@ public class Place {
 		return owner_id;
 	}
 	
-	
+	//TODO: Is this really meant as a setLock or maybe as addLock
 	public void setLock(Lock[] data) {
 		locksLoaded = true;
 		for(int i=0; i < data.length; i++) {

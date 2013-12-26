@@ -1,5 +1,7 @@
 package de.kisi.android;
 
+import de.kisi.android.vicinity.manager.BluetoothLEManager;
+import de.kisi.android.vicinity.manager.GeofenceManager;
 import android.app.Application;
 
 public class KisiApplication extends Application{
@@ -13,18 +15,7 @@ public class KisiApplication extends Application{
 		super.onCreate();
 		instance = this;
 		
-		// TODO: Uncomment this for release
-		/*
-		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(){
-			@Override
-			public void uncaughtException(Thread arg0, Throwable arg1) {
-				 System.exit(1);
-			}
-		});
-		*/
-		
-		de.kisi.android.api.KisiAPI.initialize(this);
-		de.kisi.android.vicinity.manager.GeofenceManager.initialize(this);
-		de.kisi.android.vicinity.LockInVicinityDisplayManager.initialize(this);
+		GeofenceManager.getInstance();
+		BluetoothLEManager.getInstance();
 	}
 }

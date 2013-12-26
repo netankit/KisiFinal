@@ -8,17 +8,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
-import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
-import de.kisi.android.R;
+import de.kisi.android.KisiApplication;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
@@ -41,10 +39,9 @@ public class KisiAPI {
 
 	private Context context;
 	
-	public static void initialize(Context context){
-		instance = new KisiAPI(context);
-	}
 	public static KisiAPI getInstance(){
+		if(instance==null)
+			instance = new KisiAPI(KisiApplication.getApplicationInstance());
 		return instance;
 	}
 
@@ -53,7 +50,7 @@ public class KisiAPI {
 	}
 
 	
-	public void login(String login, String password, final LoginCallback callback, Activity activity){
+	public void login(String login, String password, final LoginCallback callback){
 		
 
 		
@@ -103,7 +100,7 @@ public class KisiAPI {
 
 	}
 	
-	public void logout(Activity activity){
+	public void logout(){
 		KisiRestClient.delete("/users/sign_out",  new TextHttpResponseHandler() {
 			public void onSuccess(String msg) {
 				SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
@@ -122,7 +119,14 @@ public class KisiAPI {
 	 * @return Array of all Places the user has access to
 	 */
 	public Place[] getPlaces(){
-		return places;
+		return getFakePlaces();
+		//return places;
+	}
+	
+	public Place[] getFakePlaces(){
+		Place[] result = new Place[1];
+		result[0]=new Place();
+		return result;
 	}
 	
 	public Place getPlaceAt(int index){
@@ -143,7 +147,7 @@ public class KisiAPI {
 	}
 
 	
-	public void updatePlaces(Activity activity) {
+	public void updatePlaces() {
 		
 		KisiRestClient.get(context, "places",  new JsonHttpResponseHandler() { 
 			
@@ -187,7 +191,7 @@ public class KisiAPI {
 	}
 	
 	
-	public void updateLocks(Activity activity, final Place place) {
+	public void updateLocks(final Place place) {
 		KisiRestClient.get(context, "places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
@@ -199,7 +203,7 @@ public class KisiAPI {
 	}
 	
 
-	public boolean createNewKey(Place p, String email, List<Lock> locks, final Activity activity) {
+	public void createNewKey(Place p, String email, List<Lock> locks) {
 
 		JSONArray lock_ids = new JSONArray();
 		for (Lock l : locks) {
@@ -219,7 +223,8 @@ public class KisiAPI {
 		KisiRestClient.post(context, url, data, new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONObject data) {
-				try {
+				//TODO: Create Callback for Feedback
+				/*try {
 					Toast.makeText(
 							activity,
 							String.format(context.getResources().getString(R.string.share_success),
@@ -227,11 +232,10 @@ public class KisiAPI {
 							Toast.LENGTH_LONG).show();
 				} catch (JSONException e) {
 					e.printStackTrace();
-				}
+				}*/
 			}
 			
 		});	
-		return true;
 	}
 	/**
 	 * Register for interest in any changes in the Places.
@@ -270,7 +274,7 @@ public class KisiAPI {
 		return place.getOwnerId()==this.user.getId();
 	}
 	
-	public void unlock(Lock lock, Activity activity, final UnlockCallback callback){
+	public void unlock(Lock lock, final UnlockCallback callback){
 		// TODO: Does the server really have to know where we are
 		// we sent so far always only (0,0)
 		JSONObject location = new JSONObject();

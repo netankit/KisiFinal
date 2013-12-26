@@ -108,7 +108,7 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 		
 		// test for complete login data
 		if(email.contains("@") && !password.isEmpty()){
-			KisiAPI.getInstance().login(email, password, this, this);
+			KisiAPI.getInstance().login(email, password, this);
 		}else{
 			Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.missing_login_data), Toast.LENGTH_SHORT).show();
 			return;

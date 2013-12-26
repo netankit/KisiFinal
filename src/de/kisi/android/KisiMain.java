@@ -49,7 +49,7 @@ public class KisiMain extends FragmentActivity implements
 		
 		kisiAPI = KisiAPI.getInstance();
 		kisiAPI.registerOnPlaceChangedListener(this);
-		kisiAPI.updatePlaces(this);
+		kisiAPI.updatePlaces();
 
 	}
 
@@ -83,7 +83,7 @@ public class KisiMain extends FragmentActivity implements
 		switch(item.getItemId())
 		{
 			case R.id.refresh:
-				kisiAPI.updatePlaces(this);
+				kisiAPI.updatePlaces();
 				return true;
 			
 			case R.id.share:
@@ -156,7 +156,7 @@ public class KisiMain extends FragmentActivity implements
     }
 
 	private void logout() {
-		kisiAPI.logout(this);
+		kisiAPI.logout();
 		finish();
 	}
 

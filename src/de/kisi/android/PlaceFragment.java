@@ -69,7 +69,7 @@ public class PlaceFragment extends Fragment {
 					setupButtons(place);
 				}
 			});
-			KisiAPI.getInstance().updateLocks(getActivity(), place);
+			KisiAPI.getInstance().updateLocks(place);
 		}
 
 		return layout;
@@ -124,7 +124,7 @@ public class PlaceFragment extends Fragment {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					KisiAPI.getInstance().unlock(lock, getActivity(), new UnlockCallback(){
+					KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
 
 						@Override
 						public void onUnlockSuccess(String message) {

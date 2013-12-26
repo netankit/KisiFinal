@@ -11,6 +11,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationStatusCodes;
 import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListener;
 
+import de.kisi.android.KisiApplication;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
@@ -19,6 +20,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 /**
  * GeofenceManager is realized as a Singleton.
  * It has to be initialized before it can be used.
@@ -38,20 +40,11 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	private static GeofenceManager instance;
 	
 	/**
-	 * Starts the GeofenceManager and register all Places.
-	 *  
-	 * @param context The Application Context
-	 */
-	public static void initialize(Context context){
-		if(instance == null)
-			instance = new GeofenceManager(context);
-	}
-	/**
 	 * Retrieve the singleton instance of the GeofenceManager.
-	 * 
-	 * @return Returns the GeofenceManager or NULL if initialize wasn't called
 	 */
 	public static GeofenceManager getInstance(){
+		if(instance == null)
+			instance = new GeofenceManager();
 		return instance;
 	}
 
@@ -63,9 +56,9 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	private int reconnectTries = 0;
 	private List<String> geofenceIds = new LinkedList<String>();
 	
-	private GeofenceManager(Context context){
-		mContext = context;
-		mLocationClient = new LocationClient(context, this, this);
+	private GeofenceManager(){
+		mContext = KisiApplication.getApplicationInstance();
+		mLocationClient = new LocationClient(mContext, this, this);
 		mLocationClient.connect();
 	}
 
@@ -154,11 +147,13 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         // Create a Geofence for every Place
         for(Place p : places)
         {
+        	String placeId = "Place: "+p.getId();
+        	Log.i("GeofenceManager","Register PlaceID: '"+placeId+"'");
         	fences.add(new Geofence.Builder()
-        	.setRequestId("Place: "+p.getId())
+        	.setRequestId(placeId)
         	.setCircularRegion(p.getLatitude(), p.getLongitude(), 50)
             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT|Geofence.GEOFENCE_TRANSITION_ENTER)
-            .setExpirationDuration(1000*60*60*24)// one day
+            .setExpirationDuration(0)
             .build());
         }
         

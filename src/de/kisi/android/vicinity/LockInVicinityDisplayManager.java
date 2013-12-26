@@ -1,5 +1,6 @@
 package de.kisi.android.vicinity;
 
+import de.kisi.android.KisiApplication;
 import android.content.Context;
 import android.content.Intent;
 
@@ -7,6 +8,8 @@ public class LockInVicinityDisplayManager {
 
 	private static LockInVicinityDisplayManager instance;
 	public static LockInVicinityDisplayManager getInstance(){
+		if(instance == null)
+			instance = new LockInVicinityDisplayManager(KisiApplication.getApplicationInstance());
 		return instance;
 	}
 	public Context mContext;
@@ -14,9 +17,6 @@ public class LockInVicinityDisplayManager {
 		mContext = context;
 	}
 	
-	public static void initialize(Context context){
-		instance = new LockInVicinityDisplayManager(context);
-	}
 	public void notifyOnEntry(int placeID){
 		Intent intent = new Intent("de.kisi.android.VICINITY_CHANGED");
 		intent.putExtra("Place", placeID);
