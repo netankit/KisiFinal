@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Vector;
 
 import de.kisi.android.R;
+import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.LoginCallback;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -32,12 +35,35 @@ public class KisiMain extends FragmentActivity implements
     private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
 
     private ViewPager pager;
-	
+	private Activity activity;
     private KisiAPI kisiAPI;
     
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
+		kisiAPI = KisiAPI.getInstance();
+		activity = this;
+		
+		if(KisiAccountManager.getInstance().getPassword() == null) {
+			Intent login = new Intent(this,  LoginActivity.class);
+			startActivity(login);
+		}
+		else {
+			kisiAPI.login(KisiAccountManager.getInstance().getUserName(), KisiAccountManager.getInstance().getPassword(), new LoginCallback() {
+				@Override
+				public void onLoginSuccess(String authtoken) {					
+					return;
+				}
+				
+				@Override
+				public void onLoginFail(String errormessage) {
+					Intent login = new Intent(activity, LoginActivity.class);
+					startActivity(login);
+				}
+			});
+		}
+		
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		
 		setContentView(R.layout.kisi_main);
@@ -47,7 +73,12 @@ public class KisiMain extends FragmentActivity implements
 		
 		pager = (ViewPager) findViewById(R.id.pager);
 		
-		kisiAPI = KisiAPI.getInstance();
+	}
+    
+    
+    @Override
+    public void onStart() {
+    	super.onStart();
 		setupView(kisiAPI.getPlaces());
 		
 		kisiAPI.updatePlaces(new OnPlaceChangedListener() {
@@ -60,7 +91,7 @@ public class KisiMain extends FragmentActivity implements
 			
 		});
 
-	}
+    }
 
 	// creating popup-menu for settings
 	public void showPopup(View v) {
@@ -135,7 +166,6 @@ public class KisiMain extends FragmentActivity implements
 				if(kisiAPI.getUser().getEiPlanId() != null)
 					blinkup.setPlanID(settings.getString("ei_plan_id", null));
 				
-				
 				blinkup.selectWifiAndSetupDevice(this, API_KEY, new ServerErrorHandler() {
 			        @Override
 			        public void onError(String errorMsg) {
@@ -163,7 +193,8 @@ public class KisiMain extends FragmentActivity implements
     }
 
 	private void logout() {
-		kisiAPI.logout(this);
+		KisiAccountManager.getInstance().removeAccount();
+		kisiAPI.logout();
 		finish();
 	}
 

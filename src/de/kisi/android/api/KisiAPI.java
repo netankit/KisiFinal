@@ -24,6 +24,7 @@ import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
+import de.kisi.android.rest.KisiRestClient;
 
 import com.google.gson.Gson;
 
@@ -45,6 +46,7 @@ public class KisiAPI {
 	public static void initialize(Context context){
 		instance = new KisiAPI(context);
 	}
+	
 	public static KisiAPI getInstance(){
 		return instance;
 	}
@@ -52,9 +54,9 @@ public class KisiAPI {
 	private KisiAPI(Context context){
 		this.context = context;
 	}
-
 	
-	public void login(String login, String password, final LoginCallback callback, Activity activity){
+	
+	public void login(String login, String password, final LoginCallback callback){
 		JSONObject login_data = new JSONObject();
 		JSONObject login_user = new JSONObject();
 		try {
@@ -68,11 +70,12 @@ public class KisiAPI {
 		KisiRestClient.getInstance().post(context, "users/sign_in", login_user,  new JsonHttpResponseHandler() {
 			
 			 public void onSuccess(org.json.JSONObject response) {
-				try {
+				String authtoken = null; 
+				 try {
 					Editor editor = context.getSharedPreferences("Config", Context.MODE_PRIVATE).edit();
-					editor.putString("authentication_token", response.getString("authentication_token"));
+					authtoken = response.getString("authentication_token");
+					editor.putString("authentication_token", authtoken);
 					editor.putInt("user_id", response.getInt("id"));
-									
 					Gson gson = new Gson();
 					user = gson.fromJson(response.toString(), User.class);
 					
@@ -81,7 +84,7 @@ public class KisiAPI {
 					e.printStackTrace();
 				}
 				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-				callback.onLoginSuccess();
+				callback.onLoginSuccess(authtoken);
 			}
 			
 			 public void onFailure(int statusCode, Throwable e, JSONObject response) {
@@ -114,7 +117,7 @@ public class KisiAPI {
 
 	}
 	
-	public void logout(Activity activity){
+	public void logout(){
 		KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
 			public void onSuccess(String msg) {
 				SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
@@ -268,7 +271,7 @@ public class KisiAPI {
 		return place.getOwnerId()==this.user.getId();
 	}
 	
-	public void unlock(Lock lock, Activity activity, final UnlockCallback callback){
+	public void unlock(Lock lock, final UnlockCallback callback){
         KisiLocationManager locationManager = KisiLocationManager.getInstance();
 		Location currentLocation = locationManager.getCurrentLocation();;
 		JSONObject location = new JSONObject();
@@ -393,5 +396,11 @@ public class KisiAPI {
 		KisiRestClient.getInstance().post(context, "gateways", data, new JsonHttpResponseHandler() {});	
 		
 	}
+	
+	
+	public boolean checkIfTokenValid() {
+		return true;
+	}
+	
 	
 }

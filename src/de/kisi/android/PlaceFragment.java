@@ -126,7 +126,7 @@ public class PlaceFragment extends Fragment {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					KisiAPI.getInstance().unlock(lock, getActivity(), new UnlockCallback(){
+					KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
 
 						@Override
 						public void onUnlockSuccess(String message) {

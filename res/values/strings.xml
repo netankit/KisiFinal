@@ -49,4 +49,7 @@
 	<string name="missing_login_data">Please type in EMail and Password first</string>
 	<string name="no_network">No network connectivity</string>
 	<string name="login_loading_message">Loggin in...</string>
+	<string name="account_type">de.kisi</string>
+	<string name="add_new_account_done">Account created</string>
+	<string name="error_creating_account">Error creating account</string>
 </resources>

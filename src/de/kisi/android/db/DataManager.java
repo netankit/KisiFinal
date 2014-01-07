@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
 

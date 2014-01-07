@@ -3,6 +3,7 @@ package de.kisi.android;
 import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.R;
+import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
 import android.os.Bundle;
@@ -32,6 +33,10 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 	
 	private SharedPreferences settings;
 
+	private String email;
+	private String password;
+
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -76,18 +81,18 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 		super.onStart();
 
 		settings = getSharedPreferences("Config", MODE_PRIVATE);
-		String email = settings.getString("email", "");
-		String password = settings.getString("password", "");
-
-		if (!email.isEmpty()) {
-			userNameField.setText(email);
-			if (password.isEmpty()) {
-				passwordField.requestFocus();
-			} else {
-				passwordField.setText(password);
-				savePassword.setChecked(true);
-			}
-		}
+//		String email = settings.getString("email", "");
+//		String password = settings.getString("password", "");
+//
+//		if (!email.isEmpty()) {
+//			userNameField.setText(email);
+//			if (password.isEmpty()) {
+//				passwordField.requestFocus();
+//			} else {
+//				passwordField.setText(password);
+//				savePassword.setChecked(true);
+//			}
+//		}
 	}
 
 	@Override
@@ -109,12 +114,12 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 		editor.remove("authentication_token");
 		editor.commit();
 
-		String email = userNameField.getText().toString();
-		String password = passwordField.getText().toString();
+		email = userNameField.getText().toString();
+		password = passwordField.getText().toString();
 		
 		// test for complete login data
 		if(email.contains("@") && !password.isEmpty()){
-			KisiAPI.getInstance().login(email, password, this, this);
+			KisiAPI.getInstance().login(email, password, this);
 		}else{
 			Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.missing_login_data), Toast.LENGTH_SHORT).show();
 			return;
@@ -124,22 +129,20 @@ public class LoginActivity extends Activity implements OnClickListener,LoginCall
 
 
 	@Override
-	public void onLoginSuccess() {
+	public void onLoginSuccess(String authtoken) {
 		// Save login credentials
-		Editor editor = settings.edit();
-		editor.putString("email", userNameField.getText().toString());
-		if (savePassword.isChecked())
-			// TODO: never save the password on the phone
-			// especially not in plain text
-			editor.putString("password", passwordField.getText().toString());
-		else
-			editor.remove("password");;
-		editor.commit();
+
+		if (savePassword.isChecked()) {
+			KisiAccountManager.getInstance().addAccount(email, password);
+		}
 		
 		progressDialog.dismiss();
 		
 		// Switch the activity to internal Views
 		Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
+		mainScreen.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		//finish login activity
+		finish();
 		startActivity(mainScreen);
 
 	}
