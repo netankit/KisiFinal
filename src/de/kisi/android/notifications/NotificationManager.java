@@ -21,7 +21,7 @@ public class NotificationManager extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Log.i("NotificationManager","onReceive("+intent.getAction()+")");
 		Bundle extras = intent.getExtras();
-		showNotification(context, "Place "+extras.getInt("Place")+" "+extras.getString("Type"));
+		showNotification(context, "Place "+extras.getInt("Place")+" Lock "+extras.getInt("Lock")+" "+extras.getString("Type"));
 	}
 
 	

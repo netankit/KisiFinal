@@ -119,14 +119,7 @@ public class KisiAPI {
 	 * @return Array of all Places the user has access to
 	 */
 	public Place[] getPlaces(){
-		return getFakePlaces();
-		//return places;
-	}
-	
-	public Place[] getFakePlaces(){
-		Place[] result = new Place[1];
-		result[0]=new Place();
-		return result;
+		return places;
 	}
 	
 	public Place getPlaceAt(int index){

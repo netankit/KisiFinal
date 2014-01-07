@@ -22,6 +22,7 @@ public class BluetoothLEManager {
 		context = KisiApplication.getApplicationInstance();
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
 			Intent intent = new Intent(context,BluetoothLEService.class);
+			context.startService(intent);
 			context.bindService(intent, new ServiceConnection(){
 
 				@Override
@@ -33,6 +34,4 @@ public class BluetoothLEManager {
 				}}, Context.BIND_AUTO_CREATE);
 		}
 	}
-	
-	
 }

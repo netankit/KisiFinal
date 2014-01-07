@@ -14,13 +14,13 @@ import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 public class ConfirmToUnlockActor implements LockInVicinityActorInterface {
 
 	@Override
-	public void actOnEntry(int placeID) {
-		LockInVicinityDisplayManager.getInstance().notifyOnEntry(placeID);
+	public void actOnEntry(int placeID, int lockId) {
+		LockInVicinityDisplayManager.getInstance().notifyOnEntry(placeID,lockId);
 	}
 
 	@Override
-	public void actOnExit(int placeID) {
-		LockInVicinityDisplayManager.getInstance().notifyOnExit(placeID);
+	public void actOnExit(int placeID, int lockId) {
+		LockInVicinityDisplayManager.getInstance().notifyOnExit(placeID,lockId);
 	}
 
 }

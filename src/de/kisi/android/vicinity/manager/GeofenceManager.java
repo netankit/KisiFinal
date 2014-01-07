@@ -151,9 +151,9 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         	Log.i("GeofenceManager","Register PlaceID: '"+placeId+"'");
         	fences.add(new Geofence.Builder()
         	.setRequestId(placeId)
-        	.setCircularRegion(p.getLatitude(), p.getLongitude(), 50)
+        	.setCircularRegion(p.getLatitude(), p.getLongitude(), 100)
             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT|Geofence.GEOFENCE_TRANSITION_ENTER)
-            .setExpirationDuration(0)
+            .setExpirationDuration(-1)
             .build());
         }
         

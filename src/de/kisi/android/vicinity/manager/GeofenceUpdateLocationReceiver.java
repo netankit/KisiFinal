@@ -25,13 +25,13 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
             for(Geofence fence : fences){
             	String p[] = fence.getRequestId().split(": ");
             	int placeID = Integer.parseInt(p[1]);
-            	actor.actOnEntry(placeID);
+            	actor.actOnEntry(placeID,0);
             }
         else if(transitionType == Geofence.GEOFENCE_TRANSITION_EXIT)
             for(Geofence fence : fences){
             	String p[] = fence.getRequestId().split(": ");
             	int placeID = Integer.parseInt(p[1]);
-            	actor.actOnExit(placeID);
+            	actor.actOnExit(placeID,0);
             }
 	}
 

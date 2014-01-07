@@ -17,15 +17,17 @@ public class LockInVicinityDisplayManager {
 		mContext = context;
 	}
 	
-	public void notifyOnEntry(int placeID){
+	public void notifyOnEntry(int placeId, int lockId){
 		Intent intent = new Intent("de.kisi.android.VICINITY_CHANGED");
-		intent.putExtra("Place", placeID);
+		intent.putExtra("Place", placeId);
+		intent.putExtra("Lock", lockId);
 		intent.putExtra("Type", "Enter");
 		mContext.sendBroadcast(intent);
 	}
-	public void notifyOnExit(int placeID){
+	public void notifyOnExit(int placeId, int lockId){
 		Intent intent = new Intent("de.kisi.android.VICINITY_CHANGED");
-		intent.putExtra("Place", placeID);
+		intent.putExtra("Place", placeId);
+		intent.putExtra("Lock", lockId);
 		intent.putExtra("Type", "Exit");
 		mContext.sendBroadcast(intent);
 	}
