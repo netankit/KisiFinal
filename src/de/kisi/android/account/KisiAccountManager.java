@@ -24,41 +24,17 @@ public class KisiAccountManager {
 	public static KisiAccountManager getInstance() {
 		return instance;
 	}
-	
-	public boolean addAccount(String email, String password) {
-		Account account = new Account(email, ACCOUNT_TYPE);
-		return accManager.addAccountExplicitly(account, password, null);
-	}
-	
-	public String getUserName(){
-		Account[] accounts = accManager.getAccountsByType(ACCOUNT_TYPE);
-		if(accounts == null || accounts.length > 1) {
-			return null;
+
+	public void deleteAccountByName(String name ) {
+		Account availableAccounts[] = accManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
+		Account result = null;
+
+		for(Account acc: availableAccounts) {
+			if(acc.name.equals(name)) {
+				accManager.removeAccount(acc, null, null);
+				return;
+			}
 		}
-		else {
-			return accounts[0].name;
-		}
-	}
-	
-	
-	public String getPassword() {
-		Account[] accounts = accManager.getAccountsByType(ACCOUNT_TYPE);
-		if(accounts.length == 0|| accounts.length > 1) {
-			return null;
-		}
-		else {
-			return accManager.getPassword(accounts[0]);
-		}
-	}
-	
-	
-	public void removeAccount() {
-		Account[] accounts = accManager.getAccountsByType(ACCOUNT_TYPE);
-		if(accounts.length == 0|| accounts.length > 1) {
-			return;
-		}
-		else {
-			accManager.removeAccount(accounts[0], null, null);
-		}
-	}
+		return;
+	}	
 }

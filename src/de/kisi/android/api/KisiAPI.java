@@ -20,6 +20,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import de.kisi.android.R;
+import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -75,7 +76,7 @@ public class KisiAPI {
 					Editor editor = context.getSharedPreferences("Config", Context.MODE_PRIVATE).edit();
 					authtoken = response.getString("authentication_token");
 					editor.putString("authentication_token", authtoken);
-					editor.putInt("user_id", response.getInt("id"));
+					
 					Gson gson = new Gson();
 					user = gson.fromJson(response.toString(), User.class);
 					
@@ -117,18 +118,25 @@ public class KisiAPI {
 
 	}
 	
+	public void clearCache() {
+		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = settings.edit();
+		editor = settings.edit();
+		editor.remove("authentication_token");
+		editor.commit();
+		user = null;
+		places = null;
+		
+		DataManager.getInstance().deleteDB();
+	}
+	
+	
 	public void logout(){
+		KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
+		clearCache();
 		KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
 			public void onSuccess(String msg) {
-				SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
-				SharedPreferences.Editor editor = settings.edit();
-				editor = settings.edit();
-				editor.remove("authentication_token");
-				editor.commit();
-				user = null;
-				places = null;
-				
-				DataManager.getInstance().deleteDB();
+	
 			}
 		});
 	}
@@ -395,11 +403,6 @@ public class KisiAPI {
 		//TODO: Implement a proper handler
 		KisiRestClient.getInstance().post(context, "gateways", data, new JsonHttpResponseHandler() {});	
 		
-	}
-	
-	
-	public boolean checkIfTokenValid() {
-		return true;
 	}
 	
 	

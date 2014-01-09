@@ -100,19 +100,17 @@ public class BlinkupController {
      * @return BlinkupController
      */
     public static BlinkupController getInstance() {
-        return getInstanceWithBaseUrl(DEFAULT_BASE_URL);
+        if (instance == null) {
+            instance = new BlinkupController(DEFAULT_BASE_URL);
+        }
+        return instance;
     }
 
     /**
-     * Get a BlinkupController instance pointing to a specific base url.
-     *
-     * @return BlinkupController
+     * Set the base url of the BlinkupController.
      */
-    public static BlinkupController getInstanceWithBaseUrl(String baseUrl) {
-        if (instance == null) {
-            instance = new BlinkupController(baseUrl);
-        }
-        return instance;
+    public void setBaseUrl(String baseUrl) {
+        impController.setBaseUrl(baseUrl);
     }
 
     /**

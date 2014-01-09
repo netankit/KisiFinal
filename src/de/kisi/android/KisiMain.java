@@ -38,6 +38,10 @@ public class KisiMain extends FragmentActivity implements
 	private Activity activity;
     private KisiAPI kisiAPI;
     
+    public static int LOGIN_REQUEST_CODE = 5;
+    
+    
+    
     @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,24 +49,8 @@ public class KisiMain extends FragmentActivity implements
 		kisiAPI = KisiAPI.getInstance();
 		activity = this;
 		
-		if(KisiAccountManager.getInstance().getPassword() == null) {
-			Intent login = new Intent(this,  LoginActivity.class);
-			startActivity(login);
-		}
-		else {
-			kisiAPI.login(KisiAccountManager.getInstance().getUserName(), KisiAccountManager.getInstance().getPassword(), new LoginCallback() {
-				@Override
-				public void onLoginSuccess(String authtoken) {					
-					return;
-				}
-				
-				@Override
-				public void onLoginFail(String errormessage) {
-					Intent login = new Intent(activity, LoginActivity.class);
-					startActivity(login);
-				}
-			});
-		}
+		Intent login = new Intent(this,  AccountPickerActivity.class);
+		startActivityForResult(login, LOGIN_REQUEST_CODE);
 		
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		
@@ -75,6 +63,8 @@ public class KisiMain extends FragmentActivity implements
 		
 	}
     
+    
+        
     
     @Override
     public void onStart() {
@@ -160,11 +150,9 @@ public class KisiMain extends FragmentActivity implements
 				
 				BlinkupController blinkup = BlinkupController.getInstance();
 				blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
-
-				SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
 				
 				if(kisiAPI.getUser().getEiPlanId() != null)
-					blinkup.setPlanID(settings.getString("ei_plan_id", null));
+					blinkup.setPlanID(kisiAPI.getUser().getEiPlanId());
 				
 				blinkup.selectWifiAndSetupDevice(this, API_KEY, new ServerErrorHandler() {
 			        @Override
@@ -189,11 +177,17 @@ public class KisiMain extends FragmentActivity implements
 	//callback for blinkup 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	BlinkupController.getInstance().handleActivityResult(this, requestCode, resultCode, data);
+    	if(requestCode == LOGIN_REQUEST_CODE){
+    		if(resultCode == AccountPickerActivity.LOGIN_FAILED) {
+    			finish();
+    		}
+    	}
+    	else {
+    		BlinkupController.getInstance().handleActivityResult(this, requestCode, resultCode, data);
+    	}
     }
 
 	private void logout() {
-		KisiAccountManager.getInstance().removeAccount();
 		kisiAPI.logout();
 		finish();
 	}
@@ -202,11 +196,11 @@ public class KisiMain extends FragmentActivity implements
 		 moveTaskToBack(true);
 	}
 
-	@Override
-	public  void onDestroy () {
-		super.onDestroy();
-		logout();
-	}
+//	@Override
+//	public  void onDestroy () {
+//		super.onDestroy();
+//		logout();
+//	}
 
 	private void setupView(Place[] places) {
 

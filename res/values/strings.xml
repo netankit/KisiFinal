@@ -52,4 +52,7 @@
 	<string name="account_type">de.kisi</string>
 	<string name="add_new_account_done">Account created</string>
 	<string name="error_creating_account">Error creating account</string>
+	<string name="login_with_other_account">Login with another account</string>
+	<string name="try_again">Try again</string>
+	<string name="close_app">Exit</string>
 </resources>
