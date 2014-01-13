@@ -70,7 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/forgot"
+            android:text="@string/forgot_html"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#A6C3FF"
             android:textSize="13sp" />
@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="@string/newUser"
+            android:text="@string/new_user_html"
             android:textColor="#ffffff"
             android:textSize="15sp" />
     </RelativeLayout>

@@ -8,19 +8,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,6 +46,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		
 	//	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.log_title);
 		mAccountManager = AccountManager.get(this);
+		buildAccountDailog();
 		
 	}	
 	
@@ -58,7 +55,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 	@Override
 	public void onResume() {
 		super.onResume();
-		buildAccountDailog();
+
 	}
 	
 	
@@ -83,6 +80,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 			progressDialog.setCancelable(false);
 			progressDialog.show();
 			KisiAPI.getInstance().login(acc.name, password, mloginCallback);
+			return;
 		}
 		//if there are more then one account let the user choose the right one
 		else {
@@ -141,7 +139,6 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
             public void run(AccountManagerFuture<Bundle> future) {
                 try {
                     Bundle bnd = future.getResult();  
-                    Log.d("uinic", "AddNewAccount Bundle is " + bnd);
                     buildAccountDailog(); 
 
                 } catch (Exception e) {
@@ -154,6 +151,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 	
 	@Override
 	public void onBackPressed() {
+		progressDialog.dismiss();
 		setResult(LOGIN_FAILED);
 		finish();
 	}
@@ -163,8 +161,8 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 	public void onLoginSuccess(String authtoken) {
 		// Switch the activity to internal Views
 		progressDialog.dismiss();
-		Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
-		mainScreen.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		//Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
+		//mainScreen.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		//finish login activity
 		setResult(LOGIN_SUCCESS);
 		finish();
@@ -175,12 +173,12 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		progressDialog.dismiss();
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(errormessage)
-               .setPositiveButton("Try again", new DialogInterface.OnClickListener() {
+               .setPositiveButton(getString(R.string.try_again), new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                 	   buildAccountDailog();
                    }
                })
-               .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+               .setNegativeButton(getString(R.string.close_app), new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                 	   setResult(LOGIN_FAILED);
                 	   finish();

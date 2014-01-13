@@ -1,9 +1,5 @@
 package de.kisi.android.account;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import de.kisi.android.rest.KisiRestClient;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
@@ -12,8 +8,6 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 
 public class KisiAuthenticator extends AbstractAccountAuthenticator {
 	
@@ -32,7 +26,6 @@ public class KisiAuthenticator extends AbstractAccountAuthenticator {
 	@Override
 	public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options)
 			throws NetworkErrorException {
-		 Log.d("KisiAuthenticator", "addAccount");
 
 		final Intent intent = new Intent(mContext, AccountActivity.class);
 		intent.putExtra(AccountActivity.ARG_ACCOUNT_TYPE, accountType);

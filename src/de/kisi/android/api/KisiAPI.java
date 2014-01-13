@@ -58,6 +58,13 @@ public class KisiAPI {
 	
 	
 	public void login(String login, String password, final LoginCallback callback){
+		//cleaning the auth token before getting a new one 
+		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = settings.edit();
+		editor = settings.edit();
+		editor.remove("authentication_token");
+		editor.commit();
+		
 		JSONObject login_data = new JSONObject();
 		JSONObject login_user = new JSONObject();
 		try {
@@ -86,6 +93,7 @@ public class KisiAPI {
 				}
 				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 				callback.onLoginSuccess(authtoken);
+				return;
 			}
 			
 			 public void onFailure(int statusCode, Throwable e, JSONObject response) {
@@ -186,8 +194,9 @@ public class KisiAPI {
 	
 	//TODO: security
 	public String getAuthToken() {
-		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
-		return settings.getString("authentication_token", "" );
+		//SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
+	//	return settings.getString("authentication_token", "" );
+		return user.getAuthentication_token();
 	}
 	
 	
@@ -216,9 +225,10 @@ public class KisiAPI {
 		}
 		JSONObject key = new JSONObject();
 		JSONObject data = new JSONObject();
+		//changed in the API from assignee_email to issued_to_email
 		try {
 			key.put("lock_ids", lock_ids);
-			key.put("assignee_email", email);
+			key.put("issued_to_email", email);
 			data.put("key", key);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -232,7 +242,7 @@ public class KisiAPI {
 					Toast.makeText(
 							activity,
 							String.format(context.getResources().getString(R.string.share_success),
-								data.getString("assignee_email")),
+								data.getString("issued_to_email")),
 							Toast.LENGTH_LONG).show();
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -320,21 +330,28 @@ public class KisiAPI {
 				callback.onUnlockSuccess(message);
 			}
 			
-			public void onFailure(Throwable e, JSONObject errorResponse) {
-				String alertMsg = null;
+			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+				//statusCode  == 0: no network connectivity
+				String errormessage = null;
+				if(statusCode == 0) {
+					 errormessage = context.getResources().getString(R.string.no_network);
+					 callback.onUnlockFail(errormessage);
+					 return;
+				 }
+				
 				if(errorResponse != null) {
 					if(errorResponse.has("alert")) {
 						try {
-							alertMsg = errorResponse.getString("alert");
+							errormessage = errorResponse.getString("alert");
 						} catch (JSONException je) {
 							e.printStackTrace();
 						}
 					}
 				}
 				else {
-					alertMsg = "Error!";
+					errormessage = "Error!";
 				}
-				callback.onUnlockFail(alertMsg);
+				callback.onUnlockFail(errormessage);
 			}	
 		});
 	}

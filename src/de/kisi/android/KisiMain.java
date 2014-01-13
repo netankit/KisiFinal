@@ -4,14 +4,10 @@ import java.util.List;
 import java.util.Vector;
 
 import de.kisi.android.R;
-import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.LoginCallback;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -29,15 +25,15 @@ import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 
 
 
-public class KisiMain extends FragmentActivity implements
-		PopupMenu.OnMenuItemClickListener {
+public class KisiMain extends FragmentActivity implements PopupMenu.OnMenuItemClickListener {
 	
     private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
 
     private ViewPager pager;
-	private Activity activity;
     private KisiAPI kisiAPI;
     
+    //just choose a random value 
+    //TODO: change this later
     public static int LOGIN_REQUEST_CODE = 5;
     
     
@@ -47,7 +43,6 @@ public class KisiMain extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		
 		kisiAPI = KisiAPI.getInstance();
-		activity = this;
 		
 		Intent login = new Intent(this,  AccountPickerActivity.class);
 		startActivityForResult(login, LOGIN_REQUEST_CODE);
@@ -60,7 +55,6 @@ public class KisiMain extends FragmentActivity implements
 				R.layout.window_title);
 		
 		pager = (ViewPager) findViewById(R.id.pager);
-		
 	}
     
     
@@ -69,8 +63,7 @@ public class KisiMain extends FragmentActivity implements
     @Override
     public void onStart() {
     	super.onStart();
-		setupView(kisiAPI.getPlaces());
-		
+
 		kisiAPI.updatePlaces(new OnPlaceChangedListener() {
 
 			@Override
@@ -180,6 +173,11 @@ public class KisiMain extends FragmentActivity implements
     	if(requestCode == LOGIN_REQUEST_CODE){
     		if(resultCode == AccountPickerActivity.LOGIN_FAILED) {
     			finish();
+    			return;
+    		}
+    		if(resultCode == AccountPickerActivity.LOGIN_SUCCESS){
+    			setupView(kisiAPI.getPlaces());
+    			return;
     		}
     	}
     	else {
@@ -192,15 +190,10 @@ public class KisiMain extends FragmentActivity implements
 		finish();
 	}
 
-	public void onBackPressed() {
-		 moveTaskToBack(true);
-	}
-
-//	@Override
-//	public  void onDestroy () {
-//		super.onDestroy();
-//		logout();
+//	public void onBackPressed() {
+//		 moveTaskToBack(true);
 //	}
+
 
 	private void setupView(Place[] places) {
 

@@ -7,11 +7,11 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -27,13 +27,12 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	private EditText passwordField;
 	private String username;
 	private String password;
-	private AccountManager accountManager;
 	
 	private AccountAuthenticatorResponse response;
 	
+	private ProgressDialog progressDialog;
 	
 	//TODO:clean this up later. copy and paste code 
-	private final String TAG = this.getClass().getSimpleName();
 	private final int REQ_SIGNUP = 1;
 	public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
 	public final static String ARG_AUTH_TYPE = "AUTH_TYPE";
@@ -41,18 +40,18 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	public final static String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
 
 	public static final String KEY_ERROR_MESSAGE = "ERR_MSG";
-
+	
 	public final static String PARAM_USER_PASS = "USER_PASS";
 	
-	 private AccountManager mAccountManager;
-	 private String mAuthTokenType;
+	private AccountManager mAccountManager;
+	private String mAuthTokenType;
 
 	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d("AccountActivity", "entered onCreate");
+		//Log.d("AccountActivity", "entered onCreate");
 		setContentView(R.layout.login_activity);
 
 		mAccountManager = AccountManager.get(getBaseContext());
@@ -108,6 +107,11 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onClick(View v) {
+		progressDialog = new ProgressDialog(this);
+		progressDialog.setMessage(getString(R.string.login_loading_message));
+		progressDialog.setCancelable(false);
+		progressDialog.show();
+		
 		username = userNameField.getText().toString();
 		password = passwordField.getText().toString();
 
@@ -115,14 +119,12 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	}
 
     private void finishLogin(Intent intent) {
-        Log.d(TAG, "> finishLogin");
 
         String accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         String accountPassword = intent.getStringExtra(PARAM_USER_PASS);
         final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
 
         if (getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)) {
-            Log.d("udinic", TAG + "> finishLogin > addAccountExplicitly");
             String authtoken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
             String authtokenType = mAuthTokenType;
             
@@ -131,7 +133,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
             mAccountManager.addAccountExplicitly(account, accountPassword, null);
             mAccountManager.setAuthToken(account, authtokenType, authtoken);
         } else {
-            Log.d("udinic", TAG + "> finishLogin > setPassword");
             mAccountManager.setPassword(account, accountPassword);
         }
 
@@ -142,7 +143,7 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onLoginSuccess(String authToken) {
-		Log.d(TAG, "auth success token:" + authToken);
+		progressDialog.dismiss();
 		final String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 		Bundle data = new Bundle();
 
@@ -158,6 +159,7 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onLoginFail(String errormessage) {
+		progressDialog.dismiss();
 		Toast.makeText(getBaseContext(), errormessage, Toast.LENGTH_SHORT).show();	
 	}
 	
