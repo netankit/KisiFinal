@@ -8,8 +8,6 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -143,17 +141,6 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 
 	}
 
-
-	@Override
-	public void onPause() { 
-		// sends user back to Login Screen if he didn't choose remember me
-		SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
-		if (settings.getString("password", "").isEmpty()) {
-			Intent loginScreen = new Intent(getApplicationContext(), LoginActivity.class);
-			startActivity(loginScreen);
-		}
-		super.onPause();
-	}
 
 	@Override
 	public void onClick(View v) {

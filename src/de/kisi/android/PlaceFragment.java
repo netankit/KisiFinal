@@ -6,6 +6,7 @@ import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -27,9 +28,12 @@ import android.widget.Toast;
 
 public class PlaceFragment extends Fragment {
 
+	final Fragment fragment = this;
 	private ScrollView layout;
 	private final static long delay = 3000;
-
+	private int index;
+	
+	
 	static PlaceFragment newInstance(int index) {
 		// Fragments must not have a custom constructor
 		PlaceFragment f = new PlaceFragment();
@@ -50,7 +54,7 @@ public class PlaceFragment extends Fragment {
 		layout = (ScrollView) inflater.inflate(R.layout.place_fragment, container, false);
 		
 		
-		int index = getArguments().getInt("index");
+		index = getArguments().getInt("index");
 		Place[] places = KisiAPI.getInstance().getPlaces();
 		// Workaround for crash when starting app from background
 		if (places == null) {
@@ -58,19 +62,20 @@ public class PlaceFragment extends Fragment {
 		}
 		
 		final Place place = KisiAPI.getInstance().getPlaceAt(index);
+		setupButtons(place);
 		// get locks from api, if not already available
-		if (place.areLocksLoaded())
-			setupButtons(place);
-		else {
-			KisiAPI.getInstance().registerOnPlaceChangedListener(new OnPlaceChangedListener(){
+//		if (place.areLocksLoaded())
+//			setupButtons(place);
+//		else {
+		KisiAPI.getInstance().updateLocks(place, new OnPlaceChangedListener() {
+
 				@Override
 				public void onPlaceChanged(Place[] newPlaces) {
-					KisiAPI.getInstance().unregisterOnPlaceChangedListener(this);
 					setupButtons(place);
 				}
+			
 			});
-			KisiAPI.getInstance().updateLocks(place);
-		}
+//		}
 
 		return layout;
 	}
@@ -124,15 +129,23 @@ public class PlaceFragment extends Fragment {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					final ProgressDialog progressDialog = new ProgressDialog(fragment.getActivity());
+					progressDialog.setMessage(fragment.getString(R.string.opening));
+					progressDialog.setCancelable(false);
+					progressDialog.show();
+					
 					KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
-
+						
+						
 						@Override
 						public void onUnlockSuccess(String message) {
+							progressDialog.dismiss();
 							changeButtonStyleToUnlocked(button, lock, message);
 						}
 
 						@Override
 						public void onUnlockFail(String alertMsg) {
+							progressDialog.dismiss();
 							changeButtonStyleToFailure(button, lock, alertMsg);
 						}});
 				}

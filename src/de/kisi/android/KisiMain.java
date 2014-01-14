@@ -8,7 +8,6 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -26,18 +25,28 @@ import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 
 
 
-public class KisiMain extends FragmentActivity implements
-		PopupMenu.OnMenuItemClickListener, OnPlaceChangedListener {
+public class KisiMain extends FragmentActivity implements PopupMenu.OnMenuItemClickListener {
 	
     private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
 
     private ViewPager pager;
-	
     private KisiAPI kisiAPI;
     
+    //just choose a random value 
+    //TODO: change this later
+    public static int LOGIN_REQUEST_CODE = 5;
+    
+    
+    
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
+		kisiAPI = KisiAPI.getInstance();
+		
+		Intent login = new Intent(this,  AccountPickerActivity.class);
+		startActivityForResult(login, LOGIN_REQUEST_CODE);
+		
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		
 		setContentView(R.layout.kisi_main);
@@ -46,12 +55,26 @@ public class KisiMain extends FragmentActivity implements
 				R.layout.window_title);
 		
 		pager = (ViewPager) findViewById(R.id.pager);
-		
-		kisiAPI = KisiAPI.getInstance();
-		kisiAPI.registerOnPlaceChangedListener(this);
-		kisiAPI.updatePlaces();
-
 	}
+    
+    
+        
+    
+    @Override
+    public void onStart() {
+    	super.onStart();
+
+		kisiAPI.updatePlaces(new OnPlaceChangedListener() {
+
+			@Override
+			public void onPlaceChanged(Place[] newPlaces) {
+				setupView(newPlaces);
+				
+			}
+			
+		});
+
+    }
 
 	// creating popup-menu for settings
 	public void showPopup(View v) {
@@ -63,16 +86,7 @@ public class KisiMain extends FragmentActivity implements
 		popup.show();
 	}
 
-	@Override
-	public void onPause() { 
-		// sends user back to Login Screen if he didn't choose remember me
-		SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
-		if (settings.getString("password", "").isEmpty()) {
-			Intent loginScreen = new Intent(getApplicationContext(), LoginActivity.class);
-			startActivity(loginScreen);
-		}
-		super.onPause();
-	}
+	
 
 	
 	@Override
@@ -83,7 +97,14 @@ public class KisiMain extends FragmentActivity implements
 		switch(item.getItemId())
 		{
 			case R.id.refresh:
-				kisiAPI.updatePlaces();
+				kisiAPI.refresh(new OnPlaceChangedListener() {
+
+					@Override
+					public void onPlaceChanged(Place[] newPlaces) {
+						setupView(newPlaces );
+					}
+					
+				});
 				return true;
 			
 			case R.id.share:
@@ -122,12 +143,9 @@ public class KisiMain extends FragmentActivity implements
 				
 				BlinkupController blinkup = BlinkupController.getInstance();
 				blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
-
-				SharedPreferences settings = getSharedPreferences("Config", MODE_PRIVATE);
 				
 				if(kisiAPI.getUser().getEiPlanId() != null)
-					blinkup.setPlanID(settings.getString("ei_plan_id", null));
-				
+					blinkup.setPlanID(kisiAPI.getUser().getEiPlanId());
 				
 				blinkup.selectWifiAndSetupDevice(this, API_KEY, new ServerErrorHandler() {
 			        @Override
@@ -152,7 +170,19 @@ public class KisiMain extends FragmentActivity implements
 	//callback for blinkup 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	BlinkupController.getInstance().handleActivityResult(this, requestCode, resultCode, data);
+    	if(requestCode == LOGIN_REQUEST_CODE){
+    		if(resultCode == AccountPickerActivity.LOGIN_FAILED) {
+    			finish();
+    			return;
+    		}
+    		if(resultCode == AccountPickerActivity.LOGIN_SUCCESS){
+    			setupView(kisiAPI.getPlaces());
+    			return;
+    		}
+    	}
+    	else {
+    		BlinkupController.getInstance().handleActivityResult(this, requestCode, resultCode, data);
+    	}
     }
 
 	private void logout() {
@@ -160,11 +190,10 @@ public class KisiMain extends FragmentActivity implements
 		finish();
 	}
 
+//	public void onBackPressed() {
+//		 moveTaskToBack(true);
+//	}
 
-	@Override
-	public void onPlaceChanged(Place[] newPlaces) {
-		setupView(newPlaces);
-	}
 
 	private void setupView(Place[] places) {
 

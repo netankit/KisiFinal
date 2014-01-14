@@ -19,6 +19,7 @@
             android:inputType="textPassword" />
 
         <TextView
+            android:id="@+id/__bu_wps_info"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center"

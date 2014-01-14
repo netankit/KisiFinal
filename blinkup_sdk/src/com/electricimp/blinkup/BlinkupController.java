@@ -33,12 +33,46 @@ public class BlinkupController {
 
     /** Resource Id for the custom string to choose wifi network. */
     public String stringIdChooseWiFiNetwork = null;
+    /** Resource Id for the custom string for wps info. */
+    public String stringIdWpsInfo = null;
     /** Resource Id for the custom string to clear device settings. */
     public String stringIdClearDeviceSettings = null;
+    /** Resource Id for the custom string for clear device button. */
+    public String stringIdClearWireless = null;
     /** Resource Id for the custom string for the Send BlinkUp button.  */
     public String stringIdSendBlinkUp = null;
     /** Resource Id for the custom string for the BlinkUp description. */
     public String stringIdBlinkUpDesc = null;
+    /** Resource Id for the custom string for legacy mode. */
+    public String stringIdLegacyMode = null;
+    /** Resource Id for the custom string for legacy mode description. */
+    public String stringIdLegacyModeDesc = null;
+    /** Resource Id for the custom string for OK. */
+    public String stringIdOk = null;
+    /** Resource Id for the custom string for next when using interstitial page. */
+    public String stringIdNext = null;
+    /** Resource Id for the custom string for SSID hint. */
+    public String stringIdSsidHint = null;
+    /** Resource Id for the custom string for password hint. */
+    public String stringIdPasswordHint = null;
+    /** Resource Id for the custom string for remember password. */
+    public String stringIdRememberPassword = null;
+    /** Resource Id for the custom string for WPS pin hint. */
+    public String stringIdWpsPinHint = null;
+    /** Resource Id for the custom string for change network. */
+    public String stringIdChangeNetwork = null;
+    /** Resource Id for the custom string for connect using WPS. */
+    public String stringIdConnectUsingWps = null;
+    /** Resource Id for the custom string for countdown description. */
+    public String stringIdCountdownDesc = null;
+    /** Resource Id for the custom string for title in low frame rate dialog. */
+    public String stringIdLowFrameRateTitle = null;
+    /** Resource Id for the custom string for description in low frame rate dialog. */
+    public String stringIdLowFrameRateDesc = null;
+    /** Resource Id for the custom string for go to settings in low frame rate dialog. */
+    public String stringIdLowFrameRateGoToSettings = null;
+    /** Resource Id for the custom string for proceed anyway in low frame rate dialog. */
+    public String stringIdLowFrameRateProceedAnyway = null;
 
     /** Resource Id for the image to activate the interstitial page. */
     public int drawableIdInterstitial = 0;
@@ -66,19 +100,17 @@ public class BlinkupController {
      * @return BlinkupController
      */
     public static BlinkupController getInstance() {
-        return getInstanceWithBaseUrl(DEFAULT_BASE_URL);
+        if (instance == null) {
+            instance = new BlinkupController(DEFAULT_BASE_URL);
+        }
+        return instance;
     }
 
     /**
-     * Get a BlinkupController instance pointing to a specific base url.
-     *
-     * @return BlinkupController
+     * Set the base url of the BlinkupController.
      */
-    public static BlinkupController getInstanceWithBaseUrl(String baseUrl) {
-        if (instance == null) {
-            instance = new BlinkupController(baseUrl);
-        }
-        return instance;
+    public void setBaseUrl(String baseUrl) {
+        impController.setBaseUrl(baseUrl);
     }
 
     /**
@@ -331,6 +363,22 @@ public class BlinkupController {
             return;
         }
         view.setText(defaultResId);
+    }
+
+    static void setHint(TextView view, String str, int defaultResId) {
+        if (str != null) {
+            view.setHint(str);
+            return;
+        }
+        view.setHint(defaultResId);
+    }
+
+    static String getCustomStringOrDefault(
+            Context context, String custom, int defaultResId) {
+        if (custom != null) {
+            return custom;
+        }
+        return context.getString(defaultResId);
     }
 
     void addBlinkupIntentFields(Context context, Intent intent) {

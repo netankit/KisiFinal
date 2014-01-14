@@ -47,4 +47,12 @@
 	<string name="new_user_html">New? <a href="https://www.kisi.de/users/sign_up">Get started on our website</a></string>
 	<string name="forgot_html"><a href="https://www.kisi.de/users/password/new">Forgot your password?</a></string>
 	<string name="missing_login_data">Please type in EMail and Password first</string>
+	<string name="no_network">No network connectivity</string>
+	<string name="login_loading_message">Loggin in...</string>
+	<string name="account_type">de.kisi</string>
+	<string name="add_new_account_done">Account created</string>
+	<string name="error_creating_account">Error creating account</string>
+	<string name="login_with_other_account">Login with another account</string>
+	<string name="try_again">Try again</string>
+	<string name="close_app">Exit</string>
 </resources>

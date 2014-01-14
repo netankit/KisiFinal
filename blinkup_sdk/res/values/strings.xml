@@ -2,8 +2,8 @@
 <resources>
     <string name="__bu_blinkup_desc">
         After tapping \"Send BlinkUp\", hold the screen close to the
-        blinking red light at the edge of the imp card until the flashing ends
-        (about 10 seconds).
+        blinking red light on the device until the flashing ends (about 10
+        seconds).
     </string>
     <string name="__bu_wps_info">
         To join without using a PIN, press the WPS button on your router and

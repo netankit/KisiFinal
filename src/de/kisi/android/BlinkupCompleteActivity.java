@@ -20,6 +20,7 @@ import de.kisi.android.api.KisiAPI;
 public class BlinkupCompleteActivity extends Activity implements TokenStatusCallback {
 	private BlinkupController blinkup;
 	private LocationManager locationManager; 
+	private BlinkupController blinkup; 
 	
 	private ProgressBar progressBar;
     private TextView status;
@@ -51,6 +52,7 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
     
 
 
+    @Override
 	public void onSuccess(JSONObject json) { 
 		//prevent that blickup sdk calls onSuccess twice
 		blinkup.cancelTokenStatusPolling();
@@ -62,12 +64,14 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 	}
 
 
+    @Override
 	public void onError(String errorMsg) {
 		status.setText(getResources().getString(R.string.blinkup_error) + " " + errorMsg);
 		progressBar.setVisibility(View.GONE);
 	}
 
 
+    @Override
 	public void onTimeout() {
 		status.setText(getResources().getString(R.string.blinkup_timeout) );
 		progressBar.setVisibility(View.GONE);
@@ -81,15 +85,33 @@ public class BlinkupCompleteActivity extends Activity implements TokenStatusCall
 			if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) { 
 				locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 				Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+				currentLocation = location;
+
+
+
+
+
+
+
+
 
 			}
 			// then the GPS Connection
 			else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { 
 				locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 				Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+				currentLocation = location;
 			}
 			// TODO What happens if nothing of both is enabled
 		}
+
+
+
+
+
+
+
+
 
 
 }

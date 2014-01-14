@@ -21,6 +21,9 @@ public class ClearWifiActivity extends PreBlinkUpActivity {
                 R.id.__bu_clear_wifi_header);
         BlinkupController.setText(headerText, blinkup.stringIdClearDeviceSettings,
                 R.string.__bu_clear_device_settings);
+
+        BlinkupController.setText(blinkupButton, blinkup.stringIdClearWireless,
+                R.string.__bu_clear_wireless);
     }
 
     @Override

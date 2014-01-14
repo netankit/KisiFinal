@@ -10,7 +10,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".LoginActivity" >
-
+    
+    
     <ImageView
         android:id="@+id/imageView1"
         android:layout_width="80dp"
@@ -28,8 +29,7 @@
         android:layout_centerVertical="true"
         android:baselineAligned="false"
         android:orientation="vertical" >
-
-        <TextView
+<TextView
             android:id="@+id/Slogan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -64,15 +64,6 @@
             android:inputType="textPassword"
             android:textColor="#ffffff"
             android:textColorHint="#ffffff" />
-
-        <CheckBox
-            android:id="@+id/rememberCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="@string/RememberMe"
-            android:textColor="#A6C3FF"
-            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/forgot"
@@ -111,6 +102,5 @@
             android:textColor="#ffffff"
             android:textSize="15sp" />
     </RelativeLayout>
-
 
 </RelativeLayout>

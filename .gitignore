@@ -1,6 +1,6 @@
 bin/
 gen/
-
+doc/
 /gen/com/example/kisibox/R.java
 .DS_Store
 lint.xml

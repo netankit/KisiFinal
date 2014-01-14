@@ -4,17 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+
+
 
 
 //TODO: tk: libraries like Lombok simplify with automating getter & setter creation
-//TODO: tk: Google's gson is a more full-featured JSON handler org.json
-//e.g., it automates object creation from JSON strings
+//@DatabaseTable
 public class Place {
+	@DatabaseField(id = true, index=true)
 	private int id;
+	@DatabaseField
 	private String name;
-	private List<Lock> locks;
+	@ForeignCollectionField(eager=false)
+    private ForeignCollection<Lock> locks;	
 	private boolean locksLoaded;
+	@DatabaseField
 	private double latitude;
+	@DatabaseField
 	private double longitude;
 	@SerializedName("street_name")
 	private String streetName;
@@ -25,15 +34,14 @@ public class Place {
 	private String state;
 	private String country;
 	private String additionalInformation; 
+	@DatabaseField
 	@SerializedName("user_id")
-	private int owner_id;
+	private int ownerId;
 //	@SerializedName("updated_at")
 //	private Date updatedAt;
 
 	
-	public Place () {	
-		locks = new ArrayList<Lock>();
-	}
+	public Place () {}
 	
 	
 	public int getId() {
@@ -46,8 +54,15 @@ public class Place {
 	public boolean areLocksLoaded(){
 		return locksLoaded;
 	}
+	
+	//TODO: clean this up 
 	public List<Lock> getLocks() {
-		return locks;
+		Lock[] lockArray = locks.toArray(new Lock[0]);
+		List<Lock> result = new ArrayList<Lock>();
+		for(Lock l: lockArray) {
+			result.add(l);
+		}
+		return result;
 	}
 	
 
@@ -103,21 +118,8 @@ public class Place {
 	}
 
 	public int getOwnerId() {
-		return owner_id;
+		return ownerId;
 	}
-	
-	//TODO: Is this really meant as a setLock or maybe as addLock
-	public void setLock(Lock[] data) {
-		locksLoaded = true;
-		for(int i=0; i < data.length; i++) {
-			locks.add(data[i]);
-		}
-	}
-	
-	
-	@Override
-	public String toString(){
-		return name+" "+id;
-	}
+
 
 }
