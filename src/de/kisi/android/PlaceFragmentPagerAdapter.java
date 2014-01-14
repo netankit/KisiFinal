@@ -12,10 +12,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class PlaceFragmentPagerAdapter extends FragmentPagerAdapter {
 
 	private int PAGE_COUNT;
-	private List<Fragment> fragments;
+	private List<PlaceFragment> fragments;
 
 	/** Constructor of the class */
-	public PlaceFragmentPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+	public PlaceFragmentPagerAdapter(FragmentManager fm, List<PlaceFragment> fragments) {
 		super(fm);
 		this.fragments = fragments;
 		PAGE_COUNT = fragments.size();

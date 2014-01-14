@@ -1,5 +1,6 @@
 package de.kisi.android.account;
 
+import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
@@ -155,6 +156,7 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		final Intent res = new Intent();
 		res.putExtras(data);
 		finishLogin(res);
+		KisiApplication.setLoggedIn(true);
     }
 
 	@Override

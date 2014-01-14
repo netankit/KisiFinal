@@ -1,5 +1,7 @@
 package de.kisi.android;
 
+import java.util.Hashtable;
+
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
@@ -14,6 +16,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -33,6 +36,7 @@ public class PlaceFragment extends Fragment {
 	private final static long delay = 3000;
 	private int index;
 	
+	private Hashtable<Integer, Button> buttonHashtable = new Hashtable<Integer, Button>();
 	
 	static PlaceFragment newInstance(int index) {
 		// Fragments must not have a custom constructor
@@ -80,6 +84,18 @@ public class PlaceFragment extends Fragment {
 		return layout;
 	}
 
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onViewCreated(view, savedInstanceState);
+		int lockIdIntent = getArguments().getInt("lock", -1);
+		//check if we received an intent
+		if(lockIdIntent != -1) {
+			buttonHashtable.get(lockIdIntent).callOnClick();
+		}
+		
+	}
+
 	private void setupButtons(final Place place) {
 		
 		Drawable lockIcon = getActivity().getResources().getDrawable(R.drawable.kisi_lock);
@@ -112,7 +128,7 @@ public class PlaceFragment extends Fragment {
 			return;
 		}    
 		
-		
+		int i =0;
 		for (final Lock lock : place.getLocks()) {
 			
 			final Button button = new Button(getActivity());
@@ -151,9 +167,43 @@ public class PlaceFragment extends Fragment {
 				}
 			});
 			ly.addView(button, layoutParams);
+			buttonHashtable.put(lock.getId(), button);
+//			int index = -3, temp_i = -2, temp_j = -1;
+//
+//			index = getArguments().getInt("index");
+//			
+//			temp_j = KisiApplication.getPlace_holder();
+//			temp_i = KisiApplication.getLock_holder();
+//
+//			if (index == temp_j) {
+//				if (i == temp_i) {
+//					if (KisiApplication.isButton_clicked() == false) {
+//
+//						button.callOnClick();
+//
+//						KisiApplication.setButton_clicked(true);
+//					}
+//
+//				}
+//			}
+
+			i++;
+			
 		}
 
 		
+	}
+	
+	public void unlockLock(int lockId) {
+		//setupButtons(KisiAPI.getInstance().getPlaceAt(index));
+		Log.d("hashtable size", String.valueOf(buttonHashtable.size()));
+		LinearLayout ly = (LinearLayout) layout.getChildAt(0);
+		Button testbutton = (Button) ly.getChildAt(0);
+		testbutton.callOnClick();
+		if(buttonHashtable.contains(lockId)) {
+			
+			buttonHashtable.get(lockId).callOnClick();
+		}
 	}
 	
 
