@@ -16,24 +16,12 @@ public class KisiApplication extends Application{
 		super.onCreate();
 		instance = this;
 		
-		GeofenceManager.getInstance();
+		//GeofenceManager.getInstance();
 		BluetoothLEManager.getInstance();
-		// TODO: Uncomment this for release
-		/*
-		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(){
-			@Override
-			public void uncaughtException(Thread arg0, Throwable arg1) {
-				 System.exit(1);
-			}
-		});
-		*/
 		de.kisi.android.db.DataManager.initialize(this);
 		de.kisi.android.account.KisiAccountManager.initialize(this);
-		de.kisi.android.api.KisiAPI.initialize(this);
+		de.kisi.android.api.KisiAPI.getInstance();
 		de.kisi.android.api.KisiLocationManager.initialize(this);
-		//TODO: Uncomment this for release with geofance
-//		de.kisi.android.vicinity.manager.GeofenceManager.initialize(this);
-//		de.kisi.android.vicinity.LockInVicinityDisplayManager.initialize(this);
 	}
 	
 	@Override

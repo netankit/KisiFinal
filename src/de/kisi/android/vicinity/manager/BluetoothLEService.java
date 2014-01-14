@@ -70,11 +70,22 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
-		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
-		iBeaconManager.bind(this);
+		//iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
+		//iBeaconManager.bind(this);
 		return mBinder;
 	}
 
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		NotificationCompat.Builder nc = new NotificationCompat.Builder(this);
+		nc.setSmallIcon(R.drawable.ic_launcher);
+		nc.setContentText("Bluetooth running");
+		nc.setContentTitle("KISI");
+		startForeground(1, nc.build());
+		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
+		iBeaconManager.bind(this);
+	    return START_STICKY;
+	}
 
 	@Override
 	public void onIBeaconServiceConnect() {
@@ -131,12 +142,14 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
         			}else{
         				Region region = new Region("Place: "+p.getId()+" Lock: "+l.getId(), "DE9D14A1-1C16-4114-9B68-3B2435C6B99A", 65535,65535);
         				iBeaconManager.startMonitoringBeaconsInRegion(region);
+        				iBeaconManager.startRangingBeaconsInRegion(region);
         				regions.put(l.getId(), region);
         			}
         		}
         	}
         	for(Region r : curRegions){
         		iBeaconManager.stopMonitoringBeaconsInRegion(r);
+				iBeaconManager.startRangingBeaconsInRegion(r);
         		regions.remove(r);
         	}
         } catch (RemoteException e) {   }			

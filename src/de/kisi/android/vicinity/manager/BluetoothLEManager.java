@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 
 public class BluetoothLEManager {
@@ -20,18 +21,10 @@ public class BluetoothLEManager {
 	
 	private BluetoothLEManager(){
 		context = KisiApplication.getApplicationInstance();
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
+				context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
 			Intent intent = new Intent(context,BluetoothLEService.class);
 			context.startService(intent);
-			context.bindService(intent, new ServiceConnection(){
-
-				@Override
-				public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-				}
-
-				@Override
-				public void onServiceDisconnected(ComponentName arg0) {
-				}}, Context.BIND_AUTO_CREATE);
 		}
 	}
 }

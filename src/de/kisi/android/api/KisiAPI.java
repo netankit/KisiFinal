@@ -18,6 +18,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import de.kisi.android.KisiApplication;
+import de.kisi.android.R;
 import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Lock;
