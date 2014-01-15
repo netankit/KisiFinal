@@ -1,6 +1,65 @@
 #
-# generated on 2014/01/06 07:28:30
+# generated on 2014/01/15 11:22:27
 #
+# --table-start--
+dataClass=de.kisi.android.model.Locator
+tableName=locator
+# --table-fields-start--
+# --field-start--
+fieldName=id
+id=true
+# --field-end--
+# --field-start--
+fieldName=placeId
+# --field-end--
+# --field-start--
+fieldName=place
+foreign=true
+foreignAutoRefresh=true
+maxForeignAutoRefreshLevel=1
+# --field-end--
+# --field-start--
+fieldName=lockId
+# --field-end--
+# --field-start--
+fieldName=lock
+foreign=true
+foreignAutoRefresh=true
+maxForeignAutoRefreshLevel=1
+# --field-end--
+# --field-start--
+fieldName=name
+# --field-end--
+# --field-start--
+fieldName=kind
+# --field-end--
+# --field-start--
+fieldName=enabled
+# --field-end--
+# --field-start--
+fieldName=suggestUnlockEnabled
+# --field-end--
+# --field-start--
+fieldName=suggestUnlockTreshold
+# --field-end--
+# --field-start--
+fieldName=autoUnlockTreshold
+# --field-end--
+# --field-start--
+fieldName=latitude
+# --field-end--
+# --field-start--
+fieldName=longitude
+# --field-end--
+# --field-start--
+fieldName=bleIdentifier
+# --field-end--
+# --field-start--
+fieldName=nfcIdentifier
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
 # --table-start--
 dataClass=de.kisi.android.model.Lock
 tableName=lock
@@ -20,6 +79,10 @@ fieldName=place
 foreign=true
 foreignAutoRefresh=true
 maxForeignAutoRefreshLevel=1
+# --field-end--
+# --field-start--
+fieldName=locators
+foreignCollection=true
 # --field-end--
 # --table-fields-end--
 # --table-end--
@@ -48,6 +111,10 @@ fieldName=longitude
 # --field-end--
 # --field-start--
 fieldName=ownerId
+# --field-end--
+# --field-start--
+fieldName=locators
+foreignCollection=true
 # --field-end--
 # --table-fields-end--
 # --table-end--

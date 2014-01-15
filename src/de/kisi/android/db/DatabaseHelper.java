@@ -12,6 +12,7 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
@@ -34,6 +35,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<Place, Integer> placeDao = null;
     private RuntimeExceptionDao<Place, Integer> placeRuntimeDao = null;
 
+    private Dao<Locator, Integer> locatorDao = null;
+    private RuntimeExceptionDao<Locator, Integer> locatorRuntimeDao = null;
     
 	
 	public DatabaseHelper(Context context) {
@@ -50,6 +53,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			Log.i(DatabaseHelper.class.getName(), "onCreate");
 			TableUtils.createTable(connectionSource, Place.class);
 			TableUtils.createTable(connectionSource, Lock.class);
+			TableUtils.createTable(connectionSource, Locator.class);
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 			throw new RuntimeException(e);
@@ -108,12 +112,37 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		}
 		return placeRuntimeDao;
 	}
+	
+	
+	/**
+	 * Returns the Database Access Object (DAO) for our Locator class. It will create it or just give the cached
+	 * value.
+	 */
+	public Dao<Locator, Integer> getLocatorDao() throws SQLException {
+		if (locatorDao == null) {
+			locatorDao = getDao(Locator.class);
+		}
+		return locatorDao;
+	}
+
+	/**
+	 * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our Place class. It will
+	 * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
+	 */
+	public RuntimeExceptionDao<Locator, Integer> getLocatorDataDao() {
+		if (locatorRuntimeDao == null) {
+			locatorRuntimeDao = getRuntimeExceptionDao(Locator.class);
+		}
+		return locatorRuntimeDao;
+	}
+	
 
 
 	public void clear() {
 		try {
 			TableUtils.clearTable(connectionSource, Place.class);
 			TableUtils.clearTable(connectionSource, Lock.class);
+			TableUtils.clearTable(connectionSource, Locator.class);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -129,5 +158,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		super.close();
 		lockRuntimeDao = null;
 		placeRuntimeDao = null;
+		locatorRuntimeDao = null;
 	}
 }

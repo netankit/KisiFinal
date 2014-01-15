@@ -37,6 +37,10 @@ public class Place {
 	@DatabaseField
 	@SerializedName("user_id")
 	private int ownerId;
+
+	@ForeignCollectionField(eager=false)
+    private ForeignCollection<Locator> locators;	
+	
 //	@SerializedName("updated_at")
 //	private Date updatedAt;
 
@@ -64,6 +68,16 @@ public class Place {
 		}
 		return result;
 	}
+	
+	public List<Locator> getLocators() {
+		Locator[] locatorArray = locators.toArray(new Locator[0]);
+		List<Locator> result = new ArrayList<Locator>();
+		for(Locator l: locatorArray) {
+			result.add(l);
+		}
+		return result;
+	}
+	
 	
 
 	public double getLatitude() {
