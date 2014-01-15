@@ -166,7 +166,6 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		//finish login activity
 		setResult(LOGIN_SUCCESS);
 		//move this later to the KisiAPI
-		KisiApplication.setLoggedIn(true);
 		finish();
 	}
 

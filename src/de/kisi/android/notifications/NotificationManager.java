@@ -22,34 +22,26 @@ public class NotificationManager extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-
-		if (KisiApplication.isLoggedIn()) {
-			KisiAPI kisiAPI = KisiAPI.getInstance();
-
-			Place[] places = kisiAPI.getPlaces();
-			Place place = null;
-			Log.i("NotificationManager", "onReceive(" + intent.getAction()
-					+ ")");
+		KisiAPI kisiAPI = KisiAPI.getInstance();
+		if (kisiAPI.getUser() != null) {
+		
+			Log.i("NotificationManager", "onReceive(" + intent.getAction() + ")");
 			Bundle extras = intent.getExtras();
-
-			int placeID = extras.getInt("Place");
+			
+			int placeId = extras.getInt("Place", -1);
 			String type = extras.getString("Type");
-			for (Place element : places) {
-				if (placeID == element.getId())
-					place = element;
-			}
-
+			
+			Place place = kisiAPI.getPlaceById(placeId);
+			
 			if (type.equals("Enter")) {
 				List<Lock> locks = place.getLocks();
 
-				for (int i = 0; i < locks.size(); i++) {
-
-					showNotification(context, locks.get(i), place);
+				for(Lock l: locks){
+					showNotification(context, l, place);
 				}
 
 			} else if (type.equals("Exit")) {
 				removeNotifications(context, place);
-
 			}
 
 		}
@@ -90,17 +82,15 @@ public class NotificationManager extends BroadcastReceiver {
 				.getSystemService(Activity.NOTIFICATION_SERVICE);
 
 		Intent intent = new Intent(c, KisiMain.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-				| Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.putExtra("Type", "unlock");
 		intent.putExtra("Place", place.getId());
 		intent.putExtra("Lock", lock.getId());
 
-		PendingIntent pIntent = PendingIntent.getActivity(c, lock.getId(),
-				intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pIntent = PendingIntent.getActivity(c, lock.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		nc.setContentIntent(pIntent);
 
-		int id = (lock.getId());
+		int id = lock.getId();
 		mNotificationManager.notify("unlock", id, nc.build());
 
 	}

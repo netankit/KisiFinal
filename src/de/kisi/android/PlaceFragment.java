@@ -16,7 +16,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -41,11 +40,9 @@ public class PlaceFragment extends Fragment {
 	static PlaceFragment newInstance(int index) {
 		// Fragments must not have a custom constructor
 		PlaceFragment f = new PlaceFragment();
-
 		Bundle args = new Bundle();
 		args.putInt("index", index);
 		f.setArguments(args);
-
 		return f;
 	}
 	
@@ -128,7 +125,6 @@ public class PlaceFragment extends Fragment {
 			return;
 		}    
 		
-		int i =0;
 		for (final Lock lock : place.getLocks()) {
 			
 			final Button button = new Button(getActivity());
@@ -168,40 +164,13 @@ public class PlaceFragment extends Fragment {
 			});
 			ly.addView(button, layoutParams);
 			buttonHashtable.put(lock.getId(), button);
-//			int index = -3, temp_i = -2, temp_j = -1;
-//
-//			index = getArguments().getInt("index");
-//			
-//			temp_j = KisiApplication.getPlace_holder();
-//			temp_i = KisiApplication.getLock_holder();
-//
-//			if (index == temp_j) {
-//				if (i == temp_i) {
-//					if (KisiApplication.isButton_clicked() == false) {
-//
-//						button.callOnClick();
-//
-//						KisiApplication.setButton_clicked(true);
-//					}
-//
-//				}
-//			}
-
-			i++;
-			
 		}
 
 		
 	}
 	
 	public void unlockLock(int lockId) {
-		//setupButtons(KisiAPI.getInstance().getPlaceAt(index));
-		Log.d("hashtable size", String.valueOf(buttonHashtable.size()));
-		LinearLayout ly = (LinearLayout) layout.getChildAt(0);
-		Button testbutton = (Button) ly.getChildAt(0);
-		testbutton.callOnClick();
-		if(buttonHashtable.contains(lockId)) {
-			
+		if(buttonHashtable.containsKey(lockId)) {
 			buttonHashtable.get(lockId).callOnClick();
 		}
 	}

@@ -156,7 +156,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		final Intent res = new Intent();
 		res.putExtras(data);
 		finishLogin(res);
-		KisiApplication.setLoggedIn(true);
     }
 
 	@Override

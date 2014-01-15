@@ -21,7 +21,6 @@ import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
 public class KisiMain extends FragmentActivity implements
@@ -29,12 +28,10 @@ public class KisiMain extends FragmentActivity implements
 
 	private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
 
-	// private List<Fragment> fragments = new Vector<Fragment>();
-
 	private ViewPager pager;
 	private KisiAPI kisiAPI;
-
-	private List<PlaceFragment> fragments = new Vector<PlaceFragment>();
+	private PlaceFragmentPagerAdapter pagerAdapter;
+	private int pageNumber = 0;
 
 	// just choose a random value
 	// TODO: change this later
@@ -57,7 +54,6 @@ public class KisiMain extends FragmentActivity implements
 				R.layout.window_title);
 
 		pager = (ViewPager) findViewById(R.id.pager);
-		KisiApplication.setButton_clicked(false);
 	}
 
 	@Override
@@ -97,21 +93,10 @@ public class KisiMain extends FragmentActivity implements
 				for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
 					if (kisiAPI.getPlaces()[j].getId() == intent.getIntExtra(
 							"Place", -1)) {
-						// setupView(kisiAPI.getPlaces());
-						pager.setCurrentItem(j, true);
-
-						// handleNotification(intent, j,
-						// kisiAPI.getPlaces()[j]);
-						// Bundle extra = new Bundle();
-						// pageNumber = j;
-						// extra.putInt("lock", intent.getIntExtra("Lock", -1));
-						// fragments.get(j).setArguments(extra);
-						// int i = intent.getIntExtra("Lock", -1);
-						// KisiApplication.setLock_holder(intent.getIntExtra("Lock",
-						// -1));
-						// KisiApplication.setPlace_holder(j);
-						//
-						// setupView(kisiAPI.getPlaces());
+						pager.setCurrentItem(j, false);
+						PlaceFragment placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
+						placeFragment.unlockLock(intent.getIntExtra("Lock", -1));
+						pageNumber = j;
 					}
 				}
 
@@ -230,33 +215,21 @@ public class KisiMain extends FragmentActivity implements
 
 	private void setupView(Place[] places) {
 
-		fragments.clear();
-
+		List<PlaceFragment> fragments = new Vector<PlaceFragment>();
+		
 		for (int j = 0; j < places.length; j++)
 			fragments.add(PlaceFragment.newInstance(j));
 
 		FragmentManager fm = getSupportFragmentManager();
-		PlaceFragmentPagerAdapter pagerAdapter = new PlaceFragmentPagerAdapter(
+		pagerAdapter = new PlaceFragmentPagerAdapter(
 				fm, fragments);
 		pager.setAdapter(pagerAdapter);
-		// pager.setCurrentItem(pageNumber);
-		//
-	}
-
-	private void handleNotification(Intent intent, int j, Place place) {
-
-		List<Lock> lock = place.getLocks();
-
-		for (int i = 0; i < lock.size(); i++) {
-
-			if (lock.get(i).getId() == intent.getIntExtra("Lock", -1)) {
-
-				KisiApplication.setLock_holder(i);
-				KisiApplication.setPlace_holder(j);
-
+		
+		//prevents that when app got start by clicking on a notification the fragment corresponding to the notification is shown
+		if(pageNumber < pagerAdapter.getCount()) {
+			pager.setCurrentItem(pageNumber, false);
 			}
-		}
-
+			
 	}
 
 }
