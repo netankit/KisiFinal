@@ -22,6 +22,7 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import de.kisi.android.R;
 import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.db.DataManager;
+import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
@@ -185,7 +186,12 @@ public class KisiAPI {
 				DataManager.getInstance().savePlaces(pl);
 				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 				listener.onPlaceChanged(places);
-				notifyAllOnPlaceChangedListener();		
+				notifyAllOnPlaceChangedListener();
+				//getting locotors of the places
+				for(Place p: pl) {
+					updateLocators(p);
+				}
+				
 			}
 			
 		});
@@ -214,6 +220,35 @@ public class KisiAPI {
 				notifyAllOnPlaceChangedListener();
 			}
 		});		
+	}
+	
+	//helper method for updateLocators
+	public Lock getLockById(Place place, int lockId){ 
+		List<Lock> locks  = place.getLocks();
+		for(Lock l: locks) {
+			if(l.getId() == lockId) {
+				return l;
+			}
+		}
+		return null;
+	}
+	
+	
+	public void updateLocators(final Place place) {
+		KisiRestClient.getInstance().get(context, "places/" + String.valueOf(place.getId()) + "/locators", new JsonHttpResponseHandler() {
+			
+			public void onSuccess(JSONArray response) {
+				Gson gson = new Gson();
+				Locator[] locators = gson.fromJson(response.toString(), Locator[].class);
+				for(Locator l: locators) {
+					l.setLock(instance.getLockById(instance.getPlaceById(l.getPlaceId()), l.getLockId()));
+					l.setPlace(instance.getPlaceById(l.getPlaceId()));
+				}
+				DataManager.getInstance().saveLocators(locators);
+				notifyAllOnPlaceChangedListener();
+			}
+			
+		});
 	}
 	
 

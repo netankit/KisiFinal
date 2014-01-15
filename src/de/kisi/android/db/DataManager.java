@@ -8,6 +8,7 @@ import android.content.Context;
 
 import com.j256.ormlite.dao.Dao;
 
+import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
@@ -27,6 +28,7 @@ public class DataManager {
 	private DatabaseHelper db;
     private Dao<Lock, Integer> lockDao;
     private Dao<Place, Integer> placeDao;
+    private Dao<Locator, Integer> locatorDao;
     private DatabaseManager dbManager;
  
     private DataManager(Context context)
@@ -36,6 +38,7 @@ public class DataManager {
             db = dbManager.getHelper(context);
             lockDao = db.getLockDao();
             placeDao = db.getPlaceDao();
+            locatorDao = db.getLocatorDao();
         }catch (SQLException e) {
             e.printStackTrace();
         }
@@ -79,9 +82,27 @@ public class DataManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	
-    	
-    	
+    }
+    
+    
+    public void saveLocators(final Locator[] locators) {
+    	try {
+			//put the hole operation into one transaction
+			locatorDao.callBatchTasks(new Callable<Void>() {
+
+				@Override
+				public Void call() throws Exception {
+
+					for (Locator l : locators) {
+						locatorDao.createOrUpdate(l);
+					}
+					return null;
+				}
+
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
     
     public List<Place> getAllPlaces() {
@@ -99,6 +120,17 @@ public class DataManager {
     	List<Lock> result = null;
     	try {
     		result =  lockDao.queryForAll();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	return result;
+    }
+    
+    
+    public List<Locator> getAllLocators() {
+    	List<Locator> result = null;
+    	try {
+    		result =  locatorDao.queryForAll();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
