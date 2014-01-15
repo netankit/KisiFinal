@@ -1,28 +1,27 @@
 package de.kisi.android.vicinity.manager;
 
 import java.util.Collection;
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.LinkedList;
-import java.util.Random;
 
+import com.radiusnetworks.ibeacon.IBeacon;
 import com.radiusnetworks.ibeacon.IBeaconConsumer;
 import com.radiusnetworks.ibeacon.IBeaconManager;
 import com.radiusnetworks.ibeacon.MonitorNotifier;
+import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.VicinityTypeEnum;
 
-import android.app.Activity;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -78,10 +77,12 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		NotificationCompat.Builder nc = new NotificationCompat.Builder(this);
-		nc.setSmallIcon(R.drawable.ic_launcher);
-		nc.setContentText("Bluetooth running");
-		nc.setContentTitle("KISI");
-		startForeground(1, nc.build());
+		if(intent.getExtras()!=null && intent.getExtras().getBoolean("foreground", false)){
+			nc.setSmallIcon(R.drawable.ic_launcher);
+			nc.setContentText("Bluetooth running");
+			nc.setContentTitle("KISI");
+			startForeground(1, nc.build());
+		}
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.bind(this);
 	    return START_STICKY;
@@ -90,6 +91,17 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 	@Override
 	public void onIBeaconServiceConnect() {
 		Log.i("BLE","connect");
+		iBeaconManager.setRangeNotifier(new RangeNotifier(){
+
+			@Override
+			public void didRangeBeaconsInRegion(Collection<IBeacon> iBeacons,
+					Region region) {
+				for(IBeacon b:iBeacons){
+					Log.i("BLE","Rssi "+b.getRssi());
+					Log.i("BLE","Acc "+b.getAccuracy());
+				}
+				
+			}});
 		iBeaconManager.setMonitorNotifier(new MonitorNotifier(){
 
 			@Override
@@ -132,18 +144,28 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 	}
 	
 	private void registerPlaces(Place[] places){
-		Log.i("BLE","Places.lenght = "+places.length);
         try {
         	Collection<Region> curRegions = regions.values();
         	for(Place p :places){
-        		for(Lock l:p.getLocks()){
-        			if(regions.containsKey(l.getId())){
-        				curRegions.remove(regions.get(l.getId()));
-        			}else{
-        				Region region = new Region("Place: "+p.getId()+" Lock: "+l.getId(), "DE9D14A1-1C16-4114-9B68-3B2435C6B99A", 65535,65535);
-        				iBeaconManager.startMonitoringBeaconsInRegion(region);
-        				iBeaconManager.startRangingBeaconsInRegion(region);
-        				regions.put(l.getId(), region);
+        		for(Locator l:p.getLocators()){
+        			if(l.getKind().equals("BLE")){
+        				if(regions.containsKey(l.getId())){
+        					curRegions.remove(regions.get(l.getId()));
+        				}else{
+        					String bleid = l.getBleIdentifier();
+        					if(bleid!=null && !bleid.isEmpty() && bleid.contains("-")){
+        						try{
+        							String splitid[] = bleid.split("-");
+        							int major = Integer.parseInt(splitid[0]);
+        							int minor = Integer.parseInt(splitid[1]);
+        							Region region = new Region("Place: "+l.getPlaceId()+" Lock: "+l.getLockId()+" Locator: "+l.getId(), "DE9D14A1-1C16-4114-9B68-3B2435C6B99A", major,minor);
+        							iBeaconManager.startMonitoringBeaconsInRegion(region);
+        							iBeaconManager.startRangingBeaconsInRegion(region);
+        							regions.put(l.getId(), region);
+        						}catch (Exception e){
+        						}
+        					}
+        				}
         			}
         		}
         	}

@@ -96,10 +96,10 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 
 		// Use high accuracy
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        // Set the update interval to 15 seconds
-        mLocationRequest.setInterval(15000);
-        // Set the fastest update interval to 1 second
-        mLocationRequest.setFastestInterval(1000);
+        // Set the update interval to 30 seconds
+        mLocationRequest.setInterval(30000);
+        // Set the fastest update interval to 15 second
+        mLocationRequest.setFastestInterval(15000);
         
         // Show interest on any change of the Places
         KisiAPI.getInstance().registerOnPlaceChangedListener(this);

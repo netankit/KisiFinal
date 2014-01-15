@@ -1,5 +1,6 @@
 package de.kisi.android.vicinity.actor;
 
+import de.kisi.android.model.Locator;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 
@@ -21,6 +22,16 @@ public class ConfirmToUnlockActor implements LockInVicinityActorInterface {
 	@Override
 	public void actOnExit(int placeID, int lockId) {
 		LockInVicinityDisplayManager.getInstance().notifyOnExit(placeID,lockId);
+	}
+
+	@Override
+	public void actOnEntry(Locator locator) {
+		LockInVicinityDisplayManager.getInstance().notifyOnEntry(locator.getPlaceId(),locator.getLockId());
+	}
+
+	@Override
+	public void actOnExit(Locator locator) {
+		LockInVicinityDisplayManager.getInstance().notifyOnExit(locator.getPlaceId(),locator.getLockId());
 	}
 
 }

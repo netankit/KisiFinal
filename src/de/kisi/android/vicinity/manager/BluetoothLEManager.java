@@ -1,12 +1,9 @@
 package de.kisi.android.vicinity.manager;
 
 import de.kisi.android.KisiApplication;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.os.IBinder;
 
 public class BluetoothLEManager {
 
@@ -18,13 +15,28 @@ public class BluetoothLEManager {
 	}
 	
 	private Context context;
+	private Intent bluetoothServiceIntent;
 	
 	private BluetoothLEManager(){
 		context = KisiApplication.getApplicationInstance();
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
 				context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-			Intent intent = new Intent(context,BluetoothLEService.class);
-			context.startService(intent);
+			bluetoothServiceIntent = new Intent(context,BluetoothLEService.class);
+		}
+	}
+	
+	public void startService(boolean runInForegroundMode){
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
+				context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+			bluetoothServiceIntent.putExtra("foreground", runInForegroundMode);
+			context.startService(bluetoothServiceIntent);
+		}
+	}
+
+	public void stopService(){
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
+				context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+			context.stopService(bluetoothServiceIntent);
 		}
 	}
 }
