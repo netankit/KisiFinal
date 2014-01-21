@@ -5,6 +5,18 @@ import de.kisi.android.vicinity.actor.*;
 public class LockInVicinityActorFactory {
 
 	public static LockInVicinityActorInterface getActor(VicinityTypeEnum type){
-		return new ConfirmToUnlockActor();
+		switch(type){
+		case BluetoothLE:
+			return new ConfirmToUnlockActor();
+		case Geofence:
+			LockInVicinityActorInterface[] actors = new LockInVicinityActorInterface[2];
+			actors[0] = new ConfirmToUnlockActor();
+			actors[1] = new StartPermanentBluetoothServiceActor();
+			return new CompositActor(actors);
+		case NFC:
+			return new AutomaticUnlockActor();
+		default:
+			return null;
+		}
 	}
 }

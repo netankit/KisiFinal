@@ -110,7 +110,7 @@
 		<receiver android:name="de.kisi.android.vicinity.manager.GeofenceUpdateLocationReceiver"
 		    android:exported="false">
 		</receiver>
-		<service
+		<service android:exported="false"
             android:name="de.kisi.android.account.KisiAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -129,7 +129,6 @@
 		        <category android:name="android.intent.category.DEFAULT"/>
 		    </intent-filter>    
         </activity>
-</application>
 
 		<service
             android:name="de.kisi.android.vicinity.manager.BluetoothLEService"

@@ -12,7 +12,6 @@ import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.VicinityTypeEnum;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.nfc.FormatException;
@@ -25,7 +24,6 @@ import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Log;
 import android.widget.Toast;
 
 public class NFCReceiver extends Activity{
@@ -56,8 +54,7 @@ public class NFCReceiver extends Activity{
 	        	for(Lock lock : place.getLocks()){
 	        		for(Locator locator : lock.getLocators()){
 	        			if (nfcData.equals(locator.getNfcIdentifier())){
-	        				// TODO: Actor Interface has changed in later Version
-	        				actor.actOnEntry(place.getId());
+	        				actor.actOnEntry(place.getId(),lock.getId());
 	        			}
 	        		}
 	        	}
