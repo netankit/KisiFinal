@@ -122,6 +122,15 @@
 		<activity android:name=".account.AccountActivity" android:theme="@style/CustomThemeLogin" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
 		<activity android:name="AccountPickerActivity" android:theme="@style/CustomThemeLogin" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
 
+		<activity android:name="de.kisi.android.vicinity.manager.NFCReceiver">
+			<intent-filter>
+		        <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+		        <data android:mimeType="application/de.kisi.android"/>
+		        <category android:name="android.intent.category.DEFAULT"/>
+		    </intent-filter>    
+        </activity>
+</application>
+
 		<service
             android:name="de.kisi.android.vicinity.manager.BluetoothLEService"
             android:enabled="true"
