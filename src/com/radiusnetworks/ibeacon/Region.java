@@ -23,7 +23,8 @@
  */
 package com.radiusnetworks.ibeacon;
 
-import android.util.Log;
+import android.annotation.SuppressLint;
+
 
 /**
  * This class represents a criteria of fields used to match iBeacons.  The strange name
@@ -44,7 +45,6 @@ import android.util.Log;
  *
  */
 public class Region  {
-	private static final String TAG = "Region";
 	/**
 	 * Part 2 of 3 of an iBeacon identifier.  A 16 bit integer typically used to identify a common grouping of iBeacons.
 	 */
@@ -111,15 +111,12 @@ public class Region  {
 	 */
 	public boolean matchesIBeacon(IBeacon iBeacon) {
 		if (proximityUuid != null && !iBeacon.getProximityUuid().equals(proximityUuid)) {
-			Log.d(TAG, "unmatching proxmityUuids: "+iBeacon.getProximityUuid()+" != "+proximityUuid);
 			return false;
 		}
 		if (major != null && iBeacon.getMajor() != major) {
-			Log.d(TAG, "unmatching major: "+iBeacon.getMajor()+" != "+major);
 			return false;
 		}
 		if (minor != null && iBeacon.getMinor() != minor) {
-			Log.d(TAG, "unmatching minor: "+iBeacon.getMajor()+" != "+minor);
 			return false;
 		}
 		return true;
@@ -157,6 +154,7 @@ public class Region  {
 	 * @param proximityUuid uuid with any combination of upper/lower case hex characters, dashes and spaces
 	 * @return a normalized string, all lower case hex characters with dashes in the form e2c56db5-dffb-48d2-b060-d0f5a71096e0
 	 */
+	@SuppressLint("DefaultLocale")
 	public static String normalizeProximityUuid(String proximityUuid) {
 		if (proximityUuid == null) {
 			return null;			

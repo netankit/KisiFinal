@@ -23,11 +23,9 @@
  */
 package com.radiusnetworks.ibeacon;
 
-import com.radiusnetworks.ibeacon.client.DataProviderException;
 import com.radiusnetworks.ibeacon.client.IBeaconDataFactory;
 import com.radiusnetworks.ibeacon.client.NullIBeaconDataFactory;
 
-import android.util.Log;
 
 /**
 * The <code>IBeacon</code> class represents a single hardware iBeacon detected by 
@@ -71,7 +69,6 @@ public class IBeacon {
 	public static final int PROXIMITY_UNKNOWN = 0;
 
     final private static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
-	private static final String TAG = "IBeacon";	
 		
     /**
      * A 16 byte UUID that typically represents the company owning a number of iBeacons
@@ -231,7 +228,6 @@ public class IBeacon {
 
 		if (patternFound == false) {
 			// This is not an iBeacon
-			Log.d(TAG, "This is not an iBeacon advertisment (no 4c000215 seen in bytes 2-5).  The bytes I see are: "+bytesToHex(scanData));
 			return null;
 		}
 								
@@ -300,7 +296,6 @@ public class IBeacon {
 		this.proximityUuid = proximityUuid;
 		this.major = major;
 		this.minor = minor;
-		this.rssi = rssi;
 		this.txPower = -59;
 		this.rssi = 0;
 	}
@@ -310,7 +305,6 @@ public class IBeacon {
 			return -1.0; // if we cannot determine accuracy, return -1.
 		}
 		
-		Log.d(TAG, "calculating accuracy based on rssi of "+rssi);
 
 
 		double ratio = rssi*1.0/txPower;
@@ -319,7 +313,6 @@ public class IBeacon {
 		}
 		else {
 			double accuracy =  (0.89976)*Math.pow(ratio,7.7095) + 0.111;	
-			Log.d(TAG, " avg rssi: "+rssi+" accuracy: "+accuracy);
 			return accuracy;
 		}
 	}	

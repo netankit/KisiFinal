@@ -23,30 +23,26 @@
  */
 package com.radiusnetworks.ibeacon;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import com.radiusnetworks.ibeacon.client.RangingTracker;
-import com.radiusnetworks.ibeacon.service.IBeaconData;
 import com.radiusnetworks.ibeacon.service.IBeaconService;
-import com.radiusnetworks.ibeacon.service.RangingData;
 import com.radiusnetworks.ibeacon.service.RegionData;
 import com.radiusnetworks.ibeacon.service.StartRMData;
 
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.util.Log;
 
 /**
  * An class used to set up interaction with iBeacons from an <code>Activity</code> or <code>Service</code>.
@@ -93,8 +89,8 @@ import android.util.Log;
  * @author David G. Young
  *
  */
+@TargetApi(18)
 public class IBeaconManager {
-	private static final String TAG = "IBeaconManager";
 	private Context context;
 	private static IBeaconManager client = null;
 	private Map<IBeaconConsumer,ConsumerInfo> consumers = new HashMap<IBeaconConsumer,ConsumerInfo>();
@@ -160,7 +156,6 @@ public class IBeaconManager {
 	 */
 	public static IBeaconManager getInstanceForApplication(Context context) {
 		if (!isInstantiated()) {
-			Log.d(TAG, "IBeaconManager instance craetion");
 			client = new IBeaconManager(context);
 		}
 		return client;
@@ -193,15 +188,10 @@ public class IBeaconManager {
 	 * @param consumer the <code>Activity</code> or <code>Service</code> that will receive the callback when the service is ready.
 	 */
 	public void bind(IBeaconConsumer consumer) {
-		if (consumers.keySet().contains(consumer)) {
-			Log.i(TAG, "This consumer is already bound");					
-		}
-		else {
-			Log.i(TAG, "This consumer is not bound.  binding: "+consumer);	
+		if (!consumers.keySet().contains(consumer)){
 			consumers.put(consumer, new ConsumerInfo());
 			Intent intent = new Intent(consumer.getApplicationContext(), IBeaconService.class);
 			consumer.bindService(intent, iBeaconServiceConnection, Context.BIND_AUTO_CREATE);
-			Log.i(TAG, "consumer count is now:"+consumers.size());
             setBackgroundMode(consumer, false); // if we just bound, we assume we are not in the background.
 		}
 	}
@@ -214,16 +204,8 @@ public class IBeaconManager {
 	 */
 	public void unBind(IBeaconConsumer consumer) {
 		if (consumers.keySet().contains(consumer)) {
-			Log.i(TAG, "Unbinding");			
 			consumer.unbindService(iBeaconServiceConnection);
 			consumers.remove(consumer);
-		}
-		else {
-			Log.i(TAG, "This consumer is not bound to: "+consumer);
-			Log.i(TAG, "Bound consumers: ");
-			for (int i = 0; i < consumers.size(); i++) {
-				Log.i(TAG, " "+consumers.get(i));
-			}
 		}
 	}
 
@@ -267,7 +249,6 @@ public class IBeaconManager {
             return true;
         }
         catch (RemoteException e) {
-            Log.e(TAG, "Failed to set background mode", e);
             return false;
         }
     }
@@ -389,14 +370,12 @@ public class IBeaconManager {
 	
 	private String callbackPackageName() {
 		String packageName = context.getPackageName();
-		Log.d(TAG, "callback packageName: "+packageName);
 		return packageName;
 	}
 
 	private ServiceConnection iBeaconServiceConnection = new ServiceConnection() {
 		// Called when the connection with the service is established
 	    public void onServiceConnected(ComponentName className, IBinder service) {
-	    	Log.d(TAG,  "we have a connection to the service now");
 	        serviceMessenger = new Messenger(service);
 	        Iterator<IBeaconConsumer> consumerIterator = consumers.keySet().iterator();
 	        while (consumerIterator.hasNext()) {
@@ -413,7 +392,6 @@ public class IBeaconManager {
 
 	    // Called when the connection with the service disconnects unexpectedly
 	    public void onServiceDisconnected(ComponentName className) {
-	        Log.e(TAG, "onServiceDisconnected");
 	    }
 	};	
 

@@ -26,15 +26,9 @@ package com.radiusnetworks.ibeacon.service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.Parcelable;
-import android.os.RemoteException;
-import android.util.Log;
 
 public class Callback {
-	private String TAG = "Callback";
-	private Messenger messenger;
 	private Intent intent;
 	public Callback(String intentPackageName) {
 		if (intentPackageName != null) {
@@ -58,7 +52,6 @@ public class Callback {
 	 */
 	public boolean call(Context context, String dataName, Parcelable data) {
 		if (intent != null) {
-			Log.d(TAG, "attempting callback via intent: "+intent.getComponent());
 			intent.putExtra(dataName, data);
 			context.startService(intent);		
 			return true;			

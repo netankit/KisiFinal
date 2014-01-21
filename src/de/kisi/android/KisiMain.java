@@ -86,7 +86,7 @@ public class KisiMain extends FragmentActivity implements
 	protected void onNewIntent(Intent intent) {
 		// TODO Auto-generated method stub
 		super.onNewIntent(intent);
-		Log.d("OnNewIntent", intent.getExtras().toString());
+		Log.d("OnNewIntent", "" + intent.getExtras());
 		if (intent.getExtras() != null)
 			if (intent.getStringExtra("Type").equals("unlock")) {
 

@@ -81,8 +81,10 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 			nc.setContentText("Bluetooth running");
 			nc.setContentTitle("KISI");
 			startForeground(1, nc.build());
-		//}else{
-		//	stopForeground(false);
+		}else{
+			try{
+			stopForeground(false);
+			}catch(Exception e){}
 		}
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.bind(this);
