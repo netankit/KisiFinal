@@ -22,10 +22,7 @@ public class Locator {
 	
 	@DatabaseField
 	private String name;
-	
-	@DatabaseField
-	private String kind;
-	
+
 	@DatabaseField
 	private boolean enabled;
 	
@@ -33,16 +30,10 @@ public class Locator {
 	@SerializedName("suggest_unlock_enabled")
 	private boolean suggestUnlockEnabled;
 	
-	//TODO: whats the type of treshold!!!
 	@DatabaseField
 	@SerializedName("suggest_unlock_treshold")
 	private double suggestUnlockTreshold;
 	
-	
-	//TODO:disable cause there is a bug in the backend that autoUnlockEnabled is a double instead of a boolean
-//	@DatabaseField
-//	@SerializedName("auto_unlock_enabled")
-//	private boolean autoUnlockEnabled;
 	
 	@DatabaseField
 	@SerializedName("auto_unlock_treshold")
@@ -55,13 +46,27 @@ public class Locator {
 	private double longitude;
 	
 	@DatabaseField
-	@SerializedName("ble_identifier")
-	private String bleIdentifier;
+	@SerializedName("auto_unlock_enabled")
+	private boolean autoUnlockEnabled;
 	
 	@DatabaseField
-	@SerializedName("nfc_identifier")
-	private String nfcIdentifier;
+	private String udid;
+	
+	@DatabaseField
+	private int major;
+	
+	@DatabaseField
+	private int minor;
+	
+//	@DatabaseField
+//	@SerializedName("nfc_identifier")
+//	private String nfcIdentifier;
+	
+	@DatabaseField
+	private String type;
 
+	
+	
 	public int getId() {
 		return id;
 	}
@@ -78,20 +83,20 @@ public class Locator {
 		this.placeId = placeId;
 	}
 
-	public int getLockId() {
-		return lockId;
-	}
-
-	public void setLockId(int lockId) {
-		this.lockId = lockId;
-	}
-	
 	public Place getPlace() {
 		return place;
 	}
 
 	public void setPlace(Place place) {
 		this.place = place;
+	}
+
+	public int getLockId() {
+		return lockId;
+	}
+
+	public void setLockId(int lockId) {
+		this.lockId = lockId;
 	}
 
 	public Lock getLock() {
@@ -110,14 +115,6 @@ public class Locator {
 		this.name = name;
 	}
 
-	public String getKind() {
-		return kind;
-	}
-
-	public void setKind(String kind) {
-		this.kind = kind;
-	}
-
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -134,29 +131,19 @@ public class Locator {
 		this.suggestUnlockEnabled = suggestUnlockEnabled;
 	}
 
-	
-	//TODO:disable cause there is a bug in the backend that autoUnlockEnabled is a double instead of a boolean
-//	public int getSuggestUnlockTreshold() {
-//		return suggestUnlockTreshold;
-//	}
-//
-//	public void setSuggestUnlockTreshold(int suggestUnlockTreshold) {
-//		this.suggestUnlockTreshold = suggestUnlockTreshold;
-//	}
-//
-//	public boolean isAutoUnlockEnabled() {
-//		return autoUnlockEnabled;
-//	}
-//
-//	public void setAutoUnlockEnabled(boolean autoUnlockEnabled) {
-//		this.autoUnlockEnabled = autoUnlockEnabled;
-//	}
-//
-//	public int getAutoUnlockTreshold() {
-//		return autoUnlockTreshold;
-//	}
+	public double getSuggestUnlockTreshold() {
+		return suggestUnlockTreshold;
+	}
 
-	public void setAutoUnlockTreshold(int autoUnlockTreshold) {
+	public void setSuggestUnlockTreshold(double suggestUnlockTreshold) {
+		this.suggestUnlockTreshold = suggestUnlockTreshold;
+	}
+
+	public double getAutoUnlockTreshold() {
+		return autoUnlockTreshold;
+	}
+
+	public void setAutoUnlockTreshold(double autoUnlockTreshold) {
 		this.autoUnlockTreshold = autoUnlockTreshold;
 	}
 
@@ -176,20 +163,46 @@ public class Locator {
 		this.longitude = longitude;
 	}
 
-	public String getBleIdentifier() {
-		return bleIdentifier;
+	public boolean isAutoUnlockEnabled() {
+		return autoUnlockEnabled;
 	}
 
-	public void setBleIdentifier(String bleIdentifier) {
-		this.bleIdentifier = bleIdentifier;
+	public void setAutoUnlockEnabled(boolean autoUnlockEnabled) {
+		this.autoUnlockEnabled = autoUnlockEnabled;
 	}
 
-	public String getNfcIdentifier() {
-		return nfcIdentifier;
+	public String getUdid() {
+		return udid;
 	}
 
-	public void setNfcIdentifier(String nfcIdentifier) {
-		this.nfcIdentifier = nfcIdentifier;
+	public void setUdid(String udid) {
+		this.udid = udid;
 	}
+
+	public int getMajor() {
+		return major;
+	}
+
+	public void setMajor(int major) {
+		this.major = major;
+	}
+
+	public int getMinor() {
+		return minor;
+	}
+
+	public void setMinor(int minor) {
+		this.minor = minor;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	
 
 }
