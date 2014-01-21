@@ -16,7 +16,7 @@ public class KisiApplication extends Application{
 		super.onCreate();
 		instance = this;
 		
-		//GeofenceManager.getInstance();
+		GeofenceManager.getInstance();
 		BluetoothLEManager.getInstance().startService(false);
 		de.kisi.android.db.DataManager.initialize(this);
 		de.kisi.android.account.KisiAccountManager.initialize(this);

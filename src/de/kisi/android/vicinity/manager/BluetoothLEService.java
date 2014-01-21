@@ -75,12 +75,14 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		NotificationCompat.Builder nc = new NotificationCompat.Builder(this);
 		if(intent.getExtras()!=null && intent.getExtras().getBoolean("foreground", false)){
+			NotificationCompat.Builder nc = new NotificationCompat.Builder(this);
 			nc.setSmallIcon(R.drawable.ic_launcher);
 			nc.setContentText("Bluetooth running");
 			nc.setContentTitle("KISI");
 			startForeground(1, nc.build());
+		}else{
+			stopForeground(false);
 		}
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.bind(this);
@@ -147,7 +149,7 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
         	Collection<Region> curRegions = regions.values();
         	for(Place p :places){
         		for(Locator l:p.getLocators()){
-        			if(l.getKind().equals("BLE")){
+        			if(l.getKind()!=null && l.getKind().equals("BLE")){
         				if(regions.containsKey(l.getId())){
         					curRegions.remove(regions.get(l.getId()));
         				}else{
