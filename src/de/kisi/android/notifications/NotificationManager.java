@@ -1,47 +1,102 @@
 package de.kisi.android.notifications;
 
-import java.util.GregorianCalendar;
-import java.util.Random;
-
-import de.kisi.android.R;
-
+import java.util.List;
 
 import android.app.Activity;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import de.kisi.android.KisiApplication;
+import de.kisi.android.KisiMain;
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.model.Lock;
+import de.kisi.android.model.Place;
 
 public class NotificationManager extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.i("NotificationManager","onReceive("+intent.getAction()+")");
-		Bundle extras = intent.getExtras();
-		showNotification(context, "Place "+extras.getInt("Place")+" Lock "+extras.getInt("Lock")+" "+extras.getString("Type"));
+		KisiAPI kisiAPI = KisiAPI.getInstance();
+		if (kisiAPI.getUser() != null) {
+		
+			Log.i("NotificationManager", "onReceive(" + intent.getAction() + ")");
+			Bundle extras = intent.getExtras();
+			
+			int placeId = extras.getInt("Place", -1);
+			String type = extras.getString("Type");
+			
+			Place place = kisiAPI.getPlaceById(placeId);
+			
+			if (type.equals("Enter")) {
+				List<Lock> locks = place.getLocks();
+
+				for(Lock l: locks){
+					showNotification(context, l, place);
+				}
+
+			} else if (type.equals("Exit")) {
+				removeNotifications(context, place);
+			}
+
+		}
 	}
 
-	
+	private void removeNotifications(Context context, Place place) {
+
+		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context
+				.getSystemService(Activity.NOTIFICATION_SERVICE);
+		List<Lock> locks = place.getLocks();
+		for (Lock lock : locks) {
+			int id = (lock.getId());
+			mNotificationManager.cancel("unlock", id);
+		}
+
+	}
+
 	/**
-	 * Just a simple Notification for testing purposes
-	 * @param c Context is needed to show Notifications
-	 * @param msg The Message that should be shown on the Notification
+	 * 
+	 * 
+	 * @param c
+	 *            Context is needed to show Notifications
+	 * @param msg
+	 *            The Message that should be shown on the Notification
 	 */
-	public void showNotification(Context c, String msg){
-		Random r = new Random();
+	public void showNotification(Context c, Lock lock, Place place) {
+
 		NotificationCompat.Builder nc = new NotificationCompat.Builder(c);
+		long[] pattern = { 0, 800 };
+		nc.setVibrate(pattern);
 		nc.setSmallIcon(R.drawable.ic_launcher);
-		GregorianCalendar cal = new GregorianCalendar();
-		String text = ""+cal.get(GregorianCalendar.HOUR_OF_DAY)+":"+cal.get(GregorianCalendar.MINUTE)+":"+cal.get(GregorianCalendar.SECOND);
-		nc.setContentText(text);
-		nc.setContentTitle(msg);
+		nc.setContentText("Touch to Unlock");
+		nc.setContentTitle(lock.getName() + "," + place.getName());
 		nc.setDefaults(Notification.DEFAULT_SOUND);
 		nc.setLights(0xFF0000FF, 100, 450);
-		android.app.NotificationManager mNotificationManager =
-				(android.app.NotificationManager) c.getSystemService(Activity.NOTIFICATION_SERVICE);
-		mNotificationManager.notify(r.nextInt(), nc.build());
+		nc.setWhen(0);
+		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) c
+				.getSystemService(Activity.NOTIFICATION_SERVICE);
+
+		Intent intent = new Intent(c, KisiMain.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.putExtra("Type", "unlock");
+		intent.putExtra("Place", place.getId());
+		intent.putExtra("Lock", lock.getId());
+
+		PendingIntent pIntent = PendingIntent.getActivity(c, lock.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		nc.setContentIntent(pIntent);
+
+		int id = lock.getId();
+		mNotificationManager.notify("unlock", id, nc.build());
+
+	}
+
+	public static void initialize(KisiApplication kisiApplication) {
+		// TODO Auto-generated method stub
+
 	}
 }

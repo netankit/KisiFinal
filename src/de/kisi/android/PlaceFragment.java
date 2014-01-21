@@ -1,5 +1,7 @@
 package de.kisi.android;
 
+import java.util.Hashtable;
+
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
@@ -33,15 +35,14 @@ public class PlaceFragment extends Fragment {
 	private final static long delay = 3000;
 	private int index;
 	
+	private Hashtable<Integer, Button> buttonHashtable = new Hashtable<Integer, Button>();
 	
 	static PlaceFragment newInstance(int index) {
 		// Fragments must not have a custom constructor
 		PlaceFragment f = new PlaceFragment();
-
 		Bundle args = new Bundle();
 		args.putInt("index", index);
 		f.setArguments(args);
-
 		return f;
 	}
 	
@@ -80,6 +81,18 @@ public class PlaceFragment extends Fragment {
 		return layout;
 	}
 
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onViewCreated(view, savedInstanceState);
+		int lockIdIntent = getArguments().getInt("lock", -1);
+		//check if we received an intent
+		if(lockIdIntent != -1) {
+			buttonHashtable.get(lockIdIntent).callOnClick();
+		}
+		
+	}
+
 	private void setupButtons(final Place place) {
 		
 		Drawable lockIcon = getActivity().getResources().getDrawable(R.drawable.kisi_lock);
@@ -111,7 +124,6 @@ public class PlaceFragment extends Fragment {
 			ly.addView(text, layoutParams);
 			return;
 		}    
-		
 		
 		for (final Lock lock : place.getLocks()) {
 			
@@ -151,9 +163,16 @@ public class PlaceFragment extends Fragment {
 				}
 			});
 			ly.addView(button, layoutParams);
+			buttonHashtable.put(lock.getId(), button);
 		}
 
 		
+	}
+	
+	public void unlockLock(int lockId) {
+		if(buttonHashtable.containsKey(lockId)) {
+			buttonHashtable.get(lockId).callOnClick();
+		}
 	}
 	
 

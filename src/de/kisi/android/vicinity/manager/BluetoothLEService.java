@@ -81,8 +81,8 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 			nc.setContentText("Bluetooth running");
 			nc.setContentTitle("KISI");
 			startForeground(1, nc.build());
-		}else{
-			stopForeground(false);
+		//}else{
+		//	stopForeground(false);
 		}
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.bind(this);
@@ -145,35 +145,33 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 	}
 	
 	private void registerPlaces(Place[] places){
+		Log.i("BLE","start register");
         try {
+        	// Get Registered Regions
         	Collection<Region> curRegions = regions.values();
         	for(Place p :places){
-        		for(Locator l:p.getLocators()){
-        			if(l.getKind()!=null && l.getKind().equals("BLE")){
-        				if(regions.containsKey(l.getId())){
-        					curRegions.remove(regions.get(l.getId()));
+        		for(Locator locator:p.getLocators()){
+        			if(locator.getType()!=null && locator.getType().equals("BLE")){
+        				if(regions.containsKey(locator.getId())){
+        					// Remove Region from Delete list
+        					curRegions.remove(regions.get(locator.getId()));
         				}else{
-        					String bleid = l.getBleIdentifier();
-        					if(bleid!=null && !bleid.isEmpty() && bleid.contains("-")){
-        						try{
-        							String splitid[] = bleid.split("-");
-        							int major = Integer.parseInt(splitid[0]);
-        							int minor = Integer.parseInt(splitid[1]);
-        							Region region = new Region("Place: "+l.getPlaceId()+" Lock: "+l.getLockId()+" Locator: "+l.getId(), "DE9D14A1-1C16-4114-9B68-3B2435C6B99A", major,minor);
-        							iBeaconManager.startMonitoringBeaconsInRegion(region);
-        							iBeaconManager.startRangingBeaconsInRegion(region);
-        							regions.put(l.getId(), region);
-        						}catch (Exception e){
-        						}
-        					}
+        					int major = locator.getMajor();
+        					int minor = locator.getMinor();
+        					Region region = new Region("Place: "+locator.getPlaceId()+" Lock: "+locator.getLockId()+" Locator: "+locator.getId(), "DE9D14A1-1C16-4114-9B68-3B2435C6B99A", major,minor);
+        					Log.i("BLE","Set iBeacon "+region.getUniqueId());
+        					iBeaconManager.startMonitoringBeaconsInRegion(region);
+        					iBeaconManager.startRangingBeaconsInRegion(region);
+        					regions.put(locator.getId(), region);
         				}
         			}
         		}
         	}
-        	for(Region r : curRegions){
-        		iBeaconManager.stopMonitoringBeaconsInRegion(r);
-				iBeaconManager.startRangingBeaconsInRegion(r);
-        		regions.remove(r);
+        	for(Region region : curRegions){
+        		iBeaconManager.stopMonitoringBeaconsInRegion(region);
+				iBeaconManager.startRangingBeaconsInRegion(region);
+				Log.i("BLE","remove "+region.getUniqueId());
+        		regions.remove(region);
         	}
         } catch (RemoteException e) {   }			
 	}

@@ -53,7 +53,7 @@ public class NFCReceiver extends Activity{
 	        for(Place place : KisiAPI.getInstance().getPlaces()){
 	        	for(Lock lock : place.getLocks()){
 	        		for(Locator locator : lock.getLocators()){
-	        			if (nfcData.equals(locator.getNfcIdentifier())){
+	        			if (nfcData.equals(locator.getUdid())){
 	        				actor.actOnEntry(place.getId(),lock.getId());
 	        			}
 	        		}

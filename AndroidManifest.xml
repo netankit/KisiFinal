@@ -1,43 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="de.kisi.android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.kisi.android"
     android:versionCode="14"
-    android:versionName="1.2" xmlns:android="http://schemas.android.com/apk/res/android">
+    android:versionName="1.2" >
 
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    
+    <!-- Geofence feature -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    
+    <!-- Authentication Manager -->
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
     <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    
+    <!-- Bluetooth Feature -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    
+    <!-- NFC Feature -->
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    
+    <!-- Notification Manager -->
+    <uses-permission android:name="android.permission.VIBRATE" />
     
     <application
-        android:allowBackup="true"
         android:name="de.kisi.android.KisiApplication"
+        android:allowBackup="true"
         android:icon="@drawable/launchericon"
         android:label="@string/app_name" >
-
-		<meta-data
+        <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <!-- UI Activities -->
         <activity
             android:name="de.kisi.android.KisiMain"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/CustomTheme" android:launchMode="standard">
-             <intent-filter android:label="@string/app_name" >
+            android:theme="@style/CustomTheme" >
+            <intent-filter android:label="@string/app_name" >
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -57,32 +72,35 @@
         </activity>
         <activity
             android:name="com.electricimp.blinkup.WifiSelectActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation" />
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.electricimp.blinkup.BlinkupGLActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation" />
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.electricimp.blinkup.WifiActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation" />
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.electricimp.blinkup.WPSActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation" />
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.electricimp.blinkup.ClearWifiActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation" />
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.electricimp.blinkup.InterstitialActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation" />
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
         <activity
             android:name="de.kisi.android.BlinkupCompleteActivity"
             android:screenOrientation="portrait"
             android:configChanges="orientation" />
+        <!-- UI Activities end -->
+        
+		<!-- Start on Boot -->
 		<receiver
             android:name="de.kisi.android.StartOnBootReceiver"
             android:enabled="true"
@@ -90,38 +108,40 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
-        </receiver>        
-        <receiver android:name="de.kisi.android.widget.KisiWidget">
-	    	<intent-filter>
-	        	<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-	        	<action android:name="de.kisi.android.VICINITY_CHANGED" />
-	        </intent-filter>
-	    	<meta-data 
-	    	    android:name="android.appwidget.provider"
-	    	    android:resource="@xml/widget" 
-	    	    />
-		</receiver>
-        <receiver android:name="de.kisi.android.notifications.NotificationManager"
-            android:exported="false">
-	    	<intent-filter>
-	        	<action android:name="de.kisi.android.VICINITY_CHANGED" />
-	        </intent-filter>
-		</receiver>  
+        </receiver>
+        <!-- Start on Boot end -->
+        
+        <!-- Notification -->
+        <receiver
+            android:name="de.kisi.android.notifications.NotificationManager"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="de.kisi.android.VICINITY_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <!-- Notification end -->
+        
+        <!-- Geofence -->
 		<receiver android:name="de.kisi.android.vicinity.manager.GeofenceUpdateLocationReceiver"
 		    android:exported="false">
 		</receiver>
-		<service android:exported="false"
-            android:name="de.kisi.android.account.KisiAuthenticatorService">
+		<!-- Geofence end -->
+		
+        <!-- Account Manager -->
+        <service android:name="de.kisi.android.account.KisiAuthenticatorService" android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
+
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
 		<activity android:name=".account.AccountActivity" android:theme="@style/CustomThemeLogin" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
 		<activity android:name="AccountPickerActivity" android:theme="@style/CustomThemeLogin" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
-
+		<!-- Account Manager end-->
+		
+		<!-- NFC -->
 		<activity android:name="de.kisi.android.vicinity.manager.NFCReceiver">
 			<intent-filter>
 		        <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
@@ -129,7 +149,9 @@
 		        <category android:name="android.intent.category.DEFAULT"/>
 		    </intent-filter>    
         </activity>
-
+		<!-- NFC end -->
+		
+		<!-- Bluetooth --> 
 		<service
             android:name="de.kisi.android.vicinity.manager.BluetoothLEService"
             android:enabled="true"
@@ -137,6 +159,7 @@
             android:isolatedProcess="false"
             >
         </service>
+        
 		<service
             android:name="com.radiusnetworks.ibeacon.service.IBeaconService"
             android:enabled="true"
@@ -144,11 +167,13 @@
             android:isolatedProcess="false"
             android:label="iBeacon" >
         </service>
+        
         <service
             android:name="com.radiusnetworks.ibeacon.IBeaconIntentProcessor"
             android:enabled="true" >
         </service>
+        <!-- Bluetooth end--> 
         
-        </application>
+    </application>
 
 </manifest>

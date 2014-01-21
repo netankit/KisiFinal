@@ -165,6 +165,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		//mainScreen.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		//finish login activity
 		setResult(LOGIN_SUCCESS);
+		//move this later to the KisiAPI
 		finish();
 	}
 
