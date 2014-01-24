@@ -139,21 +139,18 @@ public class KisiMain extends FragmentActivity implements
 		case R.id.share:
 			// check if user has a place
 			if (places.length == 0) {
-				Toast.makeText(this, R.string.share_empty_place_error,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.share_empty_place_error, Toast.LENGTH_LONG).show();
 				return false;
 			}
 
 			Place p = places[pager.getCurrentItem()];
 			// check if user is owner
 			if (!kisiAPI.userIsOwner(p)) {
-				Toast.makeText(this, R.string.share_owner_only,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.share_owner_only, Toast.LENGTH_LONG).show();
 				return false;
 			}
 
-			Intent intent = new Intent(getApplicationContext(),
-					ShareKeyActivity.class);
+			Intent intent = new Intent(getApplicationContext(), ShareKeyActivity.class);
 			intent.putExtra("place", pager.getCurrentItem());
 			startActivity(intent);
 			return true;
@@ -161,8 +158,7 @@ public class KisiMain extends FragmentActivity implements
 		case R.id.showLog:
 			// check if user has a place
 			if (places.length == 0) {
-				Toast.makeText(this, R.string.log_empty_place_error,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.log_empty_place_error, Toast.LENGTH_LONG).show();
 				return false;
 			}
 			Place place = places[pager.getCurrentItem()];
@@ -175,8 +171,7 @@ public class KisiMain extends FragmentActivity implements
 		case R.id.setup:
 
 			BlinkupController blinkup = BlinkupController.getInstance();
-			blinkup.intentBlinkupComplete = new Intent(this,
-					BlinkupCompleteActivity.class);
+			blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
 
 			if (kisiAPI.getUser().getEiPlanId() != null)
 				blinkup.setPlanID(kisiAPI.getUser().getEiPlanId());
@@ -185,8 +180,7 @@ public class KisiMain extends FragmentActivity implements
 					new ServerErrorHandler() {
 						@Override
 						public void onError(String errorMsg) {
-							Toast.makeText(getApplicationContext(), errorMsg,
-									Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
 						}
 					});
 			return true;

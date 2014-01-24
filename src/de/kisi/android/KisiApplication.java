@@ -2,7 +2,6 @@ package de.kisi.android;
 
 import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 
 public class KisiApplication extends Application {
 
