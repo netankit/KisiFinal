@@ -3,15 +3,17 @@ package de.kisi.android.notifications;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.Notification;
+import android.app.Notification; 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import de.kisi.android.KisiApplication;
+import android.widget.Toast;
 import de.kisi.android.KisiMain;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
@@ -47,7 +49,7 @@ public class NotificationManager extends BroadcastReceiver {
 		}
 	}
 
-	private void removeNotifications(Context context, Place place) {
+	public static void removeNotifications(Context context, Place place) {
 
 		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context
 				.getSystemService(Activity.NOTIFICATION_SERVICE);
@@ -59,30 +61,19 @@ public class NotificationManager extends BroadcastReceiver {
 
 	}
 
-	/**
-	 * 
-	 * 
-	 * @param c
-	 *            Context is needed to show Notifications
-	 * @param msg
-	 *            The Message that should be shown on the Notification
-	 */
+
 	public void showNotification(Context c, Lock lock, Place place) {
 
 		NotificationCompat.Builder nc = new NotificationCompat.Builder(c);
-		long[] pattern = { 0, 800 };
-		nc.setVibrate(pattern);
-		nc.setSmallIcon(R.drawable.ic_launcher);
+		nc.setSmallIcon(R.drawable.notification_icon);
+		Bitmap bitmap = BitmapFactory.decodeResource(c.getResources(), R.drawable.notification_icon);
+		nc.setLargeIcon(bitmap);
 		nc.setContentText("Touch to Unlock");
-		nc.setContentTitle(lock.getName() + "," + place.getName());
-		nc.setDefaults(Notification.DEFAULT_SOUND);
-		nc.setLights(0xFF0000FF, 100, 450);
-		nc.setWhen(0);
-		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) c
-				.getSystemService(Activity.NOTIFICATION_SERVICE);
-
+		nc.setContentTitle(lock.getName() + " - " + place.getName());
+		nc.setDefaults(Notification.DEFAULT_ALL);
+		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) c.getSystemService(Activity.NOTIFICATION_SERVICE);
 		Intent intent = new Intent(c, KisiMain.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("Type", "unlock");
 		intent.putExtra("Place", place.getId());
 		intent.putExtra("Lock", lock.getId());
@@ -94,9 +85,9 @@ public class NotificationManager extends BroadcastReceiver {
 		mNotificationManager.notify("unlock", id, nc.build());
 
 	}
-
-	public static void initialize(KisiApplication kisiApplication) {
-		// TODO Auto-generated method stub
-
+	
+	public static void removeAllNotifications(Context context) {
+		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Activity.NOTIFICATION_SERVICE);
+		mNotificationManager.cancelAll();
 	}
 }

@@ -25,7 +25,9 @@ import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
+import de.kisi.android.notifications.NotificationManager;
 import de.kisi.android.rest.KisiRestClient;
+import de.kisi.android.vicinity.manager.GeofenceManager;
 
 import com.google.gson.Gson;
 
@@ -86,7 +88,7 @@ public class KisiAPI {
 					
 					Gson gson = new Gson();
 					user = gson.fromJson(response.toString(), User.class);
-					
+					DataManager.getInstance().saveUser(user);
 					editor.commit();
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -142,6 +144,8 @@ public class KisiAPI {
 	public void logout(){
 		KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
 		clearCache();
+		GeofenceManager.getInstance().removeAllGeofances();
+		NotificationManager.removeAllNotifications(context);
 		KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
 			public void onSuccess(String msg) {
 	
@@ -155,15 +159,17 @@ public class KisiAPI {
 	 * @return Array of all Places the user has access to
 	 */
 	public Place[] getPlaces(){
-		return places;
+		return places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 	}
 	
 	public Place getPlaceAt(int index){
+		places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		if(places != null && index>=0 && index<places.length)
 			return places[index];
 		return null;
 	}
 	public Place getPlaceById(int num){
+		places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		for(Place p : places)
 			if(p.getId() == num)
 				return p;
@@ -172,11 +178,15 @@ public class KisiAPI {
 	
 	
 	public User getUser() {
-		return user;
+		return 	DataManager.getInstance().getUser();
 	}
 
 	
 	public void updatePlaces(final OnPlaceChangedListener listener) {
+		if(user == null)
+			return;
+		places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+		
 		KisiRestClient.getInstance().get(context, "places",  new JsonHttpResponseHandler() { 
 			
 			public void onSuccess(JSONArray response) {
@@ -185,17 +195,16 @@ public class KisiAPI {
 				DataManager.getInstance().savePlaces(pl);
 				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 				listener.onPlaceChanged(places);
-				notifyAllOnPlaceChangedListener();		
+				notifyAllOnPlaceChangedListener();	
 			}
 			
 		});
 	}
 	
+
 	
 	//TODO: security
 	public String getAuthToken() {
-		//SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
-	//	return settings.getString("authentication_token", "" );
 		return user.getAuthentication_token();
 	}
 	
@@ -215,6 +224,17 @@ public class KisiAPI {
 			}
 		});		
 	}
+	
+	public Lock getLockById(Place place, int lockId){ 
+		List<Lock> locks  = place.getLocks();
+		for(Lock l: locks) {
+			if(l.getId() == lockId) {
+				return l;
+			}
+		}
+		return null;
+	}
+	
 	
 
 	public boolean createNewKey(Place p, String email, List<Lock> locks, final Activity activity) {
@@ -358,7 +378,7 @@ public class KisiAPI {
 	
 	
 	public void refresh(OnPlaceChangedListener listener) {
-		DataManager.getInstance().deleteDB();
+		DataManager.getInstance().deletePlaceLockFromDB();
 		this.updatePlaces(listener);
 	}
 	

@@ -50,7 +50,7 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 	
 	private void buildShareDialog(final Place place) {
 		final List<Lock> locks = place.getLocks();
-		LinearLayout linearLayout = (LinearLayout)findViewById(R.id.linearLayout1);
+		LinearLayout linearLayout = (LinearLayout)findViewById(R.id.placelinearLayout1);
 		
 		final Drawable uncheckedIcon = getResources().getDrawable(R.drawable.share_unchecked);
 		final Drawable checkedIcon = getResources().getDrawable(R.drawable.share_checked);

@@ -10,6 +10,7 @@ import com.j256.ormlite.dao.Dao;
 
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import de.kisi.android.model.User;
 
 public class DataManager {
 
@@ -27,6 +28,7 @@ public class DataManager {
 	private DatabaseHelper db;
     private Dao<Lock, Integer> lockDao;
     private Dao<Place, Integer> placeDao;
+    private Dao<User, Integer> userDao;
     private DatabaseManager dbManager;
  
     private DataManager(Context context)
@@ -36,6 +38,7 @@ public class DataManager {
             db = dbManager.getHelper(context);
             lockDao = db.getLockDao();
             placeDao = db.getPlaceDao();
+            userDao = db.getUserDao();
         }catch (SQLException e) {
             e.printStackTrace();
         }
@@ -83,6 +86,17 @@ public class DataManager {
     	
     	
     }
+
+    public void saveUser(User user) {
+    	try {
+			userDao.createOrUpdate(user);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    
     
     public List<Place> getAllPlaces() {
     	List<Place> result = null;
@@ -105,10 +119,30 @@ public class DataManager {
     	return result;
     }
     
+    
+    public User getUser() {
+    	List<User> result = null;
+    	try {
+    		result =  userDao.queryForAll();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	if(result == null||result.size() == 0) {
+    		return null;
+    	}
+    	else{
+    		return result.get(0);
+    	}
+    }
  
     
     public void deleteDB() {
     	db.clear();
+    }
+    
+    
+    public void deletePlaceLockFromDB() {
+    	db.clearPlaceLock();
     }
     
     public void close() {

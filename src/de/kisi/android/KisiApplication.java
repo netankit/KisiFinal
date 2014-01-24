@@ -2,6 +2,7 @@ package de.kisi.android;
 
 import android.app.Application;
 import android.util.Log;
+import android.widget.Toast;
 
 public class KisiApplication extends Application {
 
@@ -24,7 +25,7 @@ public class KisiApplication extends Application {
 		 * @Override public void uncaughtException(Thread arg0, Throwable arg1)
 		 * { System.exit(1); } });
 		 */
-		de.kisi.android.db.DataManager.initialize(this);
+		de.kisi.android.db.DataManager.initialize(this);;
 		de.kisi.android.account.KisiAccountManager.initialize(this);
 		de.kisi.android.api.KisiAPI.initialize(this);
 		de.kisi.android.api.KisiLocationManager.initialize(this);

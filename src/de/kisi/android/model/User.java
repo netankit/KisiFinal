@@ -1,15 +1,22 @@
 package de.kisi.android.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
 
 public class User {
+	@DatabaseField(id = true, index=true)
 	private int id;
+	@DatabaseField
 	private String authentication_token;
+	@DatabaseField
 	private String email;
+	@DatabaseField
 	@SerializedName("ei_plan_id")
 	private String eiPlanId;
+	@DatabaseField
 	@SerializedName("first_name")
 	private String firstName;
+	@DatabaseField
 	@SerializedName("last_name")
 	private String lastName;
 	

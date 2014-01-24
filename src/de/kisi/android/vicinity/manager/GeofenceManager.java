@@ -1,5 +1,6 @@
 package de.kisi.android.vicinity.manager;
 
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationClient.OnRemoveGeofencesResultListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationStatusCodes;
 import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListener;
@@ -14,7 +16,6 @@ import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListen
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
-
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +27,7 @@ import android.os.Bundle;
  * On entering or leaving such a Geofence a VicinityActor will 
  * be activated.
  * 
- * @author Thomas Hörmann
+ * @author Thomas Hoermann
  *
  */
 public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallbacks,
@@ -36,6 +37,8 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 										{
 	// Instance for Singleton Access
 	private static GeofenceManager instance;
+	
+	private Hashtable<Integer, Place> placeMap = new Hashtable<Integer, Place>();
 	
 	/**
 	 * Starts the GeofenceManager and register all Places.
@@ -154,15 +157,70 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         // Create a Geofence for every Place
         for(Place p : places)
         {
-        	fences.add(new Geofence.Builder()
-        	.setRequestId("Place: "+p.getId())
-        	.setCircularRegion(p.getLatitude(), p.getLongitude(), 50)
-            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT|Geofence.GEOFENCE_TRANSITION_ENTER)
-            .setExpirationDuration(1000*60*60*24)// one day
-            .build());
+        	//check if place already generated a geofence 
+        	//this check must be done, because the API updates the place quite often on the startup and calls the onPlaceChanged
+        	//and so the phone would vibrate the whole time
+        	if(!placeMap.containsKey(p.getId()) && p.getNotificationEnabled()) {
+        		placeMap.put(p.getId(), p);
+        		fences.add(new Geofence.Builder()
+        		.setRequestId("Place: "+p.getId())
+        		.setCircularRegion(p.getLatitude(), p.getLongitude(), 50)
+        		.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT|Geofence.GEOFENCE_TRANSITION_ENTER)
+        		.setExpirationDuration(Geofence.NEVER_EXPIRE) //infinite  
+        		.build());
+        	}        	
+        	
         }
         
         // Register Geofences to the OS
-        mLocationClient.addGeofences(fences, getPendingIntent(), this);
+        if(!fences.isEmpty()) {
+        	mLocationClient.addGeofences(fences, getPendingIntent(), this);
+        }
 	}
+	
+	
+	public void removeGeofance(Place place) {
+		placeMap.remove(place.getId());
+		List<String> geofenceRequestIdsToRemove = new LinkedList<String>();
+		geofenceRequestIdsToRemove.add("Place: " + place.getId());
+		mLocationClient.removeGeofences(geofenceRequestIdsToRemove, new OnRemoveGeofencesResultListener() {
+
+			@Override
+			public void onRemoveGeofencesByPendingIntentResult(int arg0,
+					PendingIntent arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onRemoveGeofencesByRequestIdsResult(int arg0,
+					String[] arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+	}
+	
+	public void removeAllGeofances() {
+		placeMap.clear();
+		mLocationClient.removeGeofences(getPendingIntent(),  new OnRemoveGeofencesResultListener() {
+
+			@Override
+			public void onRemoveGeofencesByPendingIntentResult(int arg0,
+					PendingIntent arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onRemoveGeofencesByRequestIdsResult(int arg0,
+					String[] arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+	}
+	
 }
