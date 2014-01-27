@@ -20,6 +20,7 @@ import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.VicinityTypeEnum;
 
+import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -28,7 +29,11 @@ import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-public class BluetoothLEService extends Service implements IBeaconConsumer{
+public class BluetoothLEService extends IntentService implements IBeaconConsumer{
+
+	public BluetoothLEService(){
+		super("BluetoothLEService");
+	}
 
 	private class RegionContainer{
 		Hashtable<Integer,Region> hashtable = new Hashtable<Integer,Region>();
@@ -72,9 +77,15 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 		//iBeaconManager.bind(this);
 		return mBinder;
 	}
-
+	
+	@Override
+	protected void onHandleIntent(Intent intent) {
+		Log.i("BLE","handle intent"+ intent.getExtras().getBoolean("foreground", false));
+	}
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		Log.i("BLE","startCommand");
+		Log.i("BLE","foreground "+ intent.getExtras().getBoolean("foreground", false));
 		if(intent.getExtras()!=null && intent.getExtras().getBoolean("foreground", false)){
 			NotificationCompat.Builder nc = new NotificationCompat.Builder(this);
 			nc.setSmallIcon(R.drawable.ic_launcher);
@@ -83,8 +94,9 @@ public class BluetoothLEService extends Service implements IBeaconConsumer{
 			startForeground(1, nc.build());
 		}else{
 			try{
-			stopForeground(false);
-			}catch(Exception e){}
+				Log.i("BLE","stopForeground");
+			stopForeground(true);
+			}catch(Exception e){Log.i("BLE","stop Error");}
 		}
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.bind(this);

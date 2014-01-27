@@ -10,8 +10,6 @@
     <style name="CustomTheme" parent="android:Theme.Holo.Light.NoActionBar">
         <item name="android:windowTitleSize">67dp</item>
         <item name="android:windowNoTitle">false</item>
-	    <item name="android:background">@drawable/backgroundlogin</item>
-	    <item name="android:colorBackground">@color/custom_theme_color</item>
     </style>
     
     <style name="CustomThemeLogin" parent="android:Theme.Holo.Light.NoActionBar">

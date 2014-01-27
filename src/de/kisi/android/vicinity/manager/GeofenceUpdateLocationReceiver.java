@@ -12,6 +12,7 @@ import de.kisi.android.vicinity.VicinityTypeEnum;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
 
@@ -20,7 +21,7 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
 		LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.Geofence);
 		List<Geofence> fences = LocationClient.getTriggeringGeofences(intent);
 		int transitionType = LocationClient.getGeofenceTransition(intent);
-        
+        Log.i("GeofenceManager","transition: "+transitionType);
 		if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER)
             for(Geofence fence : fences){
             	String p[] = fence.getRequestId().split(": ");

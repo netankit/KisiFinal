@@ -70,8 +70,8 @@ public class NotificationManager extends BroadcastReceiver {
 	public void showNotification(Context c, Lock lock, Place place) {
 
 		NotificationCompat.Builder nc = new NotificationCompat.Builder(c);
-		long[] pattern = { 0, 800 };
-		nc.setVibrate(pattern);
+		//long[] pattern = { 0, 800 };
+		//nc.setVibrate(pattern);
 		nc.setSmallIcon(R.drawable.ic_launcher);
 		nc.setContentText("Touch to Unlock");
 		nc.setContentTitle(lock.getName() + "," + place.getName());

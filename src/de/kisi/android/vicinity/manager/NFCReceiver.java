@@ -24,6 +24,7 @@ import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.widget.Toast;
 
 public class NFCReceiver extends Activity{
@@ -35,7 +36,7 @@ public class NFCReceiver extends Activity{
 		//Write Data on the Tag
 		//NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		//Tag tag = getIntent().getParcelableExtra(NfcAdapter.EXTRA_TAG);
-		//NFCReceiver.writeTag(this, tag, "{535227EB-4329-4540-8DC7-FCE0292D8769}");
+		//NFCReceiver.writeTag(this, tag, "stop");
 		
 		
 		try{
@@ -44,7 +45,12 @@ public class NFCReceiver extends Activity{
 	        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 	        NdefRecord relayRecord = ((NdefMessage)rawMsgs[0]).getRecords()[0];
 	        String nfcData = new String(relayRecord.getPayload());
-	 
+	        if(nfcData.equals("start")){
+	    		BluetoothLEManager.getInstance().startService(true);
+	        }
+	        if(nfcData.equals("stop")){
+	    		BluetoothLEManager.getInstance().startService(false);
+	        }
 	        // Display the data on the tag
 	        Toast.makeText(this, nfcData, Toast.LENGTH_SHORT).show();
 			LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.NFC);
@@ -60,9 +66,10 @@ public class NFCReceiver extends Activity{
 	        	}
 	        }
 	 
+	    }catch(Exception e){
+	    }finally{
 	        // Just finish the activity
 	        finish();
-	    }catch(Exception e){
 	    }
 	}
 
@@ -130,6 +137,7 @@ public class NFCReceiver extends Activity{
 	            }
 	        }
 	    } catch(Exception e) {
+	    	Log.e("NFC",e.toString());
 	    }
 	 
 	    return false;
