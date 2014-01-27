@@ -37,11 +37,10 @@ public class KisiLocationManager implements LocationListener{
 		else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) 
 			locationProvider = LocationManager.GPS_PROVIDER;
 		
-		if(locationProvider != null) {
+		if(locationProvider != null){
 			currentLocation = locationManager.getLastKnownLocation(locationProvider);
 			locationManager.requestLocationUpdates(locationProvider, 0, 0, this);
 		}
-
 	}
 	
 	public Location getCurrentLocation() {

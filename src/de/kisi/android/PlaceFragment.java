@@ -32,42 +32,39 @@ public class PlaceFragment extends Fragment {
 
 	final Fragment fragment = this;
 	private ScrollView layout;
-	private final static long delay = 3000;
+	private final static long delay = 1000;
 	private int index;
+	private Lock lockToUnlock;
 	
-	private Hashtable<Integer, Button> buttonHashtable = new Hashtable<Integer, Button>();
+	
+	private Hashtable<Integer, Button> buttonHashtable;
 	
 	static PlaceFragment newInstance(int index) {
 		// Fragments must not have a custom constructor
 		PlaceFragment f = new PlaceFragment();
 		Bundle args = new Bundle();
 		args.putInt("index", index);
-		f.setArguments(args);
+		f.setArguments(args);		
 		return f;
 	}
+	
+	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		if (container == null) {
 			return null;
 		}
+		
+		buttonHashtable = new Hashtable<Integer, Button>();
 
 		layout = (ScrollView) inflater.inflate(R.layout.place_fragment, container, false);
 		
-		
 		index = getArguments().getInt("index");
-		Place[] places = KisiAPI.getInstance().getPlaces();
-		// Workaround for crash when starting app from background
-		if (places == null) {
-			return layout;
-		}
 		
 		final Place place = KisiAPI.getInstance().getPlaceAt(index);
 		setupButtons(place);
-		// get locks from api, if not already available
-//		if (place.areLocksLoaded())
-//			setupButtons(place);
-//		else {
+		if(lockToUnlock == null)  {
 		KisiAPI.getInstance().updateLocks(place, new OnPlaceChangedListener() {
 
 				@Override
@@ -76,23 +73,13 @@ public class PlaceFragment extends Fragment {
 				}
 			
 			});
-//		}
-
+		}
+		unlockLock();
+		
 		return layout;
 	}
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onViewCreated(view, savedInstanceState);
-		int lockIdIntent = getArguments().getInt("lock", -1);
-		//check if we received an intent
-		if(lockIdIntent != -1) {
-			buttonHashtable.get(lockIdIntent).callOnClick();
-		}
-		
-	}
-
+	
 	private void setupButtons(final Place place) {
 		
 		Drawable lockIcon = getActivity().getResources().getDrawable(R.drawable.kisi_lock);
@@ -127,61 +114,76 @@ public class PlaceFragment extends Fragment {
 		
 		for (final Lock lock : place.getLocks()) {
 			
-			final Button button = new Button(getActivity());
-			button.setText(lock.getName());
-			button.setTypeface(font);
-			button.setGravity(Gravity.CENTER);
-			button.setWidth(width);
-			button.setHeight(height);
-			button.setTextColor(Color.WHITE);
-			button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
-			button.setCompoundDrawablesWithIntrinsicBounds(lockIcon, null, null, null);
-			button.setVisibility(View.VISIBLE);
+			final Button button;
+			
+			if(buttonHashtable.containsKey(lock.getId())) {
+				button = buttonHashtable.get(lock.getId());
+				
+			} else {
+				button = new Button(getActivity());
+				button.setText(lock.getName());
+				button.setTypeface(font);
+				button.setGravity(Gravity.CENTER);
+				button.setWidth(width);
+				button.setHeight(height);
+				button.setTextColor(Color.WHITE);
+				
+				button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+				button.setCompoundDrawablesWithIntrinsicBounds(lockIcon, null, null, null);
+				button.setVisibility(View.VISIBLE);
 
-			button.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					final ProgressDialog progressDialog = new ProgressDialog(fragment.getActivity());
-					progressDialog.setMessage(fragment.getString(R.string.opening));
-					progressDialog.setCancelable(false);
-					progressDialog.show();
-					
-					KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
+				button.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(final View v) {
+						final ProgressDialog progressDialog = new ProgressDialog(fragment.getActivity());
+						progressDialog.setMessage(fragment.getString(R.string.opening));
+						progressDialog.setCancelable(false);
+						progressDialog.show();
 						
-						
-						@Override
-						public void onUnlockSuccess(String message) {
-							progressDialog.dismiss();
-							changeButtonStyleToUnlocked(button, lock, message);
-						}
+						KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
+							
+							
+							@Override
+							public void onUnlockSuccess(String message) {
+								progressDialog.dismiss();
+								changeButtonStyleToUnlocked(button, lock, message);
+							}
 
-						@Override
-						public void onUnlockFail(String alertMsg) {
-							progressDialog.dismiss();
-							changeButtonStyleToFailure(button, lock, alertMsg);
-						}});
-				}
-			});
+							@Override
+							public void onUnlockFail(String alertMsg) {
+								progressDialog.dismiss();
+								changeButtonStyleToFailure(button, lock, alertMsg);
+							}});
+					}
+				});
+				
+				buttonHashtable.put(lock.getId(), button);
+			}
+			
 			ly.addView(button, layoutParams);
-			buttonHashtable.put(lock.getId(), button);
 		}
 
 		
 	}
 	
-	public void unlockLock(int lockId) {
-		if(buttonHashtable.containsKey(lockId)) {
-			buttonHashtable.get(lockId).callOnClick();
+	private void unlockLock() {
+		if(lockToUnlock != null) {
+			if(buttonHashtable.containsKey(lockToUnlock.getId())) {
+				buttonHashtable.get(lockToUnlock.getId()).callOnClick();
+			}
+			lockToUnlock = null;
 		}
 	}
 	
 
 	@SuppressWarnings("deprecation")
 	public void changeButtonStyleToUnlocked(Button button, Lock lock, String message) {
+		layout.requestLayout();
 		Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
+		final Button currentButton = buttonHashtable.get(lock.getId());
 		// save button design
-		final Drawable currentBackground = button.getBackground();
-		final Button currentButton = button;
+		final Drawable currentBackground = currentButton.getBackground();
+		//final Button currentButton = button;
 		final String currentText = (String) button.getText();
 		final int actualPadding = currentButton.getPaddingLeft();
 		final float density = getActivity().getResources().getDisplayMetrics().density;
@@ -220,10 +222,12 @@ public class PlaceFragment extends Fragment {
 	
 	@SuppressWarnings("deprecation")
 	public void changeButtonStyleToFailure(Button button, Lock lock, String message) {
+		layout.requestLayout();
 		Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
+		final Button currentButton = buttonHashtable.get(lock.getId());
 		// save button design
-		final Drawable currentBackground = button.getBackground();
-		final Button currentButton = button;
+		final Drawable currentBackground = currentButton.getBackground();
+		//final Button currentButton = button;
 		final String currentText = (String) button.getText();
 		final int actualPadding = currentButton.getPaddingLeft();
 		final float density = getActivity().getResources().getDisplayMetrics().density;
@@ -235,7 +239,7 @@ public class PlaceFragment extends Fragment {
 				.getDrawable(R.drawable.lockfailure));
 		currentButton.setPadding(shift, 0, 0, 0);
 		currentButton.setText("");
-
+		currentButton.requestLayout();
 		// disable click
 		currentButton.setClickable(false);
 
@@ -255,7 +259,13 @@ public class PlaceFragment extends Fragment {
 		}, delay);
 
 	}
-	
+
+	public void setLockToUnlock(Lock lockToUnlock) {
+		this.lockToUnlock = lockToUnlock;
+		if(this.isVisible()) {
+			unlockLock();
+		}
+	}
 	
 
 }

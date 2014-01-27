@@ -3,10 +3,19 @@ package de.kisi.android.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
+
+import de.kisi.android.KisiApplication;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.notifications.NotificationManager;
+import de.kisi.android.vicinity.manager.GeofenceManager;
 
 
 
@@ -135,5 +144,46 @@ public class Place {
 		return ownerId;
 	}
 
+	
+	public boolean getNotificationEnabled() {
+		Context context = KisiApplication.getApplicationInstance().getApplicationContext();
+		SharedPreferences prefs = context.getSharedPreferences("userconfig", Context.MODE_PRIVATE);
+		return prefs.getBoolean(generateSharedPreferencesKey(), true);
+	}
+	
+	public void setNotificationEnabled(boolean value) {
+		Context context = KisiApplication.getApplicationInstance().getApplicationContext();
+		SharedPreferences prefs = context.getSharedPreferences("userconfig", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(generateSharedPreferencesKey(), value);
+		editor.commit();
+		//remove  Geofence 
+		if(value == false) {
+			GeofenceManager.getInstance().removeGeofance(this); 
+			NotificationManager.removeNotifications(KisiApplication.getApplicationInstance(), this);
+			return;
+		}
+		//add Geofence
+		if(value == true) {
+			KisiAPI.getInstance().updatePlaces(new OnPlaceChangedListener() {
+
+				@Override
+				public void onPlaceChanged(Place[] newPlaces) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+		}
+	}
+	
+	private String generateSharedPreferencesKey() {
+		if(KisiAPI.getInstance().getUser() != null) {
+			return this.id + "-" + KisiAPI.getInstance().getUser().getId();
+		}
+		else {
+			return "";
+		}
+	}
 
 }

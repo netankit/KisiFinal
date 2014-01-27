@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.kisi.android"
-    android:versionCode="14"
-    android:versionName="1.2" >
+    android:versionCode="16"
+    android:versionName="2.0.0" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -182,6 +182,8 @@
         </service>
         <!-- Bluetooth end--> 
         
+        <activity android:name="PlaceNotificationSettings" android:screenOrientation="portrait" android:configChanges="orientation"></activity>
     </application>
+
 
 </manifest>

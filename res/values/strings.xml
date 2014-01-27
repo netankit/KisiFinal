@@ -34,9 +34,7 @@
     <string name="session_timeout_relogin">Session timeout. Please login again.</string>
     <string name="logout_in_progress">Logging out…</string>
     <string name="logout_successful">Logged out successfully.</string>
-
-    <string name="blinkup_timeout">Timeout </string>
-    <string name="blinkup_error">Blinkup error:</string>
+    <string name="blinkup_error">Blickup failed. Please try agian.</string>
     <string name="blinkup_setting_up">Setting up your KISI device</string>
     <string name="blinkup_success">Success!\nPlease go to the KISI website to configure your places and locks</string>
     <string name="no_lock">No locks for this place</string>
@@ -55,4 +53,5 @@
 	<string name="login_with_other_account">Login with another account</string>
 	<string name="try_again">Try again</string>
 	<string name="close_app">Exit</string>
+	<string name="notification_settings">Notification settings</string>
 </resources>

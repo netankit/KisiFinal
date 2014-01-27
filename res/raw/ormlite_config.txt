@@ -2,69 +2,28 @@
 # generated on 2014/01/27 11:48:14
 #
 # --table-start--
-dataClass=de.kisi.android.model.Locator
-tableName=locator
+dataClass=de.kisi.android.model.User
+tableName=user
 # --table-fields-start--
 # --field-start--
 fieldName=id
 id=true
+indexName=user_id_idx
 # --field-end--
 # --field-start--
-fieldName=placeId
+fieldName=authentication_token
 # --field-end--
 # --field-start--
-fieldName=place
-foreign=true
-foreignAutoRefresh=true
-maxForeignAutoRefreshLevel=1
+fieldName=email
 # --field-end--
 # --field-start--
-fieldName=lockId
+fieldName=eiPlanId
 # --field-end--
 # --field-start--
-fieldName=lock
-foreign=true
-foreignAutoRefresh=true
-maxForeignAutoRefreshLevel=1
+fieldName=firstName
 # --field-end--
 # --field-start--
-fieldName=name
-# --field-end--
-# --field-start--
-fieldName=enabled
-# --field-end--
-# --field-start--
-fieldName=suggestUnlockEnabled
-# --field-end--
-# --field-start--
-fieldName=suggestUnlockTreshold
-# --field-end--
-# --field-start--
-fieldName=autoUnlockTreshold
-# --field-end--
-# --field-start--
-fieldName=latitude
-# --field-end--
-# --field-start--
-fieldName=longitude
-# --field-end--
-# --field-start--
-fieldName=autoUnlockEnabled
-# --field-end--
-# --field-start--
-fieldName=udid
-# --field-end--
-# --field-start--
-fieldName=major
-# --field-end--
-# --field-start--
-fieldName=minor
-# --field-end--
-# --field-start--
-fieldName=tag
-# --field-end--
-# --field-start--
-fieldName=type
+fieldName=lastName
 # --field-end--
 # --table-fields-end--
 # --table-end--

@@ -45,12 +45,12 @@ public class NFCReceiver extends Activity{
 	        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 	        NdefRecord relayRecord = ((NdefMessage)rawMsgs[0]).getRecords()[0];
 	        String nfcData = new String(relayRecord.getPayload());
-	        if(nfcData.equals("start")){
+	        /*if(nfcData.equals("start")){
 	    		BluetoothLEManager.getInstance().startService(true);
 	        }
 	        if(nfcData.equals("stop")){
 	    		BluetoothLEManager.getInstance().startService(false);
-	        }
+	        }*/
 	        // Display the data on the tag
 	        Toast.makeText(this, nfcData, Toast.LENGTH_SHORT).show();
 			LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.NFC);
@@ -59,7 +59,7 @@ public class NFCReceiver extends Activity{
 	        for(Place place : KisiAPI.getInstance().getPlaces()){
 	        	for(Lock lock : place.getLocks()){
 	        		for(Locator locator : lock.getLocators()){
-	        			if (nfcData.equals(locator.getUdid())){
+	        			if (nfcData.equals(locator.getTag())){
 	        				actor.actOnEntry(place.getId(),lock.getId());
 	        			}
 	        		}

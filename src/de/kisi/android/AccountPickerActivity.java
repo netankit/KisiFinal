@@ -84,7 +84,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		}
 		//if there are more then one account let the user choose the right one
 		else {
-			LinearLayout linearLayout = (LinearLayout)findViewById(R.id.linearLayout1);
+			LinearLayout linearLayout = (LinearLayout)findViewById(R.id.placelinearLayout1);
 			//clear db and auth token before maybe login a different account
 			KisiAPI.getInstance().clearCache();
 			linearLayout.removeAllViews();

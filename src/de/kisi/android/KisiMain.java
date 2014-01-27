@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,9 +17,11 @@ import android.widget.Toast;
 
 import com.electricimp.blinkup.BlinkupController;
 import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
+import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
 public class KisiMain extends FragmentActivity implements
@@ -31,7 +32,8 @@ public class KisiMain extends FragmentActivity implements
 	private ViewPager pager;
 	private KisiAPI kisiAPI;
 	private PlaceFragmentPagerAdapter pagerAdapter;
-	private int pageNumber = 0;
+
+	private int currentPage = 0;
 
 	// just choose a random value
 	// TODO: change this later
@@ -41,6 +43,8 @@ public class KisiMain extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		NewRelic.withApplicationToken("AAe80044cf73854b68f6e83881c9e61c0df9d92e56").start(this.getApplication());
+		
 		kisiAPI = KisiAPI.getInstance();
 
 		Intent login = new Intent(this, AccountPickerActivity.class);
@@ -53,13 +57,25 @@ public class KisiMain extends FragmentActivity implements
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 				R.layout.window_title);
 
+
+		FragmentManager fm = getSupportFragmentManager();
+		pagerAdapter = new PlaceFragmentPagerAdapter(fm);
 		pager = (ViewPager) findViewById(R.id.pager);
+		
 	}
 
 	@Override
-	public void onStart() {
+	protected void onStart() {
 		super.onStart();
-
+		buildUI();
+	}
+	
+	private void buildUI() { 
+		Place[] places;
+		if((places = kisiAPI.getPlaces()) != null) {
+			setupView(places);
+		}
+		
 		kisiAPI.updatePlaces(new OnPlaceChangedListener() {
 
 			@Override
@@ -67,10 +83,10 @@ public class KisiMain extends FragmentActivity implements
 				setupView(newPlaces);
 
 			}
-
+			
 		});
-
 	}
+	
 
 	// creating popup-menu for settings
 	public void showPopup(View v) {
@@ -82,26 +98,25 @@ public class KisiMain extends FragmentActivity implements
 		popup.show();
 	}
 
+	
+	//receives intents when activity is already running
 	@Override
 	protected void onNewIntent(Intent intent) {
-		// TODO Auto-generated method stub
 		super.onNewIntent(intent);
-		Log.d("OnNewIntent", "" + intent.getExtras());
-		if (intent.getExtras() != null)
-			if (intent.getStringExtra("Type").equals("unlock")) {
 
-				for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
-					if (kisiAPI.getPlaces()[j].getId() == intent.getIntExtra(
-							"Place", -1)) {
-						pager.setCurrentItem(j, false);
-						PlaceFragment placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
-						placeFragment.unlockLock(intent.getIntExtra("Lock", -1));
-						pageNumber = j;
-					}
-				}
+		if(intent.hasExtra("Type")) {
+			handleUnlockIntent(intent);
+		}
+	}
 
-			}
-
+	//receives intents when activity is started by an intent
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		if(getIntent().hasExtra("Type")) {
+			handleUnlockIntent(getIntent());
+		}
 	}
 
 	@Override
@@ -116,7 +131,7 @@ public class KisiMain extends FragmentActivity implements
 				@Override
 				public void onPlaceChanged(Place[] newPlaces) {
 					setupView(newPlaces);
-				}
+					}
 
 			});
 			return true;
@@ -179,6 +194,11 @@ public class KisiMain extends FragmentActivity implements
 		case R.id.logout:
 			logout();
 			return true;
+			
+		case R.id.notification:
+			Intent settingsIntent = new Intent(this, PlaceNotificationSettings.class);
+			startActivity(settingsIntent);
+			return true;
 
 		default:
 			return false;
@@ -195,7 +215,7 @@ public class KisiMain extends FragmentActivity implements
 				return;
 			}
 			if (resultCode == AccountPickerActivity.LOGIN_SUCCESS) {
-				setupView(kisiAPI.getPlaces());
+				buildUI();
 				return;
 			}
 		} else {
@@ -209,27 +229,58 @@ public class KisiMain extends FragmentActivity implements
 		finish();
 	}
 
-	// public void onBackPressed() {
-	// moveTaskToBack(true);
-	// }
-
 	private void setupView(Place[] places) {
-
+		currentPage = pager.getCurrentItem();
+		
 		List<PlaceFragment> fragments = new Vector<PlaceFragment>();
 		
 		for (int j = 0; j < places.length; j++)
 			fragments.add(PlaceFragment.newInstance(j));
-
-		FragmentManager fm = getSupportFragmentManager();
-		pagerAdapter = new PlaceFragmentPagerAdapter(
-				fm, fragments);
-		pager.setAdapter(pagerAdapter);
+	
+		pagerAdapter.setFragementList(fragments);
+		if(pager.getAdapter() == null) {
+			pager.setAdapter(pagerAdapter);
+		}
 		
-		//prevents that when app got start by clicking on a notification the fragment corresponding to the notification is shown
-		if(pageNumber < pagerAdapter.getCount()) {
-			pager.setCurrentItem(pageNumber, false);
-			}
-			
+		//when view get refreshed to pager should show that fragment, which was shown before 
+		//if place got delete the pager shows the first fragment
+		if(currentPage < pagerAdapter.getCount()) {
+			pager.setCurrentItem(currentPage, false);
+		}
+		else {
+			pager.setCurrentItem(0, false);
+		}
+		pager.invalidate();
 	}
 
+	private void handleUnlockIntent(Intent intent) {
+		if (intent.getExtras() != null)
+			if (intent.getStringExtra("Type").equals("unlock")) {
+				int placeId = intent.getIntExtra("Place", -1);
+				for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
+					if (kisiAPI.getPlaces()[j].getId() == placeId) {
+						int lockId = intent.getIntExtra("Lock", -1);
+						Lock lockToUnlock = kisiAPI.getLockById(kisiAPI.getPlaceById(placeId), lockId);
+						pager.setCurrentItem(j, false);
+						int id  = pager.getCurrentItem();
+						// http://tofu0913.blogspot.de/2013/06/adnroid-get-current-fragment-when-using.html
+						// BAD HACK see: String android.support.v4.app.FragmentPagerAdapter.makeFragmentName(int viewId, long id)
+						PlaceFragment placeFragment = (PlaceFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+id); 
+						currentPage = j;
+						//check if fragment got already attach to the pager and otherwise get fragment from pagerAdapter
+						if(placeFragment != null) {
+							placeFragment.setLockToUnlock(lockToUnlock);
+						}
+						else {
+							placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
+							placeFragment.setLockToUnlock(lockToUnlock);
+						}
+						break;
+					}
+				}
+
+			}
+	}
+	
+	
 }

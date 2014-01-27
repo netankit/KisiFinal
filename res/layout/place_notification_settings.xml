@@ -9,7 +9,7 @@
     android:background="@drawable/testbackground"
     android:paddingTop="15dp" >
 
-    <LinearLayout
+	<LinearLayout
         android:id="@+id/placelinearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
