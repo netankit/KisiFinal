@@ -11,22 +11,21 @@ import com.radiusnetworks.ibeacon.MonitorNotifier;
 import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
-import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
+import de.kisi.android.notifications.NotificationManager;
+import de.kisi.android.notifications.NotificationPlace;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.VicinityTypeEnum;
 
 import android.app.IntentService;
-import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 public class BluetoothLEService extends IntentService implements IBeaconConsumer{
@@ -80,23 +79,20 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 	
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.i("BLE","handle intent"+ intent.getExtras().getBoolean("foreground", false));
 	}
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.i("BLE","startCommand");
-		Log.i("BLE","foreground "+ intent.getExtras().getBoolean("foreground", false));
 		if(intent.getExtras()!=null && intent.getExtras().getBoolean("foreground", false)){
-			NotificationCompat.Builder nc = new NotificationCompat.Builder(this);
-			nc.setSmallIcon(R.drawable.ic_launcher);
-			nc.setContentText("Bluetooth running");
-			nc.setContentTitle("KISI");
-			startForeground(1, nc.build());
+			Log.i("BLE","start foreground");
+			NotificationPlace nPlace = NotificationManager.setBLEServiceForeground(this);
+			Log.i("BLE","place "+nPlace.getId());
+			Log.i("BLE","notification "+nPlace.getNotification());
+			startForeground(nPlace.getId(),nPlace.getNotification());
 		}else{
+			Log.i("BLE","start background");
 			try{
-				Log.i("BLE","stopForeground");
-			stopForeground(true);
-			}catch(Exception e){Log.i("BLE","stop Error");}
+				stopForeground(true);
+			}catch(Exception e){}
 		}
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.bind(this);
@@ -111,11 +107,12 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 			@Override
 			public void didRangeBeaconsInRegion(Collection<IBeacon> iBeacons,
 					Region region) {
+				/*
 				for(IBeacon b:iBeacons){
 					Log.i("BLE","Rssi "+b.getRssi());
 					Log.i("BLE","Acc "+b.getAccuracy());
 				}
-				
+				*/
 			}});
 		iBeaconManager.setMonitorNotifier(new MonitorNotifier(){
 

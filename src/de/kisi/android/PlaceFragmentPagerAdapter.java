@@ -48,7 +48,10 @@ public class PlaceFragmentPagerAdapter extends FragmentPagerAdapter {
 	@Override
 	public CharSequence getPageTitle(int num) {
 		Place l = KisiAPI.getInstance().getPlaceAt(num);
-		return l.getName();
+		if(l!=null)
+			return l.getName();
+		else
+			return "";
 	}
 	
 }

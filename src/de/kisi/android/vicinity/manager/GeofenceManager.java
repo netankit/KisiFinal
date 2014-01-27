@@ -157,10 +157,11 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         		placeMap.put(p.getId(), p);
         		fences.add(new Geofence.Builder()
         		.setRequestId("Place: "+p.getId())
-        		.setCircularRegion(p.getLatitude(), p.getLongitude(), 50)
+        		.setCircularRegion(p.getLatitude(), p.getLongitude(), 1500)
         		.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT|Geofence.GEOFENCE_TRANSITION_ENTER)
         		.setExpirationDuration(Geofence.NEVER_EXPIRE) //infinite  
         		.build());
+        		Log.i("BLE","Add Geofence "+p.getId());
         	}        	
         	
         }

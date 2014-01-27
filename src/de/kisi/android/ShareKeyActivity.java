@@ -120,6 +120,7 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 		submit.setTextSize(25);
 		layoutParams = new LinearLayout.LayoutParams(width, LinearLayout.LayoutParams.WRAP_CONTENT);
 		layoutParams.setMargins(margin, margin, margin, margin);
+		final Activity activity = this;
 		submit.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -133,7 +134,7 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 					Toast.makeText(getApplicationContext(), R.string.share_error_empty_email, Toast.LENGTH_LONG).show();
 					return;
 				}
-				KisiAPI.getInstance().createNewKey(place, email, sendlocks);
+				KisiAPI.getInstance().createNewKey(place, email, sendlocks, activity);
 				finish();
 			}
 		});

@@ -6,6 +6,7 @@ import java.util.List;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,17 +26,19 @@ public class NotificationManager extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		KisiAPI kisiAPI = KisiAPI.getInstance();
+		Log.i("BLE","Notification "+intent.getAction());
 		if (kisiAPI.getUser() != null) {
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN){
-				
 				Bundle extras = intent.getExtras();
+				Log.i("BLE","Notification "+extras.getString("Type")+extras.getInt("Place", -1));
+				
 				int placeId = extras.getInt("Place", -1);
+				Log.i("BLE","Place has "+KisiAPI.getInstance().getPlaceById(placeId).getLocks().size()+" locks");
 				String type = extras.getString("Type");
 				if (type.equals("Enter")) 
 					addPlace(KisiAPI.getInstance().getPlaceById(placeId));
 				else
 					removePlace(KisiAPI.getInstance().getPlaceById(placeId),context);
-				showNotifications(context);
 				showNotifications(context);
 				
 			}else{
@@ -68,44 +71,69 @@ public class NotificationManager extends BroadcastReceiver {
 				mNotificationManager.cancelAll();
 				return;
 			}else{
+				int i = 0;
 				for(NotificationPlace place : places){
-				NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
-				nb.setSmallIcon(R.drawable.notification_icon)
-				.setContentTitle("KISI")
-			    .setContentText(place.name)
-			    .setDefaults(Notification.DEFAULT_ALL)
-				.setWhen(0);
-				Intent intent = new Intent(context, KisiMain.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.putExtra("Type", "unlock");
-				intent.putExtra("Place", place.id);
-				intent.putExtra("Lock", -1);
-				PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-				nb.setContentIntent(pIntent);
-				RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_view);
-				contentView.setTextViewText(R.id.place, place.name);
-				for(NotificationLock lock : place.locks){
-					RemoteViews button;
-					button = new RemoteViews(context.getPackageName(), R.layout.notification_item);
-					button.setTextViewText(R.id.unlockButton, lock.name);
-					intent = new Intent(context, KisiMain.class);
-					intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					intent.putExtra("Type", "unlock");
-					intent.putExtra("Place", place.id);
-					intent.putExtra("Lock", lock.id);
-					PendingIntent pendingIntent = PendingIntent.getActivity(context, lock.id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-					button.setOnClickPendingIntent(R.id.unlockButton, pendingIntent);
-					contentView.addView(R.id.widget2, button);
-				}
-				Notification notification = nb.build();
-				notification.bigContentView = contentView;
-				mNotificationManager.notify(place.id, notification);
+					createNotification(place,context);
+					mNotificationManager.notify(++i, place.notification);
 
 				}
 
 		}
 	}
+	
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	private static void createNotification(NotificationPlace place,Context context){
 
+		NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
+		nb.setSmallIcon(R.drawable.notification_icon)
+		.setContentTitle("KISI")
+	    .setContentText(place.name)
+	    .setDefaults(Notification.DEFAULT_ALL)
+		.setWhen(0);
+		Intent intent = new Intent(context, KisiMain.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.putExtra("Type", "unlock");
+		intent.putExtra("Place", place.id);
+		intent.putExtra("Lock", -1);
+		PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		nb.setContentIntent(pIntent);
+		RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_view);
+		contentView.setTextViewText(R.id.place, place.name);
+		Log.i("BLE","add place "+place.id);
+		for(NotificationLock lock : place.locks){
+			RemoteViews button;
+			button = new RemoteViews(context.getPackageName(), R.layout.notification_item);
+			button.setTextViewText(R.id.unlockButton, lock.name);
+			intent = new Intent(context, KisiMain.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.putExtra("Type", "unlock");
+			intent.putExtra("Place", place.id);
+			intent.putExtra("Lock", lock.id);
+			PendingIntent pendingIntent = PendingIntent.getActivity(context, lock.id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			button.setOnClickPendingIntent(R.id.unlockButton, pendingIntent);
+			contentView.addView(R.id.widget2, button);
+			Log.i("BLE","add lock "+lock.id);
+		}
+		Notification notification = nb.build();
+		notification.bigContentView = contentView;
+		place.notification = notification;
+	}
+	
+	public static NotificationPlace setBLEServiceForeground(Context context){
+		Log.i("BLE","Notification places.size()="+places.size());
+		if(places.size()>0){
+			NotificationPlace place = places.getFirst();
+			createNotification(place,context);
+			return place;
+		}
+		NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
+		nc.setSmallIcon(R.drawable.ic_launcher);
+		nc.setContentText("Bluetooth running");
+		nc.setContentTitle("KISI");
+		NotificationPlace nPlace = new NotificationPlace(1," ");
+		nPlace.notification = nc.build();
+		return nPlace;
+	}
 	private static LinkedList<NotificationPlace> places = new LinkedList<NotificationPlace>();
 
 	private static void addPlace(Place place){
@@ -120,6 +148,7 @@ public class NotificationManager extends BroadcastReceiver {
 		NotificationPlace newPlace = new NotificationPlace(place.getId(),place.getName());
 		places.add(newPlace);
 		for(Lock lock : place.getLocks()){
+			Log.i("BLE","place"+place.getId()+" -> "+lock.getId());
 			newPlace.locks.add(new NotificationLock(lock.getId(),lock.getName()));
 		}
 	}

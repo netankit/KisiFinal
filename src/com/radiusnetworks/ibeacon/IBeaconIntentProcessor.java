@@ -71,14 +71,12 @@ public class IBeaconIntentProcessor extends IntentService {
                             Constructor<?> contextContstructor = rangeNotifierClass.getDeclaredConstructor(Context.class);
                             rangeNotifier = (RangeNotifier) contextContstructor.newInstance(this.getApplicationContext());
                         } catch (Exception e) {
-//                            Log.w(TAG, "Cannot invoke " + rangeNotifierClassName + "(Context c) constructor due to ", e);
                         }
                         if (rangeNotifier == null) {
                             rangeNotifier = (RangeNotifier) rangeNotifierClass.newInstance();
                         }
                         IBeaconManager.getInstanceForApplication(this).setRangeNotifier(rangeNotifier);
                     } catch (Exception e) {
-  //                      Log.e(TAG, "Can't instantiate range notifier: " + rangeNotifierClassName, e);
                     }
                 }
                 if (monitorNotifierClassName != null) {
@@ -88,7 +86,6 @@ public class IBeaconIntentProcessor extends IntentService {
                             Constructor<?> contextContstructor = monitorNotifierClass.getDeclaredConstructor(Context.class);
                             monitorNotifier = (MonitorNotifier) contextContstructor.newInstance(this.getApplicationContext());
                         } catch (Exception e) {
-//                            Log.w(TAG, "Cannot invoke " + monitorNotifierClassName + "(Context c) constructor due to ", e);
                         }
 
                         if (monitorNotifier == null) {
@@ -100,8 +97,6 @@ public class IBeaconIntentProcessor extends IntentService {
                     }
                 }
 
-            } else {
-//                Log.d(TAG, "IBeacon manager is already instantiated.  Not constructing default notifiers.");
             }
 
         } catch (NameNotFoundException e) {

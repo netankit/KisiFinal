@@ -54,7 +54,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.util.Log;
 
 /**
  * @author dyoung
@@ -454,11 +453,11 @@ public class IBeaconService extends Service {
 
     private void processIBeaconFromScan(IBeacon iBeacon) {
         trackedBeacons.add(iBeacon);
-        Log.d(TAG,
+        /*Log.d(TAG,
                 "iBeacon detected :" + iBeacon.getProximityUuid() + " "
                         + iBeacon.getMajor() + " " + iBeacon.getMinor()
                         + " accuracy: " + iBeacon.getAccuracy()
-                        + " proximity: " + iBeacon.getProximity());
+                        + " proximity: " + iBeacon.getProximity());*/
 
         List<Region> matchedRegions = matchingRegions(iBeacon,
                 monitoredRegionState.keySet());

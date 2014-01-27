@@ -21,15 +21,16 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
 		LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.Geofence);
 		List<Geofence> fences = LocationClient.getTriggeringGeofences(intent);
 		int transitionType = LocationClient.getGeofenceTransition(intent);
-        Log.i("GeofenceManager","transition: "+transitionType);
 		if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER)
             for(Geofence fence : fences){
+                Log.i("BLE","geofence transition: enter "+fence.getRequestId());
             	String p[] = fence.getRequestId().split(": ");
             	int placeID = Integer.parseInt(p[1]);
             	actor.actOnEntry(placeID,0);
             }
         else if(transitionType == Geofence.GEOFENCE_TRANSITION_EXIT)
             for(Geofence fence : fences){
+                Log.i("BLE","geofence transition: exit "+fence.getRequestId());
             	String p[] = fence.getRequestId().split(": ");
             	int placeID = Integer.parseInt(p[1]);
             	actor.actOnExit(placeID,0);
