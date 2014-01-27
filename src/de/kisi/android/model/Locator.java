@@ -58,9 +58,8 @@ public class Locator {
 	@DatabaseField
 	private int minor;
 	
-//	@DatabaseField
-//	@SerializedName("nfc_identifier")
-//	private String nfcIdentifier;
+	@DatabaseField
+	private String tag;
 	
 	@DatabaseField
 	private String type;
@@ -193,6 +192,14 @@ public class Locator {
 
 	public void setMinor(int minor) {
 		this.minor = minor;
+	}
+	
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 
 	public String getType() {

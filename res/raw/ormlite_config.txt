@@ -1,5 +1,5 @@
 #
-# generated on 2014/01/21 11:59:40
+# generated on 2014/01/27 11:48:14
 #
 # --table-start--
 dataClass=de.kisi.android.model.Locator
@@ -59,6 +59,9 @@ fieldName=major
 # --field-end--
 # --field-start--
 fieldName=minor
+# --field-end--
+# --field-start--
+fieldName=tag
 # --field-end--
 # --field-start--
 fieldName=type
