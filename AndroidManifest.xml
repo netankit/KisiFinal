@@ -33,6 +33,8 @@
     <!-- Notification Manager -->
     <uses-permission android:name="android.permission.VIBRATE" />
     
+    
+    
     <application
         android:name="de.kisi.android.KisiApplication"
         android:allowBackup="true"
@@ -70,6 +72,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/CustomTheme" >
         </activity>
+        <activity 
+            android:name="PlaceNotificationSettings" 
+            android:screenOrientation="portrait" 
+            android:configChanges="orientation" 
+            android:theme="@style/CustomTheme" />
         <activity
             android:name="com.electricimp.blinkup.WifiSelectActivity"
             android:configChanges="orientation"
@@ -182,7 +189,6 @@
         </service>
         <!-- Bluetooth end--> 
         
-        <activity android:name="PlaceNotificationSettings" android:screenOrientation="portrait" android:configChanges="orientation"></activity>
     </application>
 
 
