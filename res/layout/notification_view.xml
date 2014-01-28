@@ -11,10 +11,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-
         <FrameLayout
             android:layout_width="64dp"
-            android:layout_height="64dp">
+            android:layout_height="64dp"
+            android:background="#FF1D3741" >
             
 	        <ImageView
 	            android:id="@+id/imageView1"
@@ -31,22 +31,23 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dp"
-                android:text="KISI"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:visibility="gone" />
-            
-            <TextView
                 android:id="@+id/place"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:text="Place"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="4dp"
+                android:text=""
                 android:textAppearance="?android:attr/textAppearanceLarge" />
-
+            
+            <TextView
+                android:id="@+id/bleInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:layout_marginTop="2dp"
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            
         </LinearLayout>
         
        

@@ -22,7 +22,7 @@ public class KisiApplication extends Application {
 		de.kisi.android.api.KisiLocationManager.initialize(this);
 
 		GeofenceManager.getInstance();
-		BluetoothLEManager.getInstance().startService(false);
+		//BluetoothLEManager.getInstance().startService(false);
 	}
 
 	@Override

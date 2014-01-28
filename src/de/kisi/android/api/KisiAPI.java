@@ -347,7 +347,7 @@ public class KisiAPI {
 			}
 			
 		}
-		String url = String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId());
+		String url = "places/"+lock.getPlaceId()+"/locks/"+lock.getId()+"/access";
 		
 		KisiRestClient.getInstance().post(context, url, data,  new JsonHttpResponseHandler() {
 			

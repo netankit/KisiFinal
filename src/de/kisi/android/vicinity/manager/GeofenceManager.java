@@ -1,6 +1,6 @@
 package de.kisi.android.vicinity.manager;
 
-import java.util.Hashtable;
+//import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	// Instance for Singleton Access
 	private static GeofenceManager instance;
 	
-	private Hashtable<Integer, Place> placeMap = new Hashtable<Integer, Place>();
+	//private Hashtable<Integer, Place> placeMap = new Hashtable<Integer, Place>();
 	
 	/**
 	 * Retrieve the singleton instance of the GeofenceManager.
@@ -142,10 +142,10 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 
 	private void registerGeofences(Place[] places){
 		// If there are no Places to register, don't register any places
-		if(places.length==0){
+		//if(places.length==0){
 			removeAllGeofences();
-			return;
-		}
+		//	return;
+		//}
 		
         List<Geofence> fences = new LinkedList<Geofence>();
 
@@ -155,16 +155,16 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         	//check if place already generated a geofence 
         	//this check must be done, because the API updates the place quite often on the startup and calls the onPlaceChanged
         	//and so the phone would vibrate the whole time
-        	if(!placeMap.containsKey(p.getId()) && p.getNotificationEnabled()) {
-        		placeMap.put(p.getId(), p);
+        	//if(!placeMap.containsKey(p.getId())) {
+        		//placeMap.put(p.getId(), p);
         		fences.add(new Geofence.Builder()
         		.setRequestId("Place: "+p.getId())
-        		.setCircularRegion(p.getLatitude(), p.getLongitude(), 1500)
+        		.setCircularRegion(p.getLatitude(), p.getLongitude(), 75)
         		.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT|Geofence.GEOFENCE_TRANSITION_ENTER)
         		.setExpirationDuration(Geofence.NEVER_EXPIRE) //infinite  
         		.build());
         		Log.i("BLE","Add Geofence "+p.getId());
-        	}        	
+        	//}        	
         	
         }
         
@@ -174,7 +174,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         }
 	}
 	
-	
+	/*
 	public void removeGeofence(Place place) {
 		placeMap.remove(place.getId());
 		List<String> geofenceRequestIdsToRemove = new LinkedList<String>();
@@ -184,36 +184,28 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 			@Override
 			public void onRemoveGeofencesByPendingIntentResult(int arg0,
 					PendingIntent arg1) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void onRemoveGeofencesByRequestIdsResult(int arg0,
 					String[] arg1) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 		});
-	}
+	}*/
 	
 	public void removeAllGeofences() {
-		placeMap.clear();
+		//placeMap.clear();
 		mLocationClient.removeGeofences(getPendingIntent(),  new OnRemoveGeofencesResultListener() {
 
 			@Override
 			public void onRemoveGeofencesByPendingIntentResult(int arg0,
 					PendingIntent arg1) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void onRemoveGeofencesByRequestIdsResult(int arg0,
 					String[] arg1) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 		});

@@ -11,4 +11,5 @@ class NotificationInformation {
 	public Type type;
 	public int notificationId;
 	public int typeId;
+	public Object object;
 }
