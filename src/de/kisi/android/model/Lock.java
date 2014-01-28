@@ -43,6 +43,12 @@ public class Lock {
 		return result;
 	}
 	
+	public Locator getLocatorById(int locatorId) {
+		for(Locator l:locators)
+			if(l.getId() == locatorId)
+				return l;
+		return null;
+	}
 	
 	
 	public int getId() {

@@ -142,8 +142,10 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 
 	private void registerGeofences(Place[] places){
 		// If there are no Places to register, don't register any places
-		if(places.length==0)
+		if(places.length==0){
+			removeAllGeofences();
 			return;
+		}
 		
         List<Geofence> fences = new LinkedList<Geofence>();
 
@@ -173,7 +175,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	}
 	
 	
-	public void removeGeofance(Place place) {
+	public void removeGeofence(Place place) {
 		placeMap.remove(place.getId());
 		List<String> geofenceRequestIdsToRemove = new LinkedList<String>();
 		geofenceRequestIdsToRemove.add("Place: " + place.getId());
@@ -196,7 +198,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 		});
 	}
 	
-	public void removeAllGeofances() {
+	public void removeAllGeofences() {
 		placeMap.clear();
 		mLocationClient.removeGeofences(getPendingIntent(),  new OnRemoveGeofencesResultListener() {
 

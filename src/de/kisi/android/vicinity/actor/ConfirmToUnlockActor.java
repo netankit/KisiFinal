@@ -16,22 +16,22 @@ public class ConfirmToUnlockActor implements LockInVicinityActorInterface {
 
 	@Override
 	public void actOnEntry(int placeID, int lockId) {
-		LockInVicinityDisplayManager.getInstance().notifyOnEntry(placeID,lockId);
+		LockInVicinityDisplayManager.getInstance().addLock(placeID,lockId);
 	}
 
 	@Override
 	public void actOnExit(int placeID, int lockId) {
-		LockInVicinityDisplayManager.getInstance().notifyOnExit(placeID,lockId);
+		LockInVicinityDisplayManager.getInstance().removeLock(placeID,lockId);
 	}
 
 	@Override
 	public void actOnEntry(Locator locator) {
-		LockInVicinityDisplayManager.getInstance().notifyOnEntry(locator.getPlaceId(),locator.getLockId());
+		LockInVicinityDisplayManager.getInstance().addLock(locator.getPlaceId(),locator.getLockId());
 	}
 
 	@Override
 	public void actOnExit(Locator locator) {
-		LockInVicinityDisplayManager.getInstance().notifyOnExit(locator.getPlaceId(),locator.getLockId());
+		LockInVicinityDisplayManager.getInstance().removeLock(locator.getPlaceId(),locator.getLockId());
 	}
 
 }

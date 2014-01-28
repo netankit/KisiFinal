@@ -15,8 +15,10 @@ public class LockInVicinityActorFactory {
 			return new CompositActor(actors);
 		case NFC:
 			return new AutomaticUnlockActor();
+		case BluetoothLEAutoUnlock:
+			return new AutomaticUnlockActor();
 		default:
-			return null;
+			return new ConfirmToUnlockActor();
 		}
 	}
 }
