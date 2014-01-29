@@ -10,7 +10,7 @@
     android:paddingTop="15dp" >
 
 	<LinearLayout
-        android:id="@+id/placelinearLayout1"
+        android:id="@+id/place_linear_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center"

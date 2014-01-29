@@ -171,8 +171,11 @@ public class KisiAPI {
 				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
 				DataManager.getInstance().savePlaces(pl);
 				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-				listener.onPlaceChanged(places);
-				notifyAllOnPlaceChangedListener();	
+				for(Place p: places) {
+					KisiAPI.getInstance().updateLocks(p, listener);
+				}
+//				listener.onPlaceChanged(places);
+//				notifyAllOnPlaceChangedListener();	
 			}
 			
 		});

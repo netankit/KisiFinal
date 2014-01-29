@@ -23,6 +23,7 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import de.kisi.android.ui.KisiMainActivity;
 
 public class KisiMain extends FragmentActivity implements
 		PopupMenu.OnMenuItemClickListener {
@@ -209,7 +210,9 @@ public class KisiMain extends FragmentActivity implements
 				return;
 			}
 			if (resultCode == AccountPickerActivity.LOGIN_SUCCESS) {
-				buildUI();
+				//buildUI();
+				Intent intent = new Intent(this, KisiMainActivity.class);
+				startActivity(intent);
 				return;
 			}
 		} else {

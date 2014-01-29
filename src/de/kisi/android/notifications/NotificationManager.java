@@ -13,12 +13,11 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
-import de.kisi.android.KisiMain;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import de.kisi.android.ui.KisiMainActivity;
 
 public class NotificationManager extends BroadcastReceiver {
 
@@ -72,7 +71,7 @@ public class NotificationManager extends BroadcastReceiver {
 		nc.setContentTitle(lock.getName() + " - " + place.getName());
 		nc.setDefaults(Notification.DEFAULT_ALL);
 		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) c.getSystemService(Activity.NOTIFICATION_SERVICE);
-		Intent intent = new Intent(c, KisiMain.class);
+		Intent intent = new Intent(c, KisiMainActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("Type", "unlock");
 		intent.putExtra("Place", place.getId());

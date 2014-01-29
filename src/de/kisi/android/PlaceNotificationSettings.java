@@ -49,7 +49,7 @@ public class PlaceNotificationSettings extends Activity {
 		
 		LinearLayout.LayoutParams  layoutParams = new LinearLayout.LayoutParams(width, height);
 		Typeface font = Typeface.createFromAsset(this.getApplicationContext().getAssets(), "Roboto-Light.ttf");
-		LinearLayout linearLayout = (LinearLayout) findViewById(R.id.placelinearLayout1);
+		LinearLayout linearLayout = (LinearLayout) findViewById(R.id.place_linear_layout);
 
 		
 		TextView textView =  new TextView(this);

@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -94,8 +95,8 @@ public class PlaceFragment extends Fragment {
 		LinearLayout ly = (LinearLayout) layout.getChildAt(0);
 		ly.removeAllViews();
 
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
-		layoutParams.setMargins(margin, margin, margin, margin);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, height);
+//		layoutParams.setMargins(margin, margin, margin, margin);
 
 		//show a text if there is no lock for a place
 		if(place.getLocks().size() == 0) {

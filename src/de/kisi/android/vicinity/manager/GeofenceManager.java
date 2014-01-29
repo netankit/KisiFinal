@@ -9,6 +9,7 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationClient.OnRemoveGeofencesResultListener;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationStatusCodes;
 import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListener;
@@ -19,6 +20,7 @@ import de.kisi.android.model.Place;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 /**
  * GeofenceManager is realized as a Singleton.
@@ -58,7 +60,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 		return instance;
 	}
 
-	
+	private Location mLocation;
 	private LocationClient mLocationClient;
 	private LocationRequest mLocationRequest;
 	private Context mContext;
@@ -110,7 +112,15 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         mLocationRequest.setInterval(15000);
         // Set the fastest update interval to 1 second
         mLocationRequest.setFastestInterval(1000);
-        
+        mLocationClient.requestLocationUpdates(mLocationRequest, new LocationListener() {
+
+			@Override
+			public void onLocationChanged(Location location) {
+				mLocation = location;
+				
+			}
+        	
+        });
         // Show interest on any change of the Places
         KisiAPI.getInstance().registerOnPlaceChangedListener(this);
         // Register Places as Geofences
@@ -221,6 +231,10 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 			}
 			
 		});
+	}
+	
+	public Location getLocation() {
+		return mLocation;
 	}
 	
 }

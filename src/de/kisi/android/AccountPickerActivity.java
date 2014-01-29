@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
+import de.kisi.android.ui.KisiMainActivity;
 
 public class AccountPickerActivity extends Activity implements LoginCallback{
 
@@ -84,7 +86,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		}
 		//if there are more then one account let the user choose the right one
 		else {
-			LinearLayout linearLayout = (LinearLayout)findViewById(R.id.placelinearLayout1);
+			LinearLayout linearLayout = (LinearLayout)findViewById(R.id.place_linear_layout);
 			//clear db and auth token before maybe login a different account
 			KisiAPI.getInstance().clearCache();
 			linearLayout.removeAllViews();
@@ -164,7 +166,8 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		//Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
 		//mainScreen.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		//finish login activity
-		setResult(LOGIN_SUCCESS);
+		Intent mainActivity = new Intent(this, KisiMainActivity.class);
+		startActivity(mainActivity);
 		//move this later to the KisiAPI
 		finish();
 	}
