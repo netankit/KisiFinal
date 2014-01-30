@@ -2,22 +2,27 @@ package de.kisi.android.vicinity;
 
 import de.kisi.android.vicinity.actor.*;
 
+/**
+ * This class is responsible for choosing the right actor. The main logic of
+ * the program can be changed within this class.
+ */
 public class LockInVicinityActorFactory {
 
 	public static LockInVicinityActorInterface getActor(VicinityTypeEnum type){
+		
 		switch(type){
-		case BluetoothLE:
+		case BluetoothLE: // BLE runs in suggest to unlock mode (this is decision of the server)
 			return new ConfirmToUnlockActor();
-		case Geofence:
+		case BluetoothLEAutoUnlock: // BLE runs in automatic unlock mode (this is decision of the server)
+			return new AutomaticUnlockActor();
+		case Geofence: // Show that Geofence entered, and also activate BLE
 			LockInVicinityActorInterface[] actors = new LockInVicinityActorInterface[2];
 			actors[0] = new ConfirmToUnlockActor();
 			actors[1] = new StartPermanentBluetoothServiceActor();
 			return new CompositActor(actors);
-		case NFC:
+		case NFC: // NFC Tag with Lock information detected
 			return new AutomaticUnlockActor();
-		case BluetoothLEAutoUnlock:
-			return new AutomaticUnlockActor();
-		default:
+		default: // default state for future vicinity manager
 			return new ConfirmToUnlockActor();
 		}
 	}

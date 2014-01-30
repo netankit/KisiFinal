@@ -36,26 +36,45 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 		super("BluetoothLEService");
 	}
 
+	/**
+	 * This class handles multiple onPlaceChanged requests, to detect
+	 * wheter there was a data change needed by this framework or not  
+	 */
 	private class RegionContainer{
 		Hashtable<Integer,Region> hashtable = new Hashtable<Integer,Region>();
 		Hashtable<Region,Integer> keys = new Hashtable<Region,Integer>();
 		
+		/**
+		 * Returns a list of all currently registered Regions 
+		 */
 		public Collection<Region> values(){
 			LinkedList<Region> regions = new LinkedList<Region>();
 			for(Region r : hashtable.values())
 				regions.add(r);
 			return regions;
 		}
+		/**
+		 * Fast check whether a key is already registered or not
+		 */
 		public boolean containsKey(Integer key){
 			return hashtable.containsKey(key);
 		}
+		/**
+		 * A new Region has been registered 
+		 */
 		public void put(Integer key, Region value){
 			hashtable.put(key, value);
 			keys.put(value, key);
 		}
+		/**
+		 * Returns the corresponding Region to the key 
+		 */
 		public Region get(Integer key){
 			return hashtable.get(key);
 		}
+		/**
+		 * Region has been deleted
+		 */
 		public void remove(Region region){
 			Integer key = keys.get(region);
 			keys.remove(region);
@@ -82,72 +101,109 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 	@Override
 	protected void onHandleIntent(Intent intent) {
 	}
+	
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		// check if foreground mode is requested
 		if(intent.getExtras()!=null && intent.getExtras().getBoolean("foreground", false)){
-			Log.i("BLE","start foreground");
+			// foreground mode needs a permanent notification to run on level 1
+			// if the notification is not valid, e.g. no notification shows up
+			// the service will run on background mode
+			//
+			// i also noticed that the notification should be created with the service context 
+			// and not the the application context, thats why the service is a parameter of the 
+			// method
 			Pair<Integer,Notification> notification = NotificationManager.getBLEServiceNotification(this);
 			if(notification != null){
-				Log.i("BLE","notification id "+notification.first);
-				Log.i("BLE","notification "+notification.second);
 				startForeground(notification.first, notification.second);
 			}
 		}else{
-			Log.i("BLE","start background");
 			try{
 				stopForeground(true);
 				NotificationManager.notifyBLEServiceNotificationDeleted();
-			}catch(Exception e){}
+			}catch(Exception e){
+				// There might be an exception when we are already in background mode
+				// but i didn't find a mechansim to check
+			}
 		}
+		
+		// bind the iBeacon Service to the BLE Service
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.bind(this);
 	    return START_STICKY;
 	}
 
+	// protect the actor for permanent fireing
+	// those are only used in the ranging
 	private static HashSet<Integer> unlockSuggest = new HashSet<Integer>();
 	private static HashSet<Integer> automaticUnlock = new HashSet<Integer>();
 			
+	/**
+	 * Connection succeeded, so we can start to set our notifier
+	 * @see com.radiusnetworks.ibeacon.IBeaconConsumer#onIBeaconServiceConnect()
+	 */
 	@Override
 	public void onIBeaconServiceConnect() {
 		Log.i("BLE","connect");
+		
+		// the range notifier is currently not used because of a
+		// bug in the iBeacon framework, but the RangeNotifier works :)
 		iBeaconManager.setRangeNotifier(new RangeNotifier(){
 
 			@Override
 			public void didRangeBeaconsInRegion(Collection<IBeacon> iBeacons,
 					Region region) {
-				IBeacon beacon = iBeacons.iterator().next();
+				// get best result of all beacons 
+				// this should always only be one beacon
+				Integer maxRssi = null;
+				for(IBeacon beacon:iBeacons){
+					if(maxRssi == null)
+						maxRssi = beacon.getRssi();
+					else
+						maxRssi = Math.max(beacon.getRssi(), maxRssi);
+				}
+				
+				if(maxRssi == null) // there is no beacon
+					return;
+				
+				// get information about the region
 				String beaconId[] = region.getUniqueId().split(" ");
 				int placeId = Integer.parseInt(beaconId[1]);
 				int lockId = Integer.parseInt(beaconId[3]);
 				int locatorId = Integer.parseInt(beaconId[5]);
 				Locator locator;
+				
 				try{
 					locator = KisiAPI.getInstance().getPlaceById(placeId).getLockById(lockId).getLocatorById(locatorId);
 					if(locator.isSuggestUnlockEnabled()){
 						LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLE);
-						if(unlockSuggest.contains(locatorId) && locator.getSuggestUnlockTreshold()<beacon.getRssi()){
+						if(unlockSuggest.contains(locatorId) && locator.getSuggestUnlockTreshold()<maxRssi){
 							unlockSuggest.remove(locatorId);
 							actor.actOnExit(placeId,lockId);
 						}
-						if(!unlockSuggest.contains(locatorId) && locator.getSuggestUnlockTreshold()>beacon.getRssi()){
+						if(!unlockSuggest.contains(locatorId) && locator.getSuggestUnlockTreshold()>maxRssi){
 							unlockSuggest.add(locatorId);
 							actor.actOnEntry(placeId,lockId);
 						}
 					}
 					if(locator.isAutoUnlockEnabled()){
 						LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLEAutoUnlock);
-						if(automaticUnlock.contains(locatorId) && locator.getAutoUnlockTreshold()<beacon.getRssi()){
+						if(automaticUnlock.contains(locatorId) && locator.getAutoUnlockTreshold()<maxRssi){
 							automaticUnlock.remove(locatorId);
 							actor.actOnExit(placeId,lockId);
 						}
-						if(!automaticUnlock.contains(locatorId) && locator.getAutoUnlockTreshold()>beacon.getRssi()){
+						if(!automaticUnlock.contains(locatorId) && locator.getAutoUnlockTreshold()>maxRssi){
 							automaticUnlock.add(locatorId);
 							actor.actOnEntry(placeId,lockId);
 						}
 					}
 				}catch(NullPointerException e){
-					
+					// Do nothing if there is no such locator
+					// this is also a protection of old locators that are deleted on the server, but
+					// not removed on the iBeacon list
 				}
+
 				/*
 				for(IBeacon b:iBeacons){
 					Log.i("BLE","Rssi "+b.getRssi());
@@ -155,27 +211,54 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 				}
 				*/
 			}});
+		
+		
 		iBeaconManager.setMonitorNotifier(new MonitorNotifier(){
 
 			@Override
 			public void didEnterRegion(Region region) {
-				LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLE);
+				actForRegion(region,true);
+			}
+			
+			@Override
+			public void didExitRegion(Region region) {
+				actForRegion(region,false);
+			}
+			
+			private void actForRegion(Region region,boolean entered){ 
+				LockInVicinityActorInterface actor;
+				
+				// Get Required Data from the Region
 				String beaconId[] = region.getUniqueId().split(" ");
 				int placeId = Integer.parseInt(beaconId[1]);
 				int lockId = Integer.parseInt(beaconId[3]);
-				actor.actOnEntry(placeId,lockId);
+				int locatorId = Integer.parseInt(beaconId[5]);
+				
+				try{
+					Locator locator = KisiAPI.getInstance().getPlaceById(placeId).getLockById(lockId).getLocatorById(locatorId);
+					// Check BLE Type
+					if(locator.isAutoUnlockEnabled())
+						actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLEAutoUnlock);
+					else
+						actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLE);
+					
+					if(entered)
+						actor.actOnEntry(placeId,lockId);
+					else
+						actor.actOnExit(placeId, lockId);
+					
+					// refresh time for shut down 
+					BluetoothLEManager.getInstance().resetShutDownTime();
+					
+				}catch(NullPointerException e){
+					// Do nothing if there is no such locator
+					// this is also a protection of old locators that are deleted on the server, but
+					// not removed on the iBeacon list
+				}
+
 				
 			}
 
-			@Override
-			public void didExitRegion(Region region) {
-				LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLE);
-				String beaconId[] = region.getUniqueId().split(" ");
-				int placeId = Integer.parseInt(beaconId[1]);
-				int lockId = Integer.parseInt(beaconId[3]);
-				actor.actOnExit(placeId,lockId);
-				
-			}
 
 			@Override
 			public void didDetermineStateForRegion(int state,
@@ -197,7 +280,6 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 	}
 	
 	private void registerPlaces(Place[] places){
-		Log.i("BLE","start register");
         try {
         	// Get Registered Regions
         	Collection<Region> curRegions = regions.values();
@@ -208,24 +290,37 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
         					// Remove Region from Delete list
         					curRegions.remove(regions.get(locator.getId()));
         				}else{
+        					// Create Region object
         					int major = locator.getMajor();
         					int minor = locator.getMinor();
         					Region region = new Region("Place: "+locator.getPlaceId()+" Lock: "+locator.getLockId()+" Locator: "+locator.getId(), "DE9D14A1-1C16-4114-9B68-3B2435C6B99A", major,minor);
-        					Log.i("BLE","Set iBeacon "+region.getUniqueId());
-        					if(!locator.isSuggestUnlockEnabled())
+
+        					
+        					// Remove those 2 lines when activate ranging again
+        					// For now only use monitoring
+        					if(locator.isSuggestUnlockEnabled() || locator.isAutoUnlockEnabled())
         						iBeaconManager.startMonitoringBeaconsInRegion(region);
-        					if(locator.isAutoUnlockEnabled() || locator.isSuggestUnlockEnabled())
+        					
+        					// Ranging does not work reliable, sometimes it throws a nullPointerException
+        					// For now we stay at monitoring only
+        					/* 
+        					if((locator.isSuggestUnlockEnabled() && locator.getSuggestUnlockTreshold() == 0) ||
+        							(locator.isAutoUnlockEnabled() && locator.getAutoUnlockTreshold() == 0)	)
+        						iBeaconManager.startMonitoringBeaconsInRegion(region);
+        					if((locator.isSuggestUnlockEnabled() && locator.getSuggestUnlockTreshold() != 0) ||
+        							(locator.isAutoUnlockEnabled() && locator.getAutoUnlockTreshold() != 0)	)
         						iBeaconManager.startRangingBeaconsInRegion(region);
+        					 */
         					regions.put(locator.getId(), region);
         				}
         			}
         		}
         	}
+        	
         	// Delete Regions that not in the list anymore
         	for(Region region : curRegions){
         		iBeaconManager.stopMonitoringBeaconsInRegion(region);
-				iBeaconManager.stopRangingBeaconsInRegion(region);
-				Log.i("BLE","remove "+region.getUniqueId());
+				//iBeaconManager.stopRangingBeaconsInRegion(region);
         		regions.remove(region);
         	}
         } catch (RemoteException e) {   }			

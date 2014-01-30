@@ -8,6 +8,7 @@ import android.content.Context;
 
 import com.j256.ormlite.dao.Dao;
 
+import de.kisi.android.KisiApplication;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -17,13 +18,10 @@ public class DataManager {
 	private static DataManager instance;
 	
 	public static DataManager getInstance() {
+		if(instance == null)
+			instance = new DataManager(KisiApplication.getApplicationInstance());
 		return instance;
 	}
-	
-	public static void initialize(Context context){
-		instance =  new DataManager(context);
-	}
-	
 	
 	private DatabaseHelper db;
     private Dao<Lock, Integer> lockDao;

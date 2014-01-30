@@ -24,6 +24,13 @@ import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 
+/**
+ * The Notification Manager is realized as a BroadcastReceiver. 
+ * This decision was made, so that the Widget Manager can be handled in the same way.
+ * For showing Notifications use the LockInVicinityDisplayManager.
+ * The LockInVicinityDisplayManager handles the send of the different 
+ * Broadcasts.
+ */
 public class NotificationManager extends BroadcastReceiver {
 
 	private static OnPlaceChangedListener listener;
@@ -36,6 +43,8 @@ public class NotificationManager extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		// Create an on place changed handler
+		// Make sure that only one handler is registered
 		KisiAPI kisiAPI = KisiAPI.getInstance();
 		if(listener == null){
 			listener = new OnPlaceChangedListener(){
@@ -48,12 +57,12 @@ public class NotificationManager extends BroadcastReceiver {
 			};
 			kisiAPI.registerOnPlaceChangedListener(listener);
 		}
-		Log.i("BLE","Notification "+intent.getAction());
-		Log.i("BLE","User "+kisiAPI.getUser());
-		if (kisiAPI.getUser() != null) {
-			handleIntent(intent);
-			updateNotifications(kisiAPI.getPlaces());
-		}
+		
+		// handle the received intent
+		handleIntent(intent);
+		
+		// 
+		updateNotifications(kisiAPI.getPlaces());
 	}
 	
 	private void updateNotifications(Place[] places){
@@ -65,10 +74,14 @@ public class NotificationManager extends BroadcastReceiver {
 			Log.i("BLE","enteredPlaces: "+i);
 		}
 		for(Place place:places){
-			Log.i("BLE","Check Place "+place.getId()+ "contains: "+enteredPlaces.contains(place.getId())+" enabled: "+place.getNotificationEnabled());
+			Log.i("BLE","Check Place: "+place.getId()+ "contains: "+enteredPlaces.contains(place.getId())+" enabled: "+place.getNotificationEnabled());
 			
 			if(enteredPlaces.contains(place.getId()) && place.getNotificationEnabled()){
 				createNotificationForPlace(place);
+			}
+			for(Lock lock:place.getLocks()){
+				if(enteredLocks.contains(lock.getId()))
+					createNotificationForLock(place,lock);
 			}
 		}
 		if(shownNotifications.size()==0 && bleServiceRunning){
@@ -83,7 +96,18 @@ public class NotificationManager extends BroadcastReceiver {
 				}
 			}
 			if(!found){
-				mNotificationManager.cancel(oldInfo.notificationId);
+				if(bleServiceNotificationId == oldInfo.notificationId){
+					NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
+					nc.setSmallIcon(R.drawable.notification_icon);
+					nc.setContentText("KISI");
+					nc.setContentTitle("BluetoothLE running");
+					nc.setDefaults(Notification.DEFAULT_ALL);
+				    nc.setOnlyAlertOnce(true);
+					nc.setWhen(0);
+					mNotificationManager.notify(oldInfo.notificationId, nc.build());
+					bleServiceNotificationSet = false;
+				}else
+					mNotificationManager.cancel(oldInfo.notificationId);
 			}
 		}
 	}
@@ -102,6 +126,7 @@ public class NotificationManager extends BroadcastReceiver {
 				info.notificationId = place.getId();
 				info.notification = getExpandedNotification(place);
 			}else{
+				bleServiceNotificationSet = true;
 				info.notificationId = bleServiceNotificationId;
 				info.notification = getExpandedNotification(place, true, context);
 			}
@@ -139,8 +164,7 @@ public class NotificationManager extends BroadcastReceiver {
 			RemoteViews button;
 			button = new RemoteViews(context.getPackageName(), R.layout.notification_item);
 			button.setTextViewText(R.id.unlockButton, lock.getName());
-			button.setOnClickFillInIntent(R.id.unlockButton, getIntent(place.getId(),lock.getId()));
-			//button.setOnClickPendingIntent(R.id.unlockButton, getPendingIntent(place.getId(),lock.getId(),lock.getId()));
+			button.setOnClickPendingIntent(R.id.unlockButton, getPendingIntent(place.getId(),lock.getId()));
 			contentView.addView(R.id.widget2, button);
 		}
 		Notification notification = nb.build();
@@ -164,7 +188,6 @@ public class NotificationManager extends BroadcastReceiver {
 		nc.setContentText("Touch to Unlock");
 		nc.setContentTitle(lock.getName() + " - " + place.getName());
 		nc.setDefaults(Notification.DEFAULT_ALL);
-	    nc.setOnlyAlertOnce(true);
 		nc.setWhen(0);
 		nc.setContentIntent(getPendingIntent(place.getId(),lock.getId()));
 
@@ -181,14 +204,7 @@ public class NotificationManager extends BroadcastReceiver {
 		intent.putExtra("Lock", lockId);
 		return PendingIntent.getActivity(KisiApplication.getApplicationInstance(), lockId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
-	private static Intent getIntent(int placeId, int lockId){
-		Intent intent = new Intent(KisiApplication.getApplicationInstance(), KisiMain.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("Type", "unlock");
-		intent.putExtra("Place", placeId);
-		intent.putExtra("Lock", lockId);
-		return intent;
-	}
+
 	
 	private void handleIntent(Intent intent){
 		Bundle extras = intent.getExtras();

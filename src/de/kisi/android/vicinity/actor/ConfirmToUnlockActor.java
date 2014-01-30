@@ -9,8 +9,6 @@ import de.kisi.android.vicinity.LockInVicinityDisplayManager;
  * It sends a Message to the DisplayManager that a Vicinity of a Place has
  * been entered. The Lock should only open when the User confirm this signal.
  * 
- * @author Thomas Hörmann
- *
  */
 public class ConfirmToUnlockActor implements LockInVicinityActorInterface {
 

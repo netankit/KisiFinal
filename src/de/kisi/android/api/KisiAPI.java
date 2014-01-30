@@ -175,7 +175,10 @@ public class KisiAPI {
 		return user;
 	}
 
-	
+	/**
+	 * 
+	 * @param listener
+	 */
 	public void updatePlaces(final OnPlaceChangedListener listener) {
 		KisiRestClient.getInstance().get(context, "places",  new JsonHttpResponseHandler() { 
 			
@@ -289,7 +292,10 @@ public class KisiAPI {
 	/**
 	 * Register for interest in any changes in the Places.
 	 * The listener is fired when a Place was added or deleted
-	 * or any change occur within the Place like a Lock has been added. 
+	 * or any change occur within the Place like a Lock or Locator has been added. 
+	 * 
+	 * Sometimes on a total refresh there can be a lot of PlaceChanges in a short
+	 * period of time, so make sure that the client can handle this.
 	 * @param listener
 	 */
 	public void registerOnPlaceChangedListener(OnPlaceChangedListener listener){
@@ -310,6 +316,8 @@ public class KisiAPI {
 	 * the Places has changed.
 	 */
 	private void notifyAllOnPlaceChangedListener(){
+		// This have to be done this way, lists are not allowed to be modified 
+		// during a foreach loop
 		for(OnPlaceChangedListener listener : unregisteredOnPlaceChangedListener)
 			registeredOnPlaceChangedListener.remove(listener);
 		registeredOnPlaceChangedListener.addAll(newregisteredOnPlaceChangedListener);
@@ -318,16 +326,32 @@ public class KisiAPI {
 			listener.onPlaceChanged(places);
 	}
 	
-	
+	/**
+	 * Checks if the place is owned by the user or just shared
+	 * 
+	 * @param place Place to be checked
+	 * @return true if user is owner, false if someone else shares this place with the user
+	 */
 	public boolean userIsOwner(Place place){
 		return place.getOwnerId()==this.user.getId();
 	}
 	
+	/**
+	 * Send a request to the server to unlock this lock. The callback will
+	 * run on another Thread, so do no direct UI modifications in there
+	 * 
+	 * @param lock The lock that should be unlocked
+	 * @param callback Callback object for feedback, or null if no feedback is requested
+	 */
 	public void unlock(Lock lock, final UnlockCallback callback){
+		
+		// Get Location Data
         KisiLocationManager locationManager = KisiLocationManager.getInstance();
 		Location currentLocation = locationManager.getCurrentLocation();;
 		JSONObject location = new JSONObject();
 		JSONObject data = new JSONObject();
+		
+		// if there is location data available, write them into the request
 		if(currentLocation != null) {
 			try {
 				location.put("latitude", currentLocation.getLatitude());
@@ -337,6 +361,7 @@ public class KisiAPI {
 			e.printStackTrace();
 			}
 		}
+		// when no location data is available, write 0 as default
 		else {
 			try {
 				location.put("latitude", 0.0);
@@ -349,19 +374,20 @@ public class KisiAPI {
 		}
 		String url = "places/"+lock.getPlaceId()+"/locks/"+lock.getId()+"/access";
 		
+		// Start request and then wait for success state
 		KisiRestClient.getInstance().post(context, url, data,  new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONObject response) {
 				String message = null;
 				if(response.has("notice")) {
-					// change button design
 					try {
 						message = response.getString("notice");
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}	
 				}
-				callback.onUnlockSuccess(message);
+				if(callback != null)
+					callback.onUnlockSuccess(message);
 			}
 			
 			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
@@ -369,7 +395,8 @@ public class KisiAPI {
 				String errormessage = null;
 				if(statusCode == 0) {
 					 errormessage = context.getResources().getString(R.string.no_network);
-					 callback.onUnlockFail(errormessage);
+					 if(callback != null)
+						 callback.onUnlockFail(errormessage);
 					 return;
 				 }
 				
@@ -385,7 +412,8 @@ public class KisiAPI {
 				else {
 					errormessage = "Error!";
 				}
-				callback.onUnlockFail(errormessage);
+				if(callback != null)
+					callback.onUnlockFail(errormessage);
 			}	
 		});
 	}

@@ -1,5 +1,6 @@
 package de.kisi.android.api;
 
+import de.kisi.android.KisiApplication;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 //TODO: evaluate with Location Provider should be used and how the best location is estimated  
 //TODO: https://developer.android.com/guide/topics/location/strategies.html#BestEstimate
 //TODO: stop this after is's done or the app is in background
+//TODO: use geofence manager for location updates
 public class KisiLocationManager implements LocationListener{
 	
 	private static KisiLocationManager instance;
@@ -20,10 +22,9 @@ public class KisiLocationManager implements LocationListener{
 	private Location currentLocation;
 	private String locationProvider;
 	
-	public static void initialize(Context context){
-		instance = new KisiLocationManager(context);
-	}
 	public static KisiLocationManager getInstance(){
+		if(instance == null)
+			instance = new KisiLocationManager(KisiApplication.getApplicationInstance());
 		return instance;
 	}
 

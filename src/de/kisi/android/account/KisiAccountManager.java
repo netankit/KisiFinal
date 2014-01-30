@@ -1,5 +1,6 @@
 package de.kisi.android.account;
 
+import de.kisi.android.KisiApplication;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
@@ -12,16 +13,13 @@ public class KisiAccountManager {
 	
 	private  AccountManager accManager;
 	
-	public static void initialize(Context context){
-		instance = new KisiAccountManager(context);
-	}
-	
-	
 	private KisiAccountManager(Context context) {
 		accManager = AccountManager.get(context);
 	}
 	
 	public static KisiAccountManager getInstance() {
+		if(instance == null)
+			instance = new KisiAccountManager(KisiApplication.getApplicationInstance());
 		return instance;
 	}
 

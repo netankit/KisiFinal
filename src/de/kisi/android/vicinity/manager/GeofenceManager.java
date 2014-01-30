@@ -1,6 +1,6 @@
 package de.kisi.android.vicinity.manager;
 
-//import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,15 +21,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+
 /**
  * GeofenceManager is realized as a Singleton.
  * It has to be initialized before it can be used.
  * The GeofenceManager creates for every Place a Geofence.
  * On entering or leaving such a Geofence a VicinityActor will 
  * be activated.
- * 
- * @author Thomas Hoermann
  *
  */
 public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallbacks,
@@ -40,7 +38,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	// Instance for Singleton Access
 	private static GeofenceManager instance;
 	
-	//private Hashtable<Integer, Place> placeMap = new Hashtable<Integer, Place>();
+	private HashSet<Integer> placeMap = new HashSet<Integer>();
 	
 	/**
 	 * Retrieve the singleton instance of the GeofenceManager.
@@ -102,6 +100,8 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         // Set the update interval to 30 seconds
         mLocationRequest.setInterval(30000);
         // Set the fastest update interval to 15 second
+        // fastest means, when another application uses more frequent data 
+        // requests we can also use this data without additional power consumption
         mLocationRequest.setFastestInterval(15000);
         
         // Show interest on any change of the Places
@@ -127,6 +127,9 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 		}
 	}
 
+	/**
+	 * Handle altered places 
+	 */
 	@Override
 	public void onPlaceChanged(Place[] newPlaces) {
 		if(initialized){
@@ -141,32 +144,40 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	}
 
 	private void registerGeofences(Place[] places){
-		// If there are no Places to register, don't register any places
-		//if(places.length==0){
+		// If there are no Places to register, delete all geofences
+		if(places.length==0){
 			removeAllGeofences();
-		//	return;
-		//}
+			return;
+		}
 		
         List<Geofence> fences = new LinkedList<Geofence>();
-
+        @SuppressWarnings("unchecked")
+		HashSet<Integer> removeSet = (HashSet<Integer>) placeMap.clone();
+        
         // Create a Geofence for every Place
         for(Place p : places)
         {
+        	removeSet.remove(p.getId());
         	//check if place already generated a geofence 
         	//this check must be done, because the API updates the place quite often on the startup and calls the onPlaceChanged
         	//and so the phone would vibrate the whole time
-        	//if(!placeMap.containsKey(p.getId())) {
-        		//placeMap.put(p.getId(), p);
+        	if(!placeMap.contains(p.getId())) {
+        		placeMap.add(p.getId());
+        		
+        		// Create the Geofence
         		fences.add(new Geofence.Builder()
         		.setRequestId("Place: "+p.getId())
-        		.setCircularRegion(p.getLatitude(), p.getLongitude(), 75)
+        		.setCircularRegion(p.getLatitude(), p.getLongitude(), 75) // radius 75 meter
         		.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT|Geofence.GEOFENCE_TRANSITION_ENTER)
         		.setExpirationDuration(Geofence.NEVER_EXPIRE) //infinite  
         		.build());
-        		Log.i("BLE","Add Geofence "+p.getId());
-        	//}        	
+        	}        	
         	
         }
+        
+        // remove the geofences that are not in the list anymore
+        for(Integer placeId:removeSet)
+        	removeGeofence(placeId);
         
         // Register Geofences to the OS
         if(!fences.isEmpty()) {
@@ -174,11 +185,14 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         }
 	}
 	
-	/*
-	public void removeGeofence(Place place) {
-		placeMap.remove(place.getId());
+	/**
+	 * This removes the corresponding geofence from a place 
+	 * @param placeId Id of the Place
+	 */
+	public void removeGeofence(int placeId) {
+		placeMap.remove(placeId);
 		List<String> geofenceRequestIdsToRemove = new LinkedList<String>();
-		geofenceRequestIdsToRemove.add("Place: " + place.getId());
+		geofenceRequestIdsToRemove.add("Place: " + placeId);
 		mLocationClient.removeGeofences(geofenceRequestIdsToRemove, new OnRemoveGeofencesResultListener() {
 
 			@Override
@@ -192,9 +206,13 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 			}
 			
 		});
-	}*/
+	}
 	
+	/**
+	 * Remove all registered geofences
+	 */
 	public void removeAllGeofences() {
+		//LockInVicinityDisplayManager.getInstance().update();
 		//placeMap.clear();
 		mLocationClient.removeGeofences(getPendingIntent(),  new OnRemoveGeofencesResultListener() {
 

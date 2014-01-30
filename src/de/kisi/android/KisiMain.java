@@ -73,6 +73,7 @@ public class KisiMain extends FragmentActivity implements
 	private void buildUI() { 
 		Place[] places;
 		if((places = kisiAPI.getPlaces()) != null) {
+			// build the UI now with persistent data
 			setupView(places);
 		}
 		
@@ -80,6 +81,7 @@ public class KisiMain extends FragmentActivity implements
 
 			@Override
 			public void onPlaceChanged(Place[] newPlaces) {
+				// build the UI again with fresh data from the server
 				setupView(newPlaces);
 
 			}
@@ -126,12 +128,14 @@ public class KisiMain extends FragmentActivity implements
 
 		switch (item.getItemId()) {
 		case R.id.refresh:
+			// Trigger a refresh of the data
 			kisiAPI.refresh(new OnPlaceChangedListener() {
 
 				@Override
 				public void onPlaceChanged(Place[] newPlaces) {
+					// refresh the view with the new data
 					setupView(newPlaces);
-					}
+				}
 
 			});
 			return true;
@@ -151,7 +155,8 @@ public class KisiMain extends FragmentActivity implements
 						Toast.LENGTH_LONG).show();
 				return false;
 			}
-
+			
+			// user is owner, start ShareKeyActivity
 			Intent intent = new Intent(getApplicationContext(),
 					ShareKeyActivity.class);
 			intent.putExtra("place", pager.getCurrentItem());
@@ -254,32 +259,37 @@ public class KisiMain extends FragmentActivity implements
 	}
 
 	private void handleUnlockIntent(Intent intent) {
-		if (intent.getExtras() != null)
-			if (intent.getStringExtra("Type").equals("unlock")) {
-				int placeId = intent.getIntExtra("Place", -1);
-				for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
-					if (kisiAPI.getPlaces()[j].getId() == placeId) {
-						int lockId = intent.getIntExtra("Lock", -1);
-						Lock lockToUnlock = kisiAPI.getLockById(kisiAPI.getPlaceById(placeId), lockId);
-						pager.setCurrentItem(j, false);
-						int id  = pager.getCurrentItem();
-						// http://tofu0913.blogspot.de/2013/06/adnroid-get-current-fragment-when-using.html
-						// BAD HACK see: String android.support.v4.app.FragmentPagerAdapter.makeFragmentName(int viewId, long id)
-						PlaceFragment placeFragment = (PlaceFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+id); 
-						currentPage = j;
-						//check if fragment got already attach to the pager and otherwise get fragment from pagerAdapter
-						if(placeFragment != null) {
-							placeFragment.setLockToUnlock(lockToUnlock);
-						}
-						else {
-							placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
-							placeFragment.setLockToUnlock(lockToUnlock);
-						}
-						break;
-					}
+		// No extras, nothing to do
+		if (intent.getExtras() == null)
+			return;
+		
+		// Its not a unlock request, nothing to do
+		if (!intent.getStringExtra("Type").equals("unlock"))
+			return;
+		
+		
+		int placeId = intent.getIntExtra("Place", -1);
+		for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
+			if (kisiAPI.getPlaces()[j].getId() == placeId) {
+				int lockId = intent.getIntExtra("Lock", -1);
+				Lock lockToUnlock = kisiAPI.getLockById(kisiAPI.getPlaceById(placeId), lockId);
+				pager.setCurrentItem(j, false);
+				int id  = pager.getCurrentItem();
+				// http://tofu0913.blogspot.de/2013/06/adnroid-get-current-fragment-when-using.html
+				// BAD HACK see: String android.support.v4.app.FragmentPagerAdapter.makeFragmentName(int viewId, long id)
+				PlaceFragment placeFragment = (PlaceFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+id); 
+				currentPage = j;
+				//check if fragment got already attach to the pager and otherwise get fragment from pagerAdapter
+				if(placeFragment != null) {
+					placeFragment.setLockToUnlock(lockToUnlock);
 				}
-
+				else {
+					placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
+					placeFragment.setLockToUnlock(lockToUnlock);
+				}
+				break;
 			}
+		}
 	}
 	
 	

@@ -4,29 +4,42 @@ import de.kisi.android.model.Locator;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.manager.BluetoothLEManager;
 
+/**
+ * This Actor starts the BLE Service in foreground mode 
+ */
 public class StartPermanentBluetoothServiceActor implements LockInVicinityActorInterface{
 
 	@Override
 	public void actOnEntry(int placeID, int lockId) {
+		// Start BLE and make sure it runs in foreground mode
 		BluetoothLEManager.getInstance().startService(true);
 		
 	}
 
 	@Override
 	public void actOnExit(int placeID, int lockId) {
-		BluetoothLEManager.getInstance().startService(false);
+		// Stop the BLE Service, because it needs a lot of power
+		// It is very unlikely that an iBeacon is outside of a Geofence, so 
+		// we do not need to run the service in Background mode
+		
+		//BluetoothLEManager.getInstance().startService(false);
+		BluetoothLEManager.getInstance().stopService();
 		
 	}
 
 	@Override
 	public void actOnEntry(Locator locator) {
+		// Start BLE and make sure it runs in foreground mode
 		BluetoothLEManager.getInstance().startService(true);
 		
 	}
 
 	@Override
 	public void actOnExit(Locator locator) {
-		BluetoothLEManager.getInstance().startService(false);
+		// Stop the BLE Service, because it needs a lot of power
+		// It is very unlikely that an iBeacon is outside of a Geofence, so 
+		// we do not need to run the service in Background mode
+		BluetoothLEManager.getInstance().stopService();//.startService(false);
 		
 	}
 

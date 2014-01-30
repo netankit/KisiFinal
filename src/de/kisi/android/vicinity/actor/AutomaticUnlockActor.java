@@ -8,6 +8,7 @@ import de.kisi.android.vicinity.LockInVicinityActorInterface;
 
 public class AutomaticUnlockActor implements LockInVicinityActorInterface {
 
+	// directly send a unlock process to the server
 	@Override
 	public void actOnEntry(int placeID, int lockId) {
 		Place place = KisiAPI.getInstance().getPlaceById(placeID);
@@ -16,17 +17,20 @@ public class AutomaticUnlockActor implements LockInVicinityActorInterface {
 				KisiAPI.getInstance().unlock(lock, null);
 	}
 
+	// we do not have to do anything
 	@Override
 	public void actOnExit(int placeID, int lockId) {
 		
 	}
 
+	// directly send a unlock process to the server
 	@Override
 	public void actOnEntry(Locator locator) {
 		KisiAPI.getInstance().unlock(locator.getLock(),null);
 		
 	}
 
+	// wo do not have to do anything
 	@Override
 	public void actOnExit(Locator locator) {
 		

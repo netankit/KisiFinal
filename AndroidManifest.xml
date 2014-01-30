@@ -155,14 +155,16 @@
 		        <data android:mimeType="application/de.kisi.android"/>
 		        <category android:name="android.intent.category.DEFAULT"/>
 		    </intent-filter>
+		    <!-- This intent-filter is only needed to detect empty NFC Tags, in case we allow the
+		         user to write their own tags -->
 		    <!-- 
-    <intent-filter>
-        <action android:name="android.nfc.action.TECH_DISCOVERED" />
-    </intent-filter>
-    <meta-data
-        android:name="android.nfc.action.TECH_DISCOVERED"
-        android:resource="@xml/nfc_tech_filter" />
--->
+		    <intent-filter>
+		        <action android:name="android.nfc.action.TECH_DISCOVERED" />
+		    </intent-filter>
+		    <meta-data
+		        android:name="android.nfc.action.TECH_DISCOVERED"
+		        android:resource="@xml/nfc_tech_filter" />
+			-->
 			</activity>
 		<!-- NFC end -->
 		
