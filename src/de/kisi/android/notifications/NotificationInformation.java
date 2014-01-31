@@ -7,10 +7,11 @@ import android.app.Notification;
  * This class stores information about the Notification
  * and raw data of the content within the Notification 
  */
-class NotificationInformation {
+public class NotificationInformation {
 	public enum Type{
 		Place,
-		Lock
+		Lock,
+		BLEOnly
 	}
 	public Notification notification;
 	public Type type;
@@ -18,5 +19,9 @@ class NotificationInformation {
 	public int typeId;
 	public Object object;
 	public boolean containsBLE = false;
+	public boolean valid = true;
 	
+	// Only allow the NotificatioManager to create instances
+	protected NotificationInformation(){
+	}
 }

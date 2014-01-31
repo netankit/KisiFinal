@@ -3,27 +3,25 @@ package de.kisi.android.notifications;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+
 import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.util.Pair;
 import android.widget.RemoteViews;
 import de.kisi.android.KisiApplication;
-import de.kisi.android.KisiMain;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import de.kisi.android.notifications.NotificationInformation.Type;
 import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 
+// TODO: When a new Lock is added after the Notification is shown refresh the Notification
 /**
  * The Notification Manager is realized as a BroadcastReceiver. 
  * This decision was made, so that the Widget Manager can be handled in the same way.
@@ -33,114 +31,85 @@ import de.kisi.android.vicinity.LockInVicinityDisplayManager;
  */
 public class NotificationManager extends BroadcastReceiver {
 
-	private static OnPlaceChangedListener listener;
 	private static HashSet<Integer> enteredPlaces = new HashSet<Integer>();
 	private static HashSet<Integer> enteredLocks = new HashSet<Integer>();
-	private static LinkedList<NotificationInformation> shownNotifications = new LinkedList<NotificationInformation>(); 
-	private static Boolean bleServiceRunning = false;
-	private static int bleServiceNotificationId = 0;
-	private static Boolean bleServiceNotificationSet = true;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		// Create an on place changed handler
-		// Make sure that only one handler is registered
-		KisiAPI kisiAPI = KisiAPI.getInstance();
-		if(listener == null){
-			listener = new OnPlaceChangedListener(){
-
-				@Override
-				public void onPlaceChanged(Place[] newPlaces) {
-					updateNotifications(newPlaces);
-					
-				}
-			};
-			kisiAPI.registerOnPlaceChangedListener(listener);
-		}
-		
 		// handle the received intent
 		handleIntent(intent);
 		
-		// 
-		updateNotifications(kisiAPI.getPlaces());
+		// handle all changes
+		updateNotifications();
 	}
 	
-	private void updateNotifications(Place[] places){
-		Context context = KisiApplication.getApplicationInstance();
+	private static Context getDefaultContext(){
+		return KisiApplication.getApplicationInstance();
+	}
+	
+	private void updateNotifications(){
+		Context context = getDefaultContext();
 		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		LinkedList<NotificationInformation> oldNotifications = shownNotifications;
-		shownNotifications = new LinkedList<NotificationInformation>();
-		for(Integer i:enteredPlaces){
-			Log.i("BLE","enteredPlaces: "+i);
-		}
+		Place[] places = KisiAPI.getInstance().getPlaces();
+		// This is a test for removed notifications
+		for(NotificationInformation info:notifications)
+			info.valid = false;
 		for(Place place:places){
-			Log.i("BLE","Check Place: "+place.getId()+ "contains: "+enteredPlaces.contains(place.getId())+" enabled: "+place.getNotificationEnabled());
-			
 			if(enteredPlaces.contains(place.getId()) && place.getNotificationEnabled()){
-				createNotificationForPlace(place);
+				if(!containsNotificationForPlace(place))
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
+						createNotificationForPlace(place);
+					else
+						createNotificationForPlaceSupport(place);
+							
+				else
+					getNotificationForPlace(place).valid = true;
 			}
 			for(Lock lock:place.getLocks()){
 				if(enteredLocks.contains(lock.getId()))
-					createNotificationForLock(place,lock);
+					if(!containsNotificationForLock(lock))
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
+							createNotificationForLock(place,lock);
+						else
+							createNotificationForLockSupport(place,lock);
+					else
+						getNotificationForLock(lock).valid = true;
 			}
 		}
-		if(shownNotifications.size()==0 && bleServiceRunning){
-			
-		}
-		for(NotificationInformation oldInfo : oldNotifications){
-			boolean found = false;
-			for(NotificationInformation newInfo : shownNotifications){
-				if(oldInfo.notificationId == newInfo.notificationId){
-					found = true;
-					break;
-				}
+		// remove invalid notifications
+		LinkedList<NotificationInformation> removeList = new LinkedList<NotificationInformation>(); 
+		for(NotificationInformation info:notifications)
+			if(!info.valid && !info.containsBLE){
+				mNotificationManager.cancel(info.notificationId);
+				removeList.add(info);
 			}
-			if(!found){
-				if(bleServiceNotificationId == oldInfo.notificationId){
-					NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
-					nc.setSmallIcon(R.drawable.notification_icon);
-					nc.setContentText("KISI");
-					nc.setContentTitle("BluetoothLE running");
-					nc.setDefaults(Notification.DEFAULT_ALL);
-				    nc.setOnlyAlertOnce(true);
-					nc.setWhen(0);
-					mNotificationManager.notify(oldInfo.notificationId, nc.build());
-					bleServiceNotificationSet = false;
-				}else
-					mNotificationManager.cancel(oldInfo.notificationId);
-			}
-		}
+		for(NotificationInformation info:removeList)
+			notifications.remove(info);
+
 	}
-	
 	private static void createNotificationForPlace(Place place){
-		Log.i("BLE","create for placd "+place.getId());
-		Context context = KisiApplication.getApplicationInstance();
-		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN){
-			NotificationInformation info = new NotificationInformation();
-			shownNotifications.add(info);	
-			info.type = NotificationInformation.Type.Place;
+		NotificationInformation info = getBLENotification();
+		Context context = getDefaultContext();
+		if(info != null && info.type == NotificationInformation.Type.BLEOnly){
+			info.notification = getExpandedNotification(place, true, context);
+			info.type = Type.Place;
 			info.typeId = place.getId();
 			info.object = place;
-			if(bleServiceNotificationSet){
-				info.notificationId = place.getId();
-				info.notification = getExpandedNotification(place);
-			}else{
-				bleServiceNotificationSet = true;
-				info.notificationId = bleServiceNotificationId;
-				info.notification = getExpandedNotification(place, true, context);
-			}
-			mNotificationManager.notify(info.notificationId, info.notification);
-
-		}else{// For Android 4.0
-			for(Lock lock:place.getLocks())
-				createNotificationForLock(place, lock);
+		}else{
+			info = new NotificationInformation();
+			info.notification = getExpandedNotification(place);
+			info.notificationId = getUnusedId();
+			info.object = place;
+			info.type = Type.Place;
+			info.typeId = place.getId();
+			notifications.add(info);
 		}
+		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.notify(info.notificationId, info.notification);
 	}
-
+	
 	private static Notification getExpandedNotification(Place place){
-		Context context = KisiApplication.getApplicationInstance();
-		return getExpandedNotification(place, false, context); 
+		return getExpandedNotification(place, false, getDefaultContext()); 
 	}
 	
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -164,7 +133,7 @@ public class NotificationManager extends BroadcastReceiver {
 			RemoteViews button;
 			button = new RemoteViews(context.getPackageName(), R.layout.notification_item);
 			button.setTextViewText(R.id.unlockButton, lock.getName());
-			button.setOnClickPendingIntent(R.id.unlockButton, getPendingIntent(place.getId(),lock.getId()));
+			button.setOnClickPendingIntent(R.id.unlockButton, PendingIntentManager.getInstance().getPendingIntentForLock(place.getId(),lock.getId()));
 			contentView.addView(R.id.widget2, button);
 		}
 		Notification notification = nb.build();
@@ -175,12 +144,11 @@ public class NotificationManager extends BroadcastReceiver {
 	
 	private static void createNotificationForLock(Place place, Lock lock){
 		NotificationInformation info = new NotificationInformation();
-		shownNotifications.add(info);	
 		info.type = NotificationInformation.Type.Lock;
 		info.typeId = lock.getId();
 		info.object = lock;
-		info.notificationId = lock.getId();
-
+		info.notificationId = getUnusedId();
+		
 		Context context = KisiApplication.getApplicationInstance();
 		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
@@ -189,27 +157,18 @@ public class NotificationManager extends BroadcastReceiver {
 		nc.setContentTitle(lock.getName() + " - " + place.getName());
 		nc.setDefaults(Notification.DEFAULT_ALL);
 		nc.setWhen(0);
-		nc.setContentIntent(getPendingIntent(place.getId(),lock.getId()));
+		nc.setContentIntent(PendingIntentManager.getInstance().getPendingIntentForLock(place.getId(), lock.getId()));
 
 		info.notification = nc.build();
+		notifications.add(info);
 		mNotificationManager.notify(info.notificationId, info.notification);
-
 	}
 
-	private static PendingIntent getPendingIntent(int placeId, int lockId){
-		Intent intent = new Intent(KisiApplication.getApplicationInstance(), KisiMain.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("Type", "unlock");
-		intent.putExtra("Place", placeId);
-		intent.putExtra("Lock", lockId);
-		return PendingIntent.getActivity(KisiApplication.getApplicationInstance(), lockId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-	}
 
 	
 	private void handleIntent(Intent intent){
 		Bundle extras = intent.getExtras();
 		String type = extras.getString("Type");
-		Log.i("BLE","Notification.Type = "+type);
 		int lockId = extras.getInt("Lock", -1);
 		int placeId = extras.getInt("Place", -2);
 		if(type.equals(LockInVicinityDisplayManager.TRANSITION_ENTER_LOCK)){
@@ -217,50 +176,158 @@ public class NotificationManager extends BroadcastReceiver {
 		}else if(type.equals(LockInVicinityDisplayManager.TRANSITION_EXIT_LOCK)){
 			enteredLocks.remove(lockId);
 		}else if(type.equals(LockInVicinityDisplayManager.TRANSITION_ENTER_PLACE)){
-			Log.i("BLE","check Intent place = "+placeId);
 			enteredPlaces.add(placeId);
 		}else if(type.equals(LockInVicinityDisplayManager.TRANSITION_EXIT_PLACE)){
 			enteredPlaces.remove(placeId);
 		}
 	}
 
-	public static Pair<Integer,Notification> getBLEServiceNotification(Context context){
-		if(!bleServiceRunning){
-			bleServiceRunning = true;
-			if(shownNotifications.size()>0){
-				NotificationInformation info = shownNotifications.get(0);
-				bleServiceNotificationId = info.notificationId;
-				info.notification = getExpandedNotification((Place)info.object,true,context);
-				return new Pair<Integer,Notification>(info.notificationId,info.notification);
-			}else{
-				bleServiceNotificationSet = false;
-				bleServiceNotificationId = 1;
-				NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
-				nc.setSmallIcon(R.drawable.notification_icon);
-				nc.setContentText("KISI");
-				nc.setContentTitle("BluetoothLE running");
-				nc.setDefaults(Notification.DEFAULT_ALL);
-			    nc.setOnlyAlertOnce(true);
-				nc.setWhen(0);
-				return new Pair<Integer,Notification>(bleServiceNotificationId,nc.build());
-			}
+	
+	private static LinkedList<NotificationInformation> notifications = new LinkedList<NotificationInformation>();
+
+	public static NotificationInformation getOrCreateBLEServiceNotification(Context context){
+		NotificationInformation bleNotification = getBLENotification();
+		if(bleNotification != null){
+			// BLE already has a Notification
+			// Do nothing
+			return bleNotification;
+		}else{
+			//There is no Notification yet
+			bleNotification = getNotificationForBLE(context);
+			bleNotification.containsBLE = true;
+			if(bleNotification.type == NotificationInformation.Type.Place)
+				bleNotification.notification = getExpandedNotification((Place)bleNotification.object,true,context);
+			return bleNotification;
 		}
-		return null;
+
 	}
 
 	public static void notifyBLEServiceNotificationDeleted() {
-		if(bleServiceRunning){
-			bleServiceRunning = false;
-			for(NotificationInformation info:shownNotifications){
-				if(bleServiceNotificationId == info.notificationId){
-					Context context = KisiApplication.getApplicationInstance();
-					android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-					info.notification = getExpandedNotification((Place)info.object);
-					mNotificationManager.notify(info.notificationId, info.notification);
-					break;
-				}
+		NotificationInformation bleNotification = getBLENotification();
+		if(bleNotification != null){
+			android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);
+			if(bleNotification.type == Type.BLEOnly){
+				mNotificationManager.cancel(bleNotification.notificationId);
+			}else if(bleNotification.type == Type.Place){
+				bleNotification.notification = getExpandedNotification((Place)bleNotification.object);
+				mNotificationManager.notify(bleNotification.notificationId, bleNotification.notification);
 			}
+			bleNotification.containsBLE = false;
 		}
 	}
 
+
+	/**
+	 * There is at most one notification that contains information
+	 * about, that BLE is running. If this notification exists 
+	 * this will be returned, otherwise it returns null
+	 * @return Notification with BLE information, null if no such Notification exists
+	 */
+	public static NotificationInformation getBLENotification(){
+		for(NotificationInformation info : notifications)
+			if(info.containsBLE)
+				return info;
+		return null;
+	}
+	
+	/**
+	 * Every place has its unique Notification, if there exists a
+	 * Notification for this Place true will be returned, false otherwise 
+	 * @param place Place
+	 * @return true if there is a Notification for the Place, false otherwise
+	 */
+	public static boolean containsNotificationForPlace(Place place){
+		for(NotificationInformation info : notifications)
+			if(info.type == Type.Place)
+				if(info.typeId == place.getId())
+					return true;
+		return false;
+	}
+	
+	public static NotificationInformation getNotificationForPlace(Place place){
+		for(NotificationInformation info : notifications)
+			if(info.type == Type.Place)
+				if(info.typeId == place.getId())
+					return info;
+		return null;
+	}
+	
+	/**
+	 * Every Lock has its unique Notification, if there exists a
+	 * Notification for this Lock true will be returned, false otherwise 
+	 * @param lock Lock
+	 * @return true if there is a Notification for the Lock, false otherwise
+	 */
+	public static boolean containsNotificationForLock(Lock lock){
+		for(NotificationInformation info : notifications)
+			if(info.type == Type.Lock)
+				if(info.typeId == lock.getId())
+					return true;
+		return false;
+	}
+	
+	public static NotificationInformation getNotificationForLock(Lock lock){
+		for(NotificationInformation info : notifications)
+			if(info.type == Type.Lock)
+				if(info.typeId == lock.getId())
+					return info;
+		return null;
+	}
+	
+	/**
+	 * Try to find a Notification that can show that BLE is 
+	 * running. So far only Place Notifications can contain BLE 
+	 * information.
+	 *  
+	 * @param context Context is needed for building the Notification
+	 * @return Returns a valid Notification object that contains a Notification that can be used
+	 */
+	public static NotificationInformation getNotificationForBLE(Context context){
+		for(NotificationInformation info : notifications){
+			if(info.type == Type.Place)
+				return info;
+		}
+		
+		// At this point no carrier for BLE was found, create a new one	
+		NotificationInformation info = new NotificationInformation();
+		NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
+		nc.setSmallIcon(R.drawable.notification_icon);
+		nc.setContentText("KISI");
+		nc.setContentTitle("BluetoothLE running");
+		nc.setWhen(0);
+		info.containsBLE = true;
+		info.notificationId = getUnusedId();
+		info.notification = nc.build();
+		info.type = Type.BLEOnly;
+		notifications.add(info);
+		return info;
+	}
+	
+	/**
+	 * Returns a new unused NotificationId
+	 * @return NotificationId
+	 */
+	private static int getUnusedId(){
+		int max = 0;
+		for(NotificationInformation info : notifications)
+			max = Math.max(info.notificationId, max);
+		return max+1;
+	}
+	
+	
+	
+	//****************************************************
+	//*********** Support Code for Android 4.0 ***********
+	//****************************************************
+	
+	private static void createNotificationForPlaceSupport(Place place){
+		for(Lock lock : place.getLocks())
+			createNotificationForLockSupport(place,lock);
+	}
+	
+	private static void createNotificationForLockSupport(Place place, Lock lock){
+		createNotificationForLock(place,lock);
+
+	}
+	
 }

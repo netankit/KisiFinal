@@ -31,9 +31,11 @@ public class NFCReceiver extends Activity{
 
 	        // Get the Data on the Tag
 	        String nfcData = new String(relayRecord.getPayload());
-
-	        // Display the data on the tag
+	        
+	        // Display the data on the tag for debuging
 	        Toast.makeText(this, nfcData, Toast.LENGTH_SHORT).show();
+	        
+	        // get actor for NFC
 			LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.NFC);
 	        
 	        // Test all locators for equality to the data string 

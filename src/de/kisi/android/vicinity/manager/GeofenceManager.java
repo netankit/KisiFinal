@@ -171,6 +171,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         		.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT|Geofence.GEOFENCE_TRANSITION_ENTER)
         		.setExpirationDuration(Geofence.NEVER_EXPIRE) //infinite  
         		.build());
+
         	}        	
         	
         }

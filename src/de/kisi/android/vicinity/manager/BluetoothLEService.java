@@ -16,19 +16,18 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
+import de.kisi.android.notifications.NotificationInformation;
 import de.kisi.android.notifications.NotificationManager;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.VicinityTypeEnum;
 
 import android.app.IntentService;
-import android.app.Notification;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import android.util.Pair;
 
 public class BluetoothLEService extends IntentService implements IBeaconConsumer{
 
@@ -114,9 +113,9 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 			// i also noticed that the notification should be created with the service context 
 			// and not the the application context, thats why the service is a parameter of the 
 			// method
-			Pair<Integer,Notification> notification = NotificationManager.getBLEServiceNotification(this);
+			NotificationInformation notification = NotificationManager.getOrCreateBLEServiceNotification(this);
 			if(notification != null){
-				startForeground(notification.first, notification.second);
+				startForeground(notification.notificationId, notification.notification);
 			}
 		}else{
 			try{
@@ -132,6 +131,17 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.bind(this);
 	    return START_STICKY;
+	}
+	
+	@Override
+	public void onDestroy (){
+		try{
+			stopForeground(true);
+		}catch(Exception e){
+		}
+		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
+		iBeaconManager.unBind(this);
+		NotificationManager.notifyBLEServiceNotificationDeleted();
 	}
 
 	// protect the actor for permanent fireing
