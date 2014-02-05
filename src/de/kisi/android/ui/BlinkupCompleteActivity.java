@@ -1,4 +1,4 @@
-package de.kisi.android;
+package de.kisi.android.ui;
 
 import org.json.JSONObject;
 
@@ -13,6 +13,7 @@ import com.electricimp.blinkup.BlinkupController;
 import com.electricimp.blinkup.BlinkupController.TokenStatusCallback;
 import com.newrelic.agent.android.NewRelic;
 
+import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 
 public class BlinkupCompleteActivity extends Activity implements TokenStatusCallback {

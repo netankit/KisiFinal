@@ -1,19 +1,24 @@
-package de.kisi.android;
+package de.kisi.android.ui;
 
 
+import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Place;
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -26,11 +31,10 @@ public class PlaceNotificationSettings extends Activity {
 		super.onCreate(savedInstanceState);
 
 //		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.place_notification_settings);
 
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
-				R.layout.log_title);
+//		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.log_title);
 
 		buildShareDialog();
 
@@ -52,24 +56,24 @@ public class PlaceNotificationSettings extends Activity {
 		LinearLayout linearLayout = (LinearLayout) findViewById(R.id.place_linear_layout);
 
 		
-		TextView textView =  new TextView(this);
-		textView.setText(getResources().getString(R.string.notification_settings));
-		textView.setTextSize(24);
-		textView.setTextColor(0xFFFFFFFF);
-		textView.setTypeface(font);
-		linearLayout.addView(textView, layoutParams);
+//		TextView textView =  new TextView(this);
+//		textView.setText(getResources().getString(R.string.notification_settings));
+//		textView.setTextSize(24);
+//		textView.setTextColor(Color.DKGRAY);
+//		textView.setTypeface(font);
+//		linearLayout.addView(textView, layoutParams);
+		LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
-	
-
 		for (final Place p : places) {
 			
-			final Switch placeSwitch = new Switch(this);
+			final Switch placeSwitch =  (Switch) li.inflate(R.layout.place_notification_switch, null); 
+//			final Switch placeSwitch = new Switch(this);
 			placeSwitch.setText(p.getName());
 			placeSwitch.setChecked(p.getNotificationEnabled());
 			placeSwitch.setTypeface(font);
 			placeSwitch.setGravity(Gravity.LEFT);
 			placeSwitch.setHeight(height);
-			placeSwitch.setTextColor(Color.WHITE);
+			placeSwitch.setTextColor(Color.DKGRAY);
 			placeSwitch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
 			placeSwitch.setVisibility(View.VISIBLE);
 			linearLayout.addView(placeSwitch);
@@ -84,6 +88,18 @@ public class PlaceNotificationSettings extends Activity {
 
 		}
 
+	}
+	
+	//listener for the backbutton of the action bar
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+       switch (item.getItemId()) {
+        case android.R.id.home:
+            finish();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
 	}
 
 

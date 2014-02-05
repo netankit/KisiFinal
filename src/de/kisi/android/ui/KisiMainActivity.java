@@ -4,12 +4,7 @@ import com.electricimp.blinkup.BlinkupController;
 import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import com.newrelic.agent.android.NewRelic;
 
-import de.kisi.android.AccountPickerActivity;
-import de.kisi.android.BlinkupCompleteActivity;
-import de.kisi.android.LogInfo;
-import de.kisi.android.PlaceNotificationSettings;
 import de.kisi.android.R;
-import de.kisi.android.ShareKeyActivity;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
@@ -76,13 +71,13 @@ public class KisiMainActivity extends Activity implements OnPlaceChangedListener
 		 };
 		 
 		 
-		 mDrawerLayout.setDrawerListener(mDrawerToggle);
-		 getActionBar().setDisplayHomeAsUpEnabled(true);
-		 getActionBar().setHomeButtonEnabled(true);
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		getActionBar().setHomeButtonEnabled(true);
 		 
 		 
-		 KisiAPI.getInstance().registerOnPlaceChangedListener(this);
-		 setUiIntoStartState();
+		KisiAPI.getInstance().registerOnPlaceChangedListener(this);
+		Intent login = new Intent(this, AccountPickerActivity.class);
+		startActivityForResult(login, LOGIN_REQUEST_CODE);
 	}
 	
 	@Override
@@ -114,7 +109,11 @@ public class KisiMainActivity extends Activity implements OnPlaceChangedListener
 			selectItem(0, place.getId());
 		}
 		else {
-			//TODO: Some Pop that there is no place
+			//check if user is even login 
+			if(KisiAPI.getInstance().getUser() != null) {
+				//TODO: implement so dialog here
+			}
+				
 			
 		}
 	}
@@ -123,7 +122,7 @@ public class KisiMainActivity extends Activity implements OnPlaceChangedListener
 	private void selectItem(int position, long id) {
 		mLockListAdapter = new LockListAdapter(this, (int) id);
 		mLockList.setAdapter(mLockListAdapter);
-		mLockList.setOnItemClickListener(new LockButtonOnClickListener(KisiAPI.getInstance().getPlaceById((int) id)));
+		mLockList.setOnItemClickListener(new LockListOnItemClickListener(KisiAPI.getInstance().getPlaceById((int) id)));
 		mLockList.invalidate();
 	    // Highlight the selected item, update the title, and close the drawer
 	    mDrawerList.setItemChecked(position, true);
@@ -221,8 +220,10 @@ public class KisiMainActivity extends Activity implements OnPlaceChangedListener
 	public void refreshViews() {
 		mDrawerListAdapter.notifyDataSetChanged();
 		mDrawerLayout.invalidate();
-		mLockListAdapter.notifyDataSetChanged();
-		mLockList.invalidate();
+		if(mLockListAdapter != null) {
+			mLockListAdapter.notifyDataSetChanged();
+			mLockList.invalidate();
+		}
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -255,7 +256,25 @@ public class KisiMainActivity extends Activity implements OnPlaceChangedListener
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		BlinkupController.getInstance().handleActivityResult(this, requestCode, resultCode, data);	
+		if (requestCode == LOGIN_REQUEST_CODE) {
+			if (resultCode == AccountPickerActivity.LOGIN_FAILED) {
+				finish();
+				return;
+			}
+			if (resultCode == AccountPickerActivity.LOGIN_SUCCESS) {
+				//start an update of the places
+				KisiAPI.getInstance().refresh(new OnPlaceChangedListener() {
+					@Override
+					public void onPlaceChanged(Place[] newPlaces) {
+						setUiIntoStartState();
+					}
+				});
+				return;
+			}
+		} else {
+			BlinkupController.getInstance().handleActivityResult(this,
+					requestCode, resultCode, data);
+		}
 	}
 
 	private void logout() {

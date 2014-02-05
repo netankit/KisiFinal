@@ -12,16 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.TextView;
+
 
 public class LockListAdapter extends BaseAdapter {
 
-	private KisiAPI mKisiAPI;
 	private Context mContext;
 	private int placeId;
 
 	public LockListAdapter(Context context, int  placeId) {
-		this.mKisiAPI = KisiAPI.getInstance();
 		this.mContext = context;
 		this.placeId = placeId;
 	}

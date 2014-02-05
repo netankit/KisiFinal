@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:layout_centerVertical="true"
     android:layout_gravity="center"
-    android:background="@drawable/testbackground"
     android:paddingTop="15dp" >
 
 	<LinearLayout
@@ -17,6 +16,15 @@
         android:baselineAligned="false"
         android:gravity="center"
         android:orientation="vertical" >
+
+		<TextView
+		    android:id="@+id/textView1"
+		    android:layout_width="253dp"
+		    android:layout_height="wrap_content"
+		    android:text="@string/notification_settings"
+		    android:textSize="24sp"
+		    android:layout_marginTop="15sp"
+            android:layout_marginBottom="25sp"  />
 
     </LinearLayout>
 </ScrollView>

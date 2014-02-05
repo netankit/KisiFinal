@@ -1,4 +1,4 @@
-package de.kisi.android;
+package de.kisi.android.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -16,35 +17,30 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CheckedTextView;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ShareKeyActivity extends Activity implements OnClickListener {
+public class ShareKeyActivity extends Activity {
 
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		
+		super.onCreate(savedInstanceState);		
 		setContentView(R.layout.share_key_activity);
 		
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
-				R.layout.log_title);
-		
-
-		ImageButton backButton = (ImageButton) findViewById(R.id.back);
-		backButton.setOnClickListener(this);
-
-		int place = getIntent().getExtras().getInt("place");
-		buildShareDialog(KisiAPI.getInstance().getPlaces()[place]);
-
+		int placeId = getIntent().getExtras().getInt("place");
+		buildShareDialog(KisiAPI.getInstance().getPlaceById(placeId));
+		//add back button to action bar 
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}	
 	
 	
@@ -52,8 +48,6 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 		final List<Lock> locks = place.getLocks();
 		LinearLayout linearLayout = (LinearLayout)findViewById(R.id.place_linear_layout);
 		
-		final Drawable uncheckedIcon = getResources().getDrawable(R.drawable.share_unchecked);
-		final Drawable checkedIcon = getResources().getDrawable(R.drawable.share_checked);
 		final List<Lock> sendlocks = new ArrayList<Lock>();
 		
 		Typeface font = Typeface.createFromAsset(this.getApplicationContext().getAssets(), "Roboto-Light.ttf");
@@ -64,59 +58,59 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 		int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15, r.getDisplayMetrics());
 
 		LinearLayout.LayoutParams layoutParams;
-		layoutParams = new LinearLayout.LayoutParams(width, LinearLayout.LayoutParams.WRAP_CONTENT);
-		layoutParams.setMargins(margin, margin, margin, margin);
-
-		final TextView textTitle = new TextView(this);
-		textTitle.setText(getResources().getString(R.string.share_title) + " " + place.getName());
-		textTitle.setTextSize(24);
-		textTitle.setTextColor(0xFFFFFFFF);
-		linearLayout.addView(textTitle, layoutParams);
-		final TextView textEmail = new TextView(this);
-		textEmail.setText(getResources().getString(R.string.share_popup_msg));
-		textEmail.setTextColor(0xFFFFFFFF);
-		linearLayout.addView(textEmail, layoutParams);
-		final EditText emailInput = new EditText(this);
-		emailInput.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-		emailInput.setHint(R.string.Email);
-		emailInput.setTextColor(0xFFFFFFFF);
-		emailInput.setHintTextColor(0xAAAAAA);
-		linearLayout.addView(emailInput, layoutParams);
+		final EditText emailInput = (EditText) findViewById(R.id.shareEmailInput);
 		
 		layoutParams = new LinearLayout.LayoutParams(width, height);
 		layoutParams.setMargins(margin, margin, margin, margin);
 		for (final Lock lock : locks) {
 			
-			final Button button = new Button(this);
-			button.setText(lock.getName());
-			button.setTypeface(font);
-			button.setGravity(Gravity.CENTER);
-			button.setWidth(width);
-			button.setHeight(height);
-			button.setTextColor(Color.WHITE);
-			button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
-			button.setCompoundDrawablesWithIntrinsicBounds(uncheckedIcon, null, null, null);
-			button.setVisibility(View.VISIBLE);
-			button.setOnClickListener(new OnClickListener(){
-				private boolean checked = false;
+			LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			CheckBox checkBox = (CheckBox) li.inflate(R.layout.share_checkbox, null);
+			checkBox.setText(lock.getName());	
+			checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+
 				@Override
-				public void onClick(View v) {
-					if (checked){
-						button.setCompoundDrawablesWithIntrinsicBounds(uncheckedIcon, null, null, null);
-						sendlocks.remove(lock);
-						checked = false;
-					}else{
-						button.setCompoundDrawablesWithIntrinsicBounds(checkedIcon, null, null, null);
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if (isChecked){
 						sendlocks.add(lock);
-						checked = true;
+					}else{
+						sendlocks.remove(lock);
 					}
-				}});
-			
-			linearLayout.addView(button, layoutParams);
+				}
+				
+			});
+//			final Button button = new Button(this);
+//			button.setText(lock.getName());
+//			button.setTypeface(font);
+//			button.setGravity(Gravity.CENTER);
+//			button.setWidth(width);
+//			button.setHeight(height);
+//			button.setTextColor(Color.DKGRAY);
+//			button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+//			button.setCompoundDrawablesWithIntrinsicBounds(uncheckedIcon, null, null, null);
+//			button.setVisibility(View.VISIBLE);
+//			button.setOnClickListener(new OnClickListener(){
+//				private boolean checked = false;
+//				@Override
+//				public void onClick(View v) {
+//					if (checked){
+//						button.setCompoundDrawablesWithIntrinsicBounds(uncheckedIcon, null, null, null);
+//						sendlocks.remove(lock);
+//						checked = false;
+//					}else{
+//						button.setCompoundDrawablesWithIntrinsicBounds(checkedIcon, null, null, null);
+//						sendlocks.add(lock);
+//						checked = true;
+//					}
+//				}});
+//			
+//			linearLayout.addView(button, layoutParams);
+			linearLayout.addView(checkBox, layoutParams);
 		}
+		
 		Button submit = new Button(this);
 		submit.setText(getResources().getString(R.string.share_submit_button));
-		submit.setTextColor(0xFFFFFFFF);
+		submit.setTextColor(Color.DKGRAY);
 		submit.setTextSize(25);
 		layoutParams = new LinearLayout.LayoutParams(width, LinearLayout.LayoutParams.WRAP_CONTENT);
 		layoutParams.setMargins(margin, margin, margin, margin);
@@ -141,10 +135,20 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 		linearLayout.addView(submit, layoutParams);
 
 	}
-
-
+	
+	//listener for the back button in the action bar
 	@Override
-	public void onClick(View v) {
-		finish();
+	public boolean onOptionsItemSelected(MenuItem item) {
+       switch (item.getItemId()) {
+        case android.R.id.home:
+            finish();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
 	}
+	
+	
+
+
 }

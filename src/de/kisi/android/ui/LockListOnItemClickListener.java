@@ -16,13 +16,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class LockButtonOnClickListener implements OnItemClickListener {
+public class LockListOnItemClickListener implements OnItemClickListener {
 
 	private Place place;
 	private static long delay = 1500;
 	
 	
-	public LockButtonOnClickListener(Place place) {
+	public LockListOnItemClickListener(Place place) {
 		this.place = place;
 	}
 	
@@ -30,7 +30,7 @@ public class LockButtonOnClickListener implements OnItemClickListener {
 
 	
 	@Override
-	public void  onItemClick(final AdapterView parent, View view, final int position, long id) {
+	public void  onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
 		final ProgressDialog progressDialog = new ProgressDialog(view.getContext());
 		progressDialog.setMessage(KisiApplication.getApplicationInstance().getString(R.string.opening));
 		progressDialog.setCancelable(false);
@@ -46,9 +46,7 @@ public class LockButtonOnClickListener implements OnItemClickListener {
 				final Button currentButton = (Button) parent.getChildAt(position);
 				// save button design
 				final Drawable currentBackground = currentButton.getBackground();
-				//final Button currentButton = button;
 				final String currentText = (String) currentButton.getText();
-				final float density = KisiApplication.getApplicationInstance().getResources().getDisplayMetrics().density;
 
 				// change to unlocked design
 				currentButton.setText("");
@@ -64,10 +62,7 @@ public class LockButtonOnClickListener implements OnItemClickListener {
 						currentButton.setText(currentText);
 
 					}
-				}, delay);
-
-				
-				
+				}, delay);	
 			}
 
 			@Override
@@ -77,10 +72,7 @@ public class LockButtonOnClickListener implements OnItemClickListener {
 				final Button currentButton = (Button) parent.getChildAt(position);
 				// save button design
 				final Drawable currentBackground = currentButton.getBackground();
-				//final Button currentButton = button;
 				final String currentText = (String) currentButton.getText();
-				final float density =KisiApplication.getApplicationInstance().getResources().getDisplayMetrics().density;
-				final int shift = (int) (138 * density); // 95
 
 				// change to failure design
 				currentButton.setBackgroundColor(Color.RED);
@@ -97,11 +89,7 @@ public class LockButtonOnClickListener implements OnItemClickListener {
 					}
 				}, delay);
 
-			}
-
-
-				
-				
+			}				
 			});
 
 	

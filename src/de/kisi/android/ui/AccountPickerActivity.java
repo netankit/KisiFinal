@@ -1,4 +1,4 @@
-package de.kisi.android;
+package de.kisi.android.ui;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -21,10 +21,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.kisi.android.R;
+import de.kisi.android.R.id;
+import de.kisi.android.R.layout;
+import de.kisi.android.R.string;
 import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
-import de.kisi.android.ui.KisiMainActivity;
 
 public class AccountPickerActivity extends Activity implements LoginCallback{
 
@@ -166,8 +169,8 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		//Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
 		//mainScreen.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		//finish login activity
-		Intent mainActivity = new Intent(this, KisiMainActivity.class);
-		startActivity(mainActivity);
+//		Intent mainActivity = new Intent(this, KisiMainActivity.class);
+//		startActivity(mainActivity);
 		//move this later to the KisiAPI
 		finish();
 	}

@@ -23,7 +23,12 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import de.kisi.android.ui.AccountPickerActivity;
+import de.kisi.android.ui.BlinkupCompleteActivity;
 import de.kisi.android.ui.KisiMainActivity;
+import de.kisi.android.ui.LogInfo;
+import de.kisi.android.ui.PlaceNotificationSettings;
+import de.kisi.android.ui.ShareKeyActivity;
 
 public class KisiMain extends FragmentActivity implements
 		PopupMenu.OnMenuItemClickListener {

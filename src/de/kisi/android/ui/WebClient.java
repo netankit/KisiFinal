@@ -1,4 +1,4 @@
-package de.kisi.android;
+package de.kisi.android.ui;
 
 import de.kisi.android.api.KisiAPI;
 import android.graphics.Bitmap;
