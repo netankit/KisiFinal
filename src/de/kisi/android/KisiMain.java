@@ -4,14 +4,9 @@ import java.util.List;
 import java.util.Vector;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.MenuInflater;
@@ -30,8 +25,7 @@ import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
-public class KisiMain extends FragmentActivity implements
-		PopupMenu.OnMenuItemClickListener {
+public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickListener {
 
 	private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
 
@@ -68,6 +62,8 @@ public class KisiMain extends FragmentActivity implements
 		pagerAdapter = new PlaceFragmentPagerAdapter(fm);
 		pager = (ViewPager) findViewById(R.id.pager);
 		
+		//ask the user to turn on the location service and the wifi
+
 	}
 
 	@Override
@@ -232,8 +228,7 @@ public class KisiMain extends FragmentActivity implements
 				return;
 			}
 		} else {
-			BlinkupController.getInstance().handleActivityResult(this,
-					requestCode, resultCode, data);
+			BlinkupController.getInstance().handleActivityResult(this,requestCode, resultCode, data);
 		}
 	}
 
@@ -295,5 +290,5 @@ public class KisiMain extends FragmentActivity implements
 			}
 	}
 	
-	
+		
 }
