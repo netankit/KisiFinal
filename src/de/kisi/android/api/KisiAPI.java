@@ -35,12 +35,9 @@ public class KisiAPI {
 	private static KisiAPI instance;  
 	
 	
-	private Place[] places = new Place[0];
 	private List<OnPlaceChangedListener> registeredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> unregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> newregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
-	
-	private User user;
 
 	private Context context;
 	
@@ -73,10 +70,9 @@ public class KisiAPI {
 			
 			 public void onSuccess(org.json.JSONObject response) {
 				Gson gson = new Gson();
-				user = gson.fromJson(response.toString(), User.class);
+				User user = gson.fromJson(response.toString(), User.class);
 				DataManager.getInstance().saveUser(user);
-				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-				callback.onLoginSuccess(KisiAPI.getInstance().getAuthToken());
+				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
 				return;
 			}
 			
@@ -110,10 +106,7 @@ public class KisiAPI {
 
 	}
 	
-	public void clearCache() {
-		user = null;
-		places = null;
-		
+	public void clearCache() {		
 		DataManager.getInstance().deleteDB();
 	}
 	
@@ -136,17 +129,17 @@ public class KisiAPI {
 	 * @return Array of all Places the user has access to
 	 */
 	public Place[] getPlaces(){
-		return places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+		return DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 	}
 	
 	public Place getPlaceAt(int index){
-		places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+		Place[] places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		if(places != null && index>=0 && index<places.length)
 			return places[index];
 		return null;
 	}
 	public Place getPlaceById(int num){
-		places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+		Place[]  places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		for(Place p : places)
 			if(p.getId() == num)
 				return p;
@@ -160,9 +153,9 @@ public class KisiAPI {
 
 	
 	public void updatePlaces(final OnPlaceChangedListener listener) {
-		if(user == null)
+		if(getUser() == null)
 			return;
-		places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+
 		
 		KisiRestClient.getInstance().get("places",  new JsonHttpResponseHandler() { 
 			
@@ -170,21 +163,15 @@ public class KisiAPI {
 				Gson gson = new Gson();
 				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
 				DataManager.getInstance().savePlaces(pl);
-				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-				listener.onPlaceChanged(places);
-				notifyAllOnPlaceChangedListener();	
+				for(Place p: pl) {
+					KisiAPI.getInstance().updateLocks(p, listener);
+				}
 			}
 			
 		});
 	}
 	
 
-	
-	//TODO: security
-	public String getAuthToken() {
-		return user.getAuthentication_token();
-	}
-	
 	
 	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {	
 		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
@@ -196,7 +183,7 @@ public class KisiAPI {
 					l.setPlace(instance.getPlaceById(l.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocks(locks);
-				listener.onPlaceChanged(places);
+				listener.onPlaceChanged(getPlaces());
 				notifyAllOnPlaceChangedListener();
 			}
 		});		
@@ -278,29 +265,21 @@ public class KisiAPI {
 		registeredOnPlaceChangedListener.addAll(newregisteredOnPlaceChangedListener);
 		newregisteredOnPlaceChangedListener.clear();
 		for(OnPlaceChangedListener listener : registeredOnPlaceChangedListener)
-			listener.onPlaceChanged(places);
+			listener.onPlaceChanged(getPlaces());
 	}
 	
 	
 	public boolean userIsOwner(Place place){
-		return place.getOwnerId()==this.user.getId();
+		return place.getOwnerId()==this.getUser().getId();
 	}
 	
 	public void unlock(Lock lock, final UnlockCallback callback){
-        KisiLocationManager locationManager = KisiLocationManager.getInstance();
-		Location currentLocation = locationManager.getCurrentLocation();;
-		JSONObject location = new JSONObject();
+        JSONObject location =  generateJSONLocation();
 		JSONObject data = new JSONObject();
 		try {
-			if(currentLocation != null) {
-				location.put("latitude", currentLocation.getLatitude());
-				location.put("longitude", currentLocation.getLongitude());
-			}
-			else {
-		 		location.put("error:", "Location data not accessible");
-			}
 			data.put("location", location);
 		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
@@ -370,19 +349,7 @@ public class KisiAPI {
         if (impeeId != null) 
             impeeId = impeeId.trim();
 
-        JSONObject location = new JSONObject();
-        KisiLocationManager locationManager = KisiLocationManager.getInstance();
-		Location currentLocation = locationManager.getCurrentLocation();
-        try {
-    		if(currentLocation != null) {
-    			location.put("latitude", currentLocation.getLatitude());
-    			location.put("longitude", currentLocation.getLongitude());
-    		} else { 
-	 			location.put("error:", "Location data not accessible");
-    		}
-		} catch (JSONException e1) {
-			e1.printStackTrace();
-		}
+        JSONObject location = generateJSONLocation();
     	JSONObject gateway = new JSONObject();
 		try {
 			gateway.put("name", "Gateway");
@@ -410,6 +377,24 @@ public class KisiAPI {
 		//TODO: Implement a proper handler
 		KisiRestClient.getInstance().post("gateways", data, new JsonHttpResponseHandler() {});	
 		
+	}
+
+	private JSONObject generateJSONLocation() {
+		JSONObject location = new JSONObject();
+		Location currentLocation = GeofenceManager.getInstance().getLocation();
+		try {
+    		if(currentLocation != null) {
+    			location.put("latitude", currentLocation.getLatitude());
+    			location.put("longitude", currentLocation.getLongitude());
+    			location.put("horizontalAccuracy", currentLocation.getAccuracy());
+    			location.put("age", (System.currentTimeMillis() - currentLocation.getTime())/1000.0);
+    		} else { 
+	 			location.put("error:", "Location data not accessible");
+    		}
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+        return location;
 	}
 	
 	

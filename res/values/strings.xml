@@ -54,4 +54,6 @@
 	<string name="try_again">Try again</string>
 	<string name="close_app">Exit</string>
 	<string name="notification_settings">Notification settings</string>
+	<string name="about">About</string>
+	<string name="version">Version:\t</string>
 </resources>

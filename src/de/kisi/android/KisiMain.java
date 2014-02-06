@@ -3,8 +3,14 @@ package de.kisi.android;
 import java.util.List;
 import java.util.Vector;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -184,14 +190,27 @@ public class KisiMain extends FragmentActivity implements
 						}
 					});
 			return true;
-
-		case R.id.logout:
-			logout();
-			return true;
 			
 		case R.id.notification:
 			Intent settingsIntent = new Intent(this, PlaceNotificationSettings.class);
 			startActivity(settingsIntent);
+			return true;
+			
+		case R.id.logout:
+			logout();
+			return true;
+			
+		case R.id.about_version:
+			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+			alertDialog.setTitle(R.string.kisi);
+			String versionName = null;
+			try {
+				versionName = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
+			} catch (NameNotFoundException e) {
+				e.printStackTrace();
+			}
+			alertDialog.setMessage(getResources().getString(R.string.version) + versionName);
+			alertDialog.show();
 			return true;
 
 		default:
