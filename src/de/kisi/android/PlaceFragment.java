@@ -8,6 +8,7 @@ import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -35,6 +36,7 @@ public class PlaceFragment extends Fragment {
 	private final static long delay = 1000;
 	private int index;
 	private Lock lockToUnlock;
+	private Activity mActivity;
 	
 	
 	private Hashtable<Integer, Button> buttonHashtable;
@@ -80,11 +82,18 @@ public class PlaceFragment extends Fragment {
 	}
 
 	
+	@Override
+	public void onAttach(Activity activity) {
+		// TODO Auto-generated method stub
+		super.onAttach(activity);
+		mActivity = activity;
+	}
+	
 	private void setupButtons(final Place place) {
 		
-		Drawable lockIcon = getActivity().getResources().getDrawable(R.drawable.kisi_lock);
+		Drawable lockIcon = mActivity.getResources().getDrawable(R.drawable.kisi_lock);
 		
-		Typeface font = Typeface.createFromAsset(getActivity().getApplicationContext().getAssets(), "Roboto-Light.ttf");
+		Typeface font = Typeface.createFromAsset(mActivity.getApplicationContext().getAssets(), "Roboto-Light.ttf");
 		//Getting px form Scale-independent Pixels
 		Resources r = getResources();
 		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 350, r.getDisplayMetrics());
@@ -99,7 +108,7 @@ public class PlaceFragment extends Fragment {
 
 		//show a text if there is no lock for a place
 		if(place.getLocks().size() == 0) {
-			final TextView text = new TextView(getActivity());
+			final TextView text = new TextView(mActivity);
 			text.setText(R.string.no_lock);
 			text.setTypeface(font);
 			text.setGravity(Gravity.CENTER);
@@ -120,7 +129,7 @@ public class PlaceFragment extends Fragment {
 				button = buttonHashtable.get(lock.getId());
 				
 			} else {
-				button = new Button(getActivity());
+				button = new Button(mActivity);
 				button.setText(lock.getName());
 				button.setTypeface(font);
 				button.setGravity(Gravity.CENTER);
@@ -135,7 +144,7 @@ public class PlaceFragment extends Fragment {
 				button.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(final View v) {
-						final ProgressDialog progressDialog = new ProgressDialog(fragment.getActivity());
+						final ProgressDialog progressDialog = new ProgressDialog(mActivity);
 						progressDialog.setMessage(fragment.getString(R.string.opening));
 						progressDialog.setCancelable(false);
 						progressDialog.show();
@@ -179,19 +188,19 @@ public class PlaceFragment extends Fragment {
 	@SuppressWarnings("deprecation")
 	public void changeButtonStyleToUnlocked(Button button, Lock lock, String message) {
 		layout.requestLayout();
-		Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
+		Toast.makeText(this.mActivity, message, Toast.LENGTH_SHORT).show();
 		final Button currentButton = buttonHashtable.get(lock.getId());
 		// save button design
 		final Drawable currentBackground = currentButton.getBackground();
 		//final Button currentButton = button;
 		final String currentText = (String) button.getText();
 		final int actualPadding = currentButton.getPaddingLeft();
-		final float density = getActivity().getResources().getDisplayMetrics().density;
+		final float density = mActivity.getResources().getDisplayMetrics().density;
 		final int shift = (int) (138 * density); // 95
 
 		// change to unlocked design
 
-		currentButton.setBackgroundDrawable(getActivity().getResources()
+		currentButton.setBackgroundDrawable(mActivity.getResources()
 				.getDrawable(R.drawable.unlocked));
 		currentButton.setPadding(shift, 0, 0, 0);
 		currentButton.setText("");
@@ -223,19 +232,19 @@ public class PlaceFragment extends Fragment {
 	@SuppressWarnings("deprecation")
 	public void changeButtonStyleToFailure(Button button, Lock lock, String message) {
 		layout.requestLayout();
-		Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
+		Toast.makeText(this.mActivity, message, Toast.LENGTH_SHORT).show();
 		final Button currentButton = buttonHashtable.get(lock.getId());
 		// save button design
 		final Drawable currentBackground = currentButton.getBackground();
 		//final Button currentButton = button;
 		final String currentText = (String) button.getText();
 		final int actualPadding = currentButton.getPaddingLeft();
-		final float density = getActivity().getResources().getDisplayMetrics().density;
+		final float density = mActivity.getResources().getDisplayMetrics().density;
 		final int shift = (int) (138 * density); // 95
 
 		// change to failure design
 
-		currentButton.setBackgroundDrawable(getActivity().getResources()
+		currentButton.setBackgroundDrawable(mActivity.getResources()
 				.getDrawable(R.drawable.lockfailure));
 		currentButton.setPadding(shift, 0, 0, 0);
 		currentButton.setText("");

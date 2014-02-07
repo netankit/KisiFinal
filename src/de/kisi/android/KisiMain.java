@@ -3,9 +3,10 @@ package de.kisi.android;
 import java.util.List;
 import java.util.Vector;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.MenuInflater;
@@ -24,8 +25,7 @@ import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
-public class KisiMain extends FragmentActivity implements
-		PopupMenu.OnMenuItemClickListener {
+public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickListener {
 
 	private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
 
@@ -62,12 +62,21 @@ public class KisiMain extends FragmentActivity implements
 		pagerAdapter = new PlaceFragmentPagerAdapter(fm);
 		pager = (ViewPager) findViewById(R.id.pager);
 		
+		//ask the user to turn on the location service and the wifi
+
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
 		buildUI();
+		
+		//receives intents when activity is started by an intent
+		if(getIntent().hasExtra("Type")) {
+			handleUnlockIntent(getIntent());
+			//removing the unlock intent, because otherwise the lock would be unlock every time the app is start from the background
+			getIntent().removeExtra("Type");
+		}
 	}
 	
 	private void buildUI() { 
@@ -101,24 +110,9 @@ public class KisiMain extends FragmentActivity implements
 	}
 
 	
-	//receives intents when activity is already running
-	@Override
-	protected void onNewIntent(Intent intent) {
-		super.onNewIntent(intent);
-
-		if(intent.hasExtra("Type")) {
-			handleUnlockIntent(intent);
-		}
-	}
-
-	//receives intents when activity is started by an intent
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		if(getIntent().hasExtra("Type")) {
-			handleUnlockIntent(getIntent());
-		}
 	}
 
 	@Override
@@ -143,22 +137,18 @@ public class KisiMain extends FragmentActivity implements
 		case R.id.share:
 			// check if user has a place
 			if (places.length == 0) {
-				Toast.makeText(this, R.string.share_empty_place_error,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.share_empty_place_error, Toast.LENGTH_LONG).show();
 				return false;
 			}
 
 			Place p = places[pager.getCurrentItem()];
 			// check if user is owner
 			if (!kisiAPI.userIsOwner(p)) {
-				Toast.makeText(this, R.string.share_owner_only,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.share_owner_only, Toast.LENGTH_LONG).show();
 				return false;
 			}
-			
-			// user is owner, start ShareKeyActivity
-			Intent intent = new Intent(getApplicationContext(),
-					ShareKeyActivity.class);
+
+			Intent intent = new Intent(getApplicationContext(), ShareKeyActivity.class);
 			intent.putExtra("place", pager.getCurrentItem());
 			startActivity(intent);
 			return true;
@@ -166,8 +156,7 @@ public class KisiMain extends FragmentActivity implements
 		case R.id.showLog:
 			// check if user has a place
 			if (places.length == 0) {
-				Toast.makeText(this, R.string.log_empty_place_error,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.log_empty_place_error, Toast.LENGTH_LONG).show();
 				return false;
 			}
 			Place place = places[pager.getCurrentItem()];
@@ -180,8 +169,7 @@ public class KisiMain extends FragmentActivity implements
 		case R.id.setup:
 
 			BlinkupController blinkup = BlinkupController.getInstance();
-			blinkup.intentBlinkupComplete = new Intent(this,
-					BlinkupCompleteActivity.class);
+			blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
 
 			if (kisiAPI.getUser().getEiPlanId() != null)
 				blinkup.setPlanID(kisiAPI.getUser().getEiPlanId());
@@ -190,19 +178,31 @@ public class KisiMain extends FragmentActivity implements
 					new ServerErrorHandler() {
 						@Override
 						public void onError(String errorMsg) {
-							Toast.makeText(getApplicationContext(), errorMsg,
-									Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
 						}
 					});
-			return true;
-
-		case R.id.logout:
-			logout();
 			return true;
 			
 		case R.id.notification:
 			Intent settingsIntent = new Intent(this, PlaceNotificationSettings.class);
 			startActivity(settingsIntent);
+			return true;
+			
+		case R.id.logout:
+			logout();
+			return true;
+			
+		case R.id.about_version:
+			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+			alertDialog.setTitle(R.string.kisi);
+			String versionName = null;
+			try {
+				versionName = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
+			} catch (NameNotFoundException e) {
+				e.printStackTrace();
+			}
+			alertDialog.setMessage(getResources().getString(R.string.version) + versionName);
+			alertDialog.show();
 			return true;
 
 		default:
@@ -224,8 +224,7 @@ public class KisiMain extends FragmentActivity implements
 				return;
 			}
 		} else {
-			BlinkupController.getInstance().handleActivityResult(this,
-					requestCode, resultCode, data);
+			BlinkupController.getInstance().handleActivityResult(this,requestCode, resultCode, data);
 		}
 	}
 
@@ -292,5 +291,5 @@ public class KisiMain extends FragmentActivity implements
 		}
 	}
 	
-	
+		
 }

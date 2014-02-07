@@ -14,12 +14,12 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.*;
 
+import de.kisi.android.KisiApplication;
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.User;
 
 public class KisiRestClient {
@@ -43,23 +43,30 @@ public class KisiRestClient {
 
 
 
-	public void get(Context context, String url, AsyncHttpResponseHandler responseHandler) {
-
-		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
-		String authToken = settings.getString("authentication_token", "");
-		if(authToken != null) 
+	public void get(String url, AsyncHttpResponseHandler responseHandler) {
+		String authToken = null;
+		if(KisiAPI.getInstance().getUser() != null) {
+			authToken = KisiAPI.getInstance().getUser().getAuthentication_token();
+		}
+		if(authToken != null) {
 			client.get(getAbsoluteUrl(url, authToken), responseHandler);
-		else
+		}
+		else {
 			client.get(getAbsoluteUrl(url), responseHandler);
+		}
 	}
 
-	public void post(Context context, String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
-		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
-		String authToken = settings.getString("authentication_token", "");
-		if(authToken != null) 
-			client.post(context, getAbsoluteUrl(url, authToken), JSONtoStringEntity(data), "application/json", responseHandler);
-		else
-			client.post(context, getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
+	public void post(String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
+		String authToken = null;
+		if(KisiAPI.getInstance().getUser() != null) {
+			authToken = KisiAPI.getInstance().getUser().getAuthentication_token();
+		}
+		if(authToken != null) {
+			client.post(KisiApplication.getApplicationInstance(), getAbsoluteUrl(url, authToken), JSONtoStringEntity(data), "application/json", responseHandler);
+		}
+		else {
+			client.post(KisiApplication.getApplicationInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
+		}
 	}
 	
 	

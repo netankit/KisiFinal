@@ -10,8 +10,6 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.os.Build;
 import android.widget.Toast;
@@ -37,12 +35,9 @@ public class KisiAPI {
 	private static KisiAPI instance;  
 	
 	
-	private Place[] places = new Place[0];
 	private List<OnPlaceChangedListener> registeredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> unregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> newregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
-	
-	private User user;
 
 	private Context context;
 	
@@ -58,13 +53,7 @@ public class KisiAPI {
 	
 	
 	public void login(String login, String password, final LoginCallback callback){
-		//cleaning the auth token before getting a new one 
-		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = settings.edit();
-		editor = settings.edit();
-		editor.remove("authentication_token");
-		editor.commit();
-		
+
 		JSONObject login_data = new JSONObject();
 		JSONObject login_user = new JSONObject();
 		try {
@@ -75,24 +64,13 @@ public class KisiAPI {
 			e1.printStackTrace();
 		}
 
-		KisiRestClient.getInstance().post(context, "users/sign_in", login_user,  new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().post("users/sign_in", login_user,  new JsonHttpResponseHandler() {
 			
 			 public void onSuccess(org.json.JSONObject response) {
-				String authtoken = null; 
-				 try {
-					Editor editor = context.getSharedPreferences("Config", Context.MODE_PRIVATE).edit();
-					authtoken = response.getString("authentication_token");
-					editor.putString("authentication_token", authtoken);
-					
-					Gson gson = new Gson();
-					user = gson.fromJson(response.toString(), User.class);
-					
-					editor.commit();
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-				callback.onLoginSuccess(authtoken);
+				Gson gson = new Gson();
+				User user = gson.fromJson(response.toString(), User.class);
+				DataManager.getInstance().saveUser(user);
+				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
 				return;
 			}
 			
@@ -126,15 +104,7 @@ public class KisiAPI {
 
 	}
 	
-	public void clearCache() {
-		SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = settings.edit();
-		editor = settings.edit();
-		editor.remove("authentication_token");
-		editor.commit();
-		user = null;
-		places = null;
-		
+	public void clearCache() {		
 		DataManager.getInstance().deleteDB();
 	}
 	
@@ -155,15 +125,17 @@ public class KisiAPI {
 	 * @return Array of all Places the user has access to
 	 */
 	public Place[] getPlaces(){
-		return places;
+		return DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 	}
 	
 	public Place getPlaceAt(int index){
+		Place[] places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		if(places != null && index>=0 && index<places.length)
 			return places[index];
 		return null;
 	}
 	public Place getPlaceById(int num){
+		Place[]  places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		for(Place p : places)
 			if(p.getId() == num)
 				return p;
@@ -180,36 +152,27 @@ public class KisiAPI {
 	 * @param listener
 	 */
 	public void updatePlaces(final OnPlaceChangedListener listener) {
-		KisiRestClient.getInstance().get(context, "places",  new JsonHttpResponseHandler() { 
+		if(getUser() == null)
+			return;
+
+		
+		KisiRestClient.getInstance().get("places",  new JsonHttpResponseHandler() { 
 			
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
 				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
 				DataManager.getInstance().savePlaces(pl);
-				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-				listener.onPlaceChanged(places);
-				notifyAllOnPlaceChangedListener();
-				//getting locotors of the places
 				for(Place p: pl) {
-					updateLocators(p);
+					KisiAPI.getInstance().updateLocks(p, listener);
 				}
-				
 			}
 			
 		});
 	}
 	
 	
-	//TODO: security
-	public String getAuthToken() {
-		//SharedPreferences settings = context.getSharedPreferences("Config", Context.MODE_PRIVATE);
-	//	return settings.getString("authentication_token", "" );
-		return user.getAuthentication_token();
-	}
-	
-	
 	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {	
-		KisiRestClient.getInstance().get(context, "places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
+		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
 			
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
@@ -218,7 +181,7 @@ public class KisiAPI {
 					l.setPlace(instance.getPlaceById(l.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocks(locks);
-				listener.onPlaceChanged(places);
+				listener.onPlaceChanged(getPlaces());
 				notifyAllOnPlaceChangedListener();
 			}
 		});		
@@ -272,7 +235,7 @@ public class KisiAPI {
 		}
 		String url = "places/" + String.valueOf(p.getId()) + "/keys";
 		
-		KisiRestClient.getInstance().post(context, url, data, new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().post(url, data, new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONObject data) {
 				try {
@@ -323,7 +286,7 @@ public class KisiAPI {
 		registeredOnPlaceChangedListener.addAll(newregisteredOnPlaceChangedListener);
 		newregisteredOnPlaceChangedListener.clear();
 		for(OnPlaceChangedListener listener : registeredOnPlaceChangedListener)
-			listener.onPlaceChanged(places);
+			listener.onPlaceChanged(getPlaces());
 	}
 	
 	/**
@@ -333,7 +296,7 @@ public class KisiAPI {
 	 * @return true if user is owner, false if someone else shares this place with the user
 	 */
 	public boolean userIsOwner(Place place){
-		return place.getOwnerId()==this.user.getId();
+		return place.getOwnerId()==this.getUser().getId();
 	}
 	
 	/**
@@ -344,38 +307,18 @@ public class KisiAPI {
 	 * @param callback Callback object for feedback, or null if no feedback is requested
 	 */
 	public void unlock(Lock lock, final UnlockCallback callback){
-		
-		// Get Location Data
-        KisiLocationManager locationManager = KisiLocationManager.getInstance();
-		Location currentLocation = locationManager.getCurrentLocation();;
-		JSONObject location = new JSONObject();
+        JSONObject location =  generateJSONLocation();
 		JSONObject data = new JSONObject();
-		
-		// if there is location data available, write them into the request
-		if(currentLocation != null) {
-			try {
-				location.put("latitude", currentLocation.getLatitude());
-				location.put("longitude", currentLocation.getLongitude());
-				data.put("location", location);
-			} catch (JSONException e) {
-			e.printStackTrace();
-			}
+		try {
+			data.put("location", location);
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		// when no location data is available, write 0 as default
-		else {
-			try {
-				location.put("latitude", 0.0);
-				location.put("longitude", 0.0);
-				data.put("location", location);
-			} catch (JSONException e) {
-			e.printStackTrace();
-			}
-			
-		}
-		String url = "places/"+lock.getPlaceId()+"/locks/"+lock.getId()+"/access";
 		
-		// Start request and then wait for success state
-		KisiRestClient.getInstance().post(context, url, data,  new JsonHttpResponseHandler() {
+		String url = String.format("places/%d/locks/%d/access", lock.getPlaceId(), lock.getId());
+		
+		KisiRestClient.getInstance().post(url, data,  new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONObject response) {
 				String message = null;
@@ -441,20 +384,7 @@ public class KisiAPI {
         if (impeeId != null) 
             impeeId = impeeId.trim();
 
-        JSONObject location = new JSONObject();
-        KisiLocationManager locationManager = KisiLocationManager.getInstance();
-		Location currentLocation = locationManager.getCurrentLocation();
-        try {
-    		if(currentLocation != null) {
-    			location.put("latitude", currentLocation.getLatitude());
-    			location.put("longitude", currentLocation.getLongitude());
-    		} else { //send 0.0 if location permission is revoked 
-    			location.put("latitude", 0.0);
-    			location.put("longitude", 0.0);
-    		}
-		} catch (JSONException e1) {
-			e1.printStackTrace();
-		}
+        JSONObject location = generateJSONLocation();
     	JSONObject gateway = new JSONObject();
 		try {
 			gateway.put("name", "Gateway");
@@ -480,8 +410,26 @@ public class KisiAPI {
 		}
 	
 		//TODO: Implement a proper handler
-		KisiRestClient.getInstance().post(context, "gateways", data, new JsonHttpResponseHandler() {});	
+		KisiRestClient.getInstance().post("gateways", data, new JsonHttpResponseHandler() {});	
 		
+	}
+
+	private JSONObject generateJSONLocation() {
+		JSONObject location = new JSONObject();
+		Location currentLocation = GeofenceManager.getInstance().getLocation();
+		try {
+    		if(currentLocation != null) {
+    			location.put("latitude", currentLocation.getLatitude());
+    			location.put("longitude", currentLocation.getLongitude());
+    			location.put("horizontalAccuracy", currentLocation.getAccuracy());
+    			location.put("age", (System.currentTimeMillis() - currentLocation.getTime())/1000.0);
+    		} else { 
+	 			location.put("error:", "Location data not accessible");
+    		}
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+        return location;
 	}
 	
 	

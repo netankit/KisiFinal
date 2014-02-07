@@ -45,7 +45,7 @@
 	<string name="new_user_html">New? <a href="https://www.kisi.de/users/sign_up">Get started on our website</a></string>
 	<string name="forgot_html"><a href="https://www.kisi.de/users/password/new">Forgot your password?</a></string>
 	<string name="missing_login_data">Please type in EMail and Password first</string>
-	<string name="no_network">No network connectivity</string>
+	<string name="no_network">No netavailablework connectivity</string>
 	<string name="login_loading_message">Loggin in...</string>
 	<string name="account_type">de.kisi</string>
 	<string name="add_new_account_done">Account created</string>
@@ -54,4 +54,13 @@
 	<string name="try_again">Try again</string>
 	<string name="close_app">Exit</string>
 	<string name="notification_settings">Notification settings</string>
+	<string name="about">About</string>
+	<string name="version">Version:\t</string>
+	<string name="location_not_available_title">Location services is disabled</string>
+	<string name="location_not_available_text">KISI needs to access your location. Please turn on location access</string>
+	<string name="cancel">Cancel</string>
+	<string name="go_to_setting">Settings</string>
+	<string name="wifi_not_available_title">Location accuracy tips</string>
+	<string name="wifi_not_available_text">You can improve the accuracy of your location by turning on the WiFi</string>
+	<string name="dont_ask_again">Don\'t ask me again</string>
 </resources>
