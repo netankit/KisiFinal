@@ -65,7 +65,8 @@ public class PlaceFragment extends Fragment {
 		index = getArguments().getInt("index");
 		
 		final Place place = KisiAPI.getInstance().getPlaceAt(index);
-		setupButtons(place);
+		if(place != null)
+			setupButtons(place);
 		if(lockToUnlock == null)  {
 		KisiAPI.getInstance().updateLocks(place, new OnPlaceChangedListener() {
 

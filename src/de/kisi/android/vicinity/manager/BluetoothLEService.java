@@ -303,9 +303,14 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
         					// Create Region object
         					int major = locator.getMajor();
         					int minor = locator.getMinor();
-        					Region region = new Region("Place: "+locator.getPlaceId()+" Lock: "+locator.getLockId()+" Locator: "+locator.getId(), "DE9D14A1-1C16-4114-9B68-3B2435C6B99A", major,minor);
-
-        					
+        					Region region = null;
+        					// use default KISI Uuid if the Uuid of the locator is null
+        					if(locator.getUuid() == null  || locator.getUuid() == "") {
+        						region = new Region("Place: "+locator.getPlaceId()+" Lock: "+locator.getLockId()+" Locator: "+locator.getId(), "DE9D14A1-1C16-4114-9B68-3B2435C6B99A", major, minor);
+        					}
+        					else {
+        						region = new Region("Place: "+locator.getPlaceId()+" Lock: "+locator.getLockId()+" Locator: "+locator.getId(), locator.getUuid(), major, minor);
+        					}
         					// Remove those 2 lines when activate ranging again
         					// For now only use monitoring
         					if(locator.isSuggestUnlockEnabled() || locator.isAutoUnlockEnabled())

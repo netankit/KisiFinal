@@ -40,6 +40,7 @@ public class BaseActivity extends FragmentActivity{
 	
 	private void checkForLocationService() {
 		// deprecated in API level 19, but the app should run on android v4.0+
+		@SuppressWarnings("deprecation")
 		String locationProviders = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 		if(!locationProviders.contains("gps") || !locationProviders.contains("network")) {
 		  // Build the alert dialog

@@ -79,6 +79,17 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		}
 	}
 	
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+
+		if(intent.hasExtra("Type")) {
+			handleUnlockIntent(intent);
+		}
+	}
+
+	
 	private void buildUI() { 
 		Place[] places;
 		if((places = kisiAPI.getPlaces()) != null) {

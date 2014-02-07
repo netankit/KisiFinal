@@ -32,12 +32,12 @@ public class Locator {
 	
 	@DatabaseField
 	@SerializedName("suggest_unlock_treshold")
-	private double suggestUnlockTreshold;
+	private Double suggestUnlockTreshold;
 	
 	
 	@DatabaseField
 	@SerializedName("auto_unlock_treshold")
-	private double autoUnlockTreshold;
+	private Double autoUnlockTreshold;
 	
 	@DatabaseField
 	private double latitude;
@@ -50,7 +50,7 @@ public class Locator {
 	private boolean autoUnlockEnabled;
 	
 	@DatabaseField
-	private String udid;
+	private String uuid;
 	
 	@DatabaseField
 	private int major;
@@ -130,11 +130,11 @@ public class Locator {
 		this.suggestUnlockEnabled = suggestUnlockEnabled;
 	}
 
-	public double getSuggestUnlockTreshold() {
+	public Double getSuggestUnlockTreshold() {
 		return suggestUnlockTreshold;
 	}
 
-	public void setSuggestUnlockTreshold(double suggestUnlockTreshold) {
+	public void setSuggestUnlockTreshold(Double suggestUnlockTreshold) {
 		this.suggestUnlockTreshold = suggestUnlockTreshold;
 	}
 
@@ -142,7 +142,7 @@ public class Locator {
 		return autoUnlockTreshold;
 	}
 
-	public void setAutoUnlockTreshold(double autoUnlockTreshold) {
+	public void setAutoUnlockTreshold(Double autoUnlockTreshold) {
 		this.autoUnlockTreshold = autoUnlockTreshold;
 	}
 
@@ -170,12 +170,12 @@ public class Locator {
 		this.autoUnlockEnabled = autoUnlockEnabled;
 	}
 
-	public String getUdid() {
-		return udid;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setUdid(String udid) {
-		this.udid = udid;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public int getMajor() {

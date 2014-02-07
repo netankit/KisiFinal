@@ -12,6 +12,7 @@ import de.kisi.android.KisiApplication;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import de.kisi.android.model.User;
 
 public class DataManager {
 
@@ -27,6 +28,7 @@ public class DataManager {
     private Dao<Lock, Integer> lockDao;
     private Dao<Place, Integer> placeDao;
     private Dao<Locator, Integer> locatorDao;
+    private Dao<User, Integer> userDao;
     private DatabaseManager dbManager;
  
     private DataManager(Context context)
@@ -36,6 +38,7 @@ public class DataManager {
             db = dbManager.getHelper(context);
             lockDao = db.getLockDao();
             placeDao = db.getPlaceDao();
+            userDao = db.getUserDao();
             locatorDao = db.getLocatorDao();
         }catch (SQLException e) {
             e.printStackTrace();
@@ -82,6 +85,16 @@ public class DataManager {
 		}
     }
     
+    public void saveUser(User user) {
+    	try {
+			userDao.createOrUpdate(user);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    
     
     public void saveLocators(final Locator[] locators) {
     	try {
@@ -122,6 +135,22 @@ public class DataManager {
 			e.printStackTrace();
 		}
     	return result;
+    }
+    
+    
+    public User getUser() {
+    	List<User> result = null;
+    	try {
+    		result =  userDao.queryForAll();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	if(result == null||result.size() == 0) {
+    		return null;
+    	}
+    	else{
+    		return result.get(0);
+    	}
     }
     
     

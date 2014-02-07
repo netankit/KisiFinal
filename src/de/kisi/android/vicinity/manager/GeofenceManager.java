@@ -64,6 +64,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	private GeofenceManager(){
 		mContext = KisiApplication.getApplicationInstance();
 		mLocationClient = new LocationClient(mContext, this, this);
+		mLocationClient.connect();
 	}
 
 	/**

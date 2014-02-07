@@ -26,6 +26,7 @@ import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
 import de.kisi.android.rest.KisiRestClient;
+import de.kisi.android.vicinity.manager.GeofenceManager;
 
 import com.google.gson.Gson;
 
@@ -134,6 +135,7 @@ public class KisiAPI {
 			return places[index];
 		return null;
 	}
+	
 	public Place getPlaceById(int num){
 		Place[]  places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		for(Place p : places)
@@ -144,7 +146,7 @@ public class KisiAPI {
 	
 	
 	public User getUser() {
-		return user;
+		return 	DataManager.getInstance().getUser();
 	}
 
 	/**
@@ -162,9 +164,15 @@ public class KisiAPI {
 				Gson gson = new Gson();
 				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
 				DataManager.getInstance().savePlaces(pl);
+				//update locks for places
 				for(Place p: pl) {
 					KisiAPI.getInstance().updateLocks(p, listener);
 				}
+				//update locators for places
+				for(Place p: pl) {
+					KisiAPI.getInstance().updateLocators(p);
+				}
+				
 			}
 			
 		});
@@ -200,7 +208,7 @@ public class KisiAPI {
 	
 	
 	public void updateLocators(final Place place) {
-		KisiRestClient.getInstance().get(context, "places/" + String.valueOf(place.getId()) + "/locators", new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locators", new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();

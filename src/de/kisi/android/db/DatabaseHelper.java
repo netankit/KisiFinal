@@ -15,6 +15,7 @@ import com.j256.ormlite.table.TableUtils;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import de.kisi.android.model.User;
 
 /**
  * Database helper class used to manage the creation and upgrading of your database. This class also usually provides
@@ -25,7 +26,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	// name of the database file for your application -- change to something appropriate for your app
 	private static final String DATABASE_NAME = "Kisi.db";
 	// any time you make changes to your database objects, you may have to increase the database version
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 3;
 
 	// the DAO object we use to access the Lock table;
 
@@ -34,6 +35,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	
     private Dao<Place, Integer> placeDao = null;
     private RuntimeExceptionDao<Place, Integer> placeRuntimeDao = null;
+    
+    private Dao<User, Integer> userDao = null;
+    private RuntimeExceptionDao<User, Integer> userRuntimeDao = null;
 
     private Dao<Locator, Integer> locatorDao = null;
     private RuntimeExceptionDao<Locator, Integer> locatorRuntimeDao = null;
@@ -53,6 +57,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			Log.i(DatabaseHelper.class.getName(), "onCreate");
 			TableUtils.createTable(connectionSource, Place.class);
 			TableUtils.createTable(connectionSource, Lock.class);
+			TableUtils.createTable(connectionSource, User.class);
 			TableUtils.createTable(connectionSource, Locator.class);
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
@@ -67,6 +72,20 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
+		try {
+			// Added in version 2 the user table
+			if (oldVersion < 2) {
+				TableUtils.createTable(connectionSource, User.class);
+			}
+			// Added in version 3 the locator table
+			//TODO: update the place and user model, because the they have now a field with the locator
+			if (oldVersion < 3) {
+				TableUtils.createTable(connectionSource, Locator.class);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -113,6 +132,32 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		return placeRuntimeDao;
 	}
 	
+
+	/**
+	 * Returns the Database Access Object (DAO) for our Place class. It will create it or just give the cached
+	 * value.
+	 */
+	public Dao<User, Integer> getUserDao() throws SQLException {
+		if (userDao == null) {
+			userDao = getDao(User.class);
+		}
+		return userDao;
+	}
+
+	/**
+	 * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our Place class. It will
+	 * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
+	 */
+	public RuntimeExceptionDao<User, Integer> getUserDataDao() {
+		if (userRuntimeDao == null) {
+			userRuntimeDao = getRuntimeExceptionDao(User.class);
+		}
+		return userRuntimeDao;
+	}
+
+	
+	
+	
 	
 	/**
 	 * Returns the Database Access Object (DAO) for our Locator class. It will create it or just give the cached
@@ -142,6 +187,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		try {
 			TableUtils.clearTable(connectionSource, Place.class);
 			TableUtils.clearTable(connectionSource, Lock.class);
+			TableUtils.clearTable(connectionSource, User.class);
 			TableUtils.clearTable(connectionSource, Locator.class);
 		} catch (SQLException e) {
 			e.printStackTrace();
