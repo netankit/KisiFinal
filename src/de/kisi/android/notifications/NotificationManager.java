@@ -13,7 +13,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 import de.kisi.android.KisiMain;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;

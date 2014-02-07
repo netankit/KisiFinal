@@ -70,6 +70,13 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	protected void onStart() {
 		super.onStart();
 		buildUI();
+		
+		//receives intents when activity is started by an intent
+		if(getIntent().hasExtra("Type")) {
+			handleUnlockIntent(getIntent());
+			//removing the unlock intent, because otherwise the lock would be unlock every time the app is start from the background
+			getIntent().removeExtra("Type");
+		}
 	}
 	
 	private void buildUI() { 
@@ -101,24 +108,9 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	}
 
 	
-	//receives intents when activity is already running
-	@Override
-	protected void onNewIntent(Intent intent) {
-		super.onNewIntent(intent);
-
-		if(intent.hasExtra("Type")) {
-			handleUnlockIntent(intent);
-		}
-	}
-
-	//receives intents when activity is started by an intent
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		if(getIntent().hasExtra("Type")) {
-			handleUnlockIntent(getIntent());
-		}
 	}
 
 	@Override

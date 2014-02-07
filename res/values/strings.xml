@@ -60,6 +60,7 @@
 	<string name="location_not_available_text">KISI needs to access your location. Please turn on location access</string>
 	<string name="cancel">Cancel</string>
 	<string name="go_to_setting">Settings</string>
-	<string name="wifi_not_available">You can improve the accuracy of your location by turning on the WiFi</string>
+	<string name="wifi_not_available_title">Location accuracy tips</string>
+	<string name="wifi_not_available_text">You can improve the accuracy of your location by turning on the WiFi</string>
 	<string name="dont_ask_again">Don\'t ask me again</string>
 </resources>

@@ -1,12 +1,10 @@
 package com.electricimp.blinkup;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -19,37 +17,13 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class WifiSelectActivity extends Activity {
-    private String setupToken;
-    private String planID;
-    private String apiKey;
-
-    private BlinkupController blinkup;
-
+public class WifiSelectActivity extends BaseWifiSelectActivity {
     private ListView networkListView;
-
-    private List<NetworkItem> networkListStrings;
-    private ArrayList<String> savedNetworks;
-    private String preferenceFile;
-
-    static final String SAVED_PASSWORD_PREFIX = "eimp:w:";
-    static final String SAVED_NETWORKS_SETTING = "eimp:savedNetworks";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.__bu_wifi_select);
-
-        blinkup = BlinkupController.getInstance();
-
-        Bundle bundle = getIntent().getExtras();
-
-        savedNetworks = new ArrayList<String>();
-
-        setupToken = bundle.getString("setupToken");
-        planID = bundle.getString("planID");
-        apiKey = bundle.getString("apiKey");
-        preferenceFile = bundle.getString("preferenceFile");
 
         BlinkupController blinkup = BlinkupController.getInstance();
 
@@ -64,6 +38,8 @@ public class WifiSelectActivity extends Activity {
                 R.id.__bu_wifi_select_header);
         BlinkupController.setText(headerText, blinkup.stringIdChooseWiFiNetwork,
                 R.string.__bu_choose_wifi_network);
+
+        addFooter(networkListView, R.string.__bu_logged_in_as, R.dimen.__bu_padding);
 
         networkListStrings = new ArrayList<NetworkItem>();
         networkListView.setAdapter(new ArrayAdapter<NetworkItem>(this,
@@ -131,6 +107,7 @@ public class WifiSelectActivity extends Activity {
                     .add(new NetworkItem(NetworkItem.Type.NETWORK, s));
         }
 
+        BlinkupController blinkup = BlinkupController.getInstance();
         String changeNetwork = (blinkup.stringIdChangeNetwork != null) ?
                 blinkup.stringIdChangeNetwork :
                 getString(R.string.__bu_change_network);
@@ -151,72 +128,5 @@ public class WifiSelectActivity extends Activity {
 
         networkListView.invalidateViews();
         super.onResume();
-    }
-
-    @Override
-    protected void onActivityResult(
-            int requestCode, int resultCode, Intent data) {
-        if (resultCode != RESULT_OK) {
-            return;
-        }
-        if (requestCode == BlinkupController.WIFI_REQUEST_CODE ||
-            requestCode == BlinkupController.WPS_REQUEST_CODE) {
-            if (blinkup.intentBlinkupComplete != null) {
-                setResult(RESULT_OK);
-                finish();
-            }
-        }
-        if (requestCode == BlinkupController.CLEAR_REQUEST_CODE) {
-           if (blinkup.intentClearComplete != null) {
-               setResult(RESULT_OK);
-               finish();
-           }
-        }
-    }
-
-    private void sendWirelessConfiguration(String ssid) {
-        Intent intent = new Intent();
-        intent.putExtra("token", setupToken);
-        if (ssid != null) {
-            intent.putExtra("ssid", ssid);
-        }
-        intent.putExtra("siteid", planID);
-        intent.putExtra("apiKey", apiKey);
-
-        intent.putStringArrayListExtra("savedNetworks", savedNetworks);
-        intent.putExtra("preferenceFile", preferenceFile);
-        intent.setClass(this, WifiActivity.class);
-        startActivityForResult(intent, BlinkupController.WIFI_REQUEST_CODE);
-    }
-
-    private void connectUsingWPS() {
-        Intent myIntent = new Intent();
-        myIntent.putExtra("token", setupToken);
-        myIntent.putExtra("siteid", planID);
-        myIntent.putExtra("apiKey", apiKey);
-
-        myIntent.setClass(this, WPSActivity.class);
-        startActivityForResult(myIntent, BlinkupController.WPS_REQUEST_CODE);
-    }
-
-    private static class NetworkItem {
-        public enum Type {
-            NETWORK,
-            CHANGE_NETWORK,
-            CONNECT_USING_WPS,
-            CLEAR
-        }
-
-        public Type type;
-        public String label;
-
-        public NetworkItem(Type type, String label) {
-            this.type = type;
-            this.label = label;
-        }
-
-        public String toString() {
-            return label;
-        }
     }
 }

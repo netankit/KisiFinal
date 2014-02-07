@@ -14,6 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 
+
+// base activity for the main activity 
+// by extending this class the activity always checks if the location and the wifi is available  when it getting started
 public class BaseActivity extends FragmentActivity{
 	
 	private Dialog mLocationAlertDialog;
@@ -79,8 +82,8 @@ public class BaseActivity extends FragmentActivity{
 	        final CheckBox dontShowAgain = (CheckBox) wifiLayout.findViewById(R.id.skip);
 			
 	        builder.setView(wifiLayout);
-	        builder.setTitle(R.string.location_not_available_title);
-			builder.setMessage(R.string.wifi_not_available);
+	        builder.setTitle(R.string.wifi_not_available_title);
+			builder.setMessage(R.string.wifi_not_available_text);
 			builder.setPositiveButton(R.string.go_to_setting, new DialogInterface.OnClickListener() {
 				
 						@Override
