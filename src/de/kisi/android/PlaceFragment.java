@@ -91,6 +91,10 @@ public class PlaceFragment extends Fragment {
 	
 	private void setupButtons(final Place place) {
 		
+		//check if fragment is attached
+		if(mActivity == null) {
+			return;
+		}
 		Drawable lockIcon = mActivity.getResources().getDrawable(R.drawable.kisi_lock);
 		
 		Typeface font = Typeface.createFromAsset(mActivity.getApplicationContext().getAssets(), "Roboto-Light.ttf");

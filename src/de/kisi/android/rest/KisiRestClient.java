@@ -69,6 +69,11 @@ public class KisiRestClient {
 		}
 	}
 	
+	//workaround method so that the login call is done without the authtoken and so renews the old authtoken
+	public void postWithoutAuthToken (String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
+		client.post(KisiApplication.getApplicationInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
+	}
+	
 	
 	public  void delete(String url, AsyncHttpResponseHandler responseHandler) {
 		client.delete(getAbsoluteUrl(url),  responseHandler);
