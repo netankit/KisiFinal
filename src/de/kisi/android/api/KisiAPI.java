@@ -65,7 +65,7 @@ public class KisiAPI {
 			e1.printStackTrace();
 		}
 
-		KisiRestClient.getInstance().post("users/sign_in", login_user,  new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", login_user,  new JsonHttpResponseHandler() {
 			
 			 public void onSuccess(org.json.JSONObject response) {
 				Gson gson = new Gson();
