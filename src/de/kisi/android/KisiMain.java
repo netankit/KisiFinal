@@ -107,6 +107,16 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		popup.show();
 	}
 
+	//receives intents when activity is already running
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+
+		if (intent.hasExtra("Type")) {
+			handleUnlockIntent(intent);
+		}
+	}
+	
 	
 	@Override
 	protected void onResume() {

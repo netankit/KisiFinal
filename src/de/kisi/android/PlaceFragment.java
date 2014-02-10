@@ -99,7 +99,7 @@ public class PlaceFragment extends Fragment {
 		
 		Typeface font = Typeface.createFromAsset(mActivity.getApplicationContext().getAssets(), "Roboto-Light.ttf");
 		//Getting px form Scale-independent Pixels
-		Resources r = getResources();
+		Resources r = mActivity.getResources();
 		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 350, r.getDisplayMetrics());
 		int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 85, r.getDisplayMetrics());
 		int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15, r.getDisplayMetrics());
