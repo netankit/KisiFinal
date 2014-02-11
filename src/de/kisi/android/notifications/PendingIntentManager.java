@@ -41,9 +41,9 @@ public class PendingIntentManager {
 	}
 	
 	public PendingIntent getPendingIntentForLock(Integer placeId, Integer lockId){
-		if(!usedLocks.containsKey(placeId))
-			usedLocks.put(placeId, index ++);
-		return createPendingIntent(placeId,lockId,usedLocks.get(placeId));
+		if(!usedLocks.containsKey(lockId))
+			usedLocks.put(lockId, index ++);
+		return createPendingIntent(placeId,lockId,usedLocks.get(lockId));
 	}
 	
 	

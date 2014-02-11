@@ -57,13 +57,10 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 				R.layout.window_title);
 
-
 		FragmentManager fm = getSupportFragmentManager();
 		pagerAdapter = new PlaceFragmentPagerAdapter(fm);
 		pager = (ViewPager) findViewById(R.id.pager);
-		
-		//ask the user to turn on the location service and the wifi
-
+	
 	}
 
 	@Override
@@ -79,7 +76,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		}
 	}
 	
-	
+	//receives intents when activity is already running
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);

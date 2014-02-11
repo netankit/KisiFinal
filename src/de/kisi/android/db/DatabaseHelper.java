@@ -78,7 +78,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 				TableUtils.createTable(connectionSource, User.class);
 			}
 			// Added in version 3 the locator table
-			//TODO: update the place and user model, because the they have now a field with the locator
 			if (oldVersion < 3) {
 				TableUtils.createTable(connectionSource, Locator.class);
 			}

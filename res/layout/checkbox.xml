@@ -3,14 +3,28 @@
     android:id="@+id/layout_root"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="10dp" >
 
     <CheckBox
-        android:id="@+id/skip"
+        android:id="@+id/location_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/dont_ask_again" >
+        android:checked="true"
+        android:text="@string/location" />
 
-    </CheckBox>
+    <CheckBox
+        android:id="@+id/wifi_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/wifi" />
+
+    <CheckBox
+        android:id="@+id/bluetooth_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/bluetooth" />
+
 </LinearLayout>

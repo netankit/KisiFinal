@@ -46,6 +46,7 @@ public class BluetoothLEManager {
 	private Context context;
 	private Intent bluetoothServiceIntent;
 	private ShutDownThread shutDownThread;
+	private boolean bleRunning = false;
 	private BluetoothLEManager(){
 		context = KisiApplication.getApplicationInstance();
 		// BLE Feature is available since Android 4.3, do nothing for lower versions
@@ -68,6 +69,8 @@ public class BluetoothLEManager {
 				context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
 			bluetoothServiceIntent.putExtra("foreground", runInForegroundMode);
 			context.startService(bluetoothServiceIntent);
+			KisiWifiManager.getInstance().turnOffWifi();
+			bleRunning = true;
 		}
 		resetShutDownTime();
 	}
@@ -79,6 +82,8 @@ public class BluetoothLEManager {
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
 				context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
 			context.stopService(bluetoothServiceIntent);
+			KisiWifiManager.getInstance().turnOnWifi();
+			bleRunning = false;
 		}
 	}
 	public void resetShutDownTime(){
@@ -90,5 +95,9 @@ public class BluetoothLEManager {
 			shutDownThread = new ShutDownThread();
 			shutDownThread.start();
 		}
+	}
+	
+	public boolean getServiceStatus() {
+		return bleRunning;
 	}
 }
