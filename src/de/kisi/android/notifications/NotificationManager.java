@@ -129,12 +129,22 @@ public class NotificationManager extends BroadcastReceiver {
 			contentView.setTextViewText(R.id.bleInfo, "Bluetooth LE running");
 			
 		contentView.removeAllViews(R.id.widget2);
+		int buttonCount = 0;
 		for(Lock lock : place.getLocks()){
+			// do not display more than 5 lock button, because otherwise each button is too small
+			// just show then three dots
+			if(buttonCount >= 5) {
+				RemoteViews textView;
+				textView = new RemoteViews(context.getPackageName(), R.layout.notifcation_text);
+				contentView.addView(R.id.widget2, textView);
+				break;
+			}
 			RemoteViews button;
 			button = new RemoteViews(context.getPackageName(), R.layout.notification_item);
 			button.setTextViewText(R.id.unlockButton, lock.getName());
 			button.setOnClickPendingIntent(R.id.unlockButton, PendingIntentManager.getInstance().getPendingIntentForLock(place.getId(),lock.getId()));
 			contentView.addView(R.id.widget2, button);
+			buttonCount++;
 		}
 		Notification notification = nb.build();
 		notification.bigContentView = contentView;
