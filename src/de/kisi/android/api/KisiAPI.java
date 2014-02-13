@@ -27,6 +27,7 @@ import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
 import de.kisi.android.rest.KisiRestClient;
 import de.kisi.android.vicinity.LockInVicinityDisplayManager;
+import de.kisi.android.vicinity.manager.BluetoothLEManager;
 import de.kisi.android.vicinity.manager.GeofenceManager;
 
 import com.google.gson.Gson;
@@ -114,6 +115,7 @@ public class KisiAPI {
 	public void logout(){
 		KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
 		clearCache();
+		BluetoothLEManager.getInstance().stopService();
 		LockInVicinityDisplayManager.getInstance().update();
 		KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
 			public void onSuccess(String msg) {

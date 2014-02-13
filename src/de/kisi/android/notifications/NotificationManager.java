@@ -91,7 +91,7 @@ public class NotificationManager extends BroadcastReceiver {
 		NotificationInformation info = getBLENotification();
 		Context context = getDefaultContext();
 		if(info != null && info.type == NotificationInformation.Type.BLEOnly){
-			info.notification = getExpandedNotification(place, true, context);
+			info.notification = getExpandedNotification(place, info, context);
 			info.type = Type.Place;
 			info.typeId = place.getId();
 			info.object = place;
@@ -109,11 +109,12 @@ public class NotificationManager extends BroadcastReceiver {
 	}
 	
 	private static Notification getExpandedNotification(Place place){
-		return getExpandedNotification(place, false, getDefaultContext()); 
+		NotificationInformation info = new NotificationInformation();
+		return getExpandedNotification(place, info, getDefaultContext()); 
 	}
 	
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	private static Notification getExpandedNotification(Place place, boolean isForBLE, Context context){
+	private static Notification getExpandedNotification(Place place, NotificationInformation info, Context context){
 		NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
 		nb.setSmallIcon(R.drawable.notification_icon);
 		nb.setContentTitle("KISI");
@@ -122,12 +123,24 @@ public class NotificationManager extends BroadcastReceiver {
 	    nb.setOnlyAlertOnce(true);
 		nb.setWhen(0);
 		nb.setOngoing(true);
+		//get send to the place by clicking on the notification
+		nb.setContentIntent(PendingIntentManager.getInstance().getPendingIntentForPlace(place.getId()));
 		//nb.setContentIntent(getPendingIntent(place.getId(),0));
 		RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_view);
 		contentView.setTextViewText(R.id.place, place.getName());
-		if(isForBLE)
+		if(info.containsBLE){			
 			contentView.setTextViewText(R.id.bleInfo, "Bluetooth LE running");
-			
+		}
+		else {
+			contentView.setTextViewText(R.id.bleInfo, "");
+		}
+		
+		if(info.BLEButton) {
+			RemoteViews bluetoothButton =  new RemoteViews(context.getPackageName(), R.layout.notification_bluetooth_button);
+			bluetoothButton.setOnClickPendingIntent(R.id.bluetoothButton, PendingIntentManager.getInstance().getPendingIntentForBluetooth());
+			contentView.addView(R.id.old_notification, bluetoothButton);
+		}
+		
 		contentView.removeAllViews(R.id.widget2);
 		int buttonCount = 0;
 		for(Lock lock : place.getLocks()){
@@ -202,11 +215,20 @@ public class NotificationManager extends BroadcastReceiver {
 			// Do nothing
 			return bleNotification;
 		}else{
+			// check if there is already a notification with a BLE Button  and use this one then
+			bleNotification = getBLEButtonNotification();
+			if(bleNotification != null) {
+				bleNotification.containsBLE = true;
+			}
 			//There is no Notification yet
-			bleNotification = getNotificationForBLE(context);
-			bleNotification.containsBLE = true;
-			if(bleNotification.type == NotificationInformation.Type.Place)
-				bleNotification.notification = getExpandedNotification((Place)bleNotification.object,true,context);
+			else {
+				bleNotification = getNotificationForBLE(context);
+			}
+			if(bleNotification.type == NotificationInformation.Type.Place) {
+				bleNotification.notification = getExpandedNotification((Place)bleNotification.object, bleNotification,context);
+				android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);	
+				mNotificationManager.notify(bleNotification.notificationId, bleNotification.notification);
+			}
 			return bleNotification;
 		}
 
@@ -215,17 +237,18 @@ public class NotificationManager extends BroadcastReceiver {
 	public static void notifyBLEServiceNotificationDeleted() {
 		NotificationInformation bleNotification = getBLENotification();
 		if(bleNotification != null){
-			android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);
-			if(bleNotification.type == Type.BLEOnly){
+			android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);	
+			bleNotification.containsBLE = false;
+			if(bleNotification.type == Type.BLEOnly && !bleNotification.BLEButton){
 				mNotificationManager.cancel(bleNotification.notificationId);
-			}else if(bleNotification.type == Type.Place){
-				bleNotification.notification = getExpandedNotification((Place)bleNotification.object);
+			}
+			else {
+				bleNotification.notification = getExpandedNotification((Place) bleNotification.object, bleNotification, getDefaultContext());
 				mNotificationManager.notify(bleNotification.notificationId, bleNotification.notification);
 			}
-			bleNotification.containsBLE = false;
 		}
 	}
-
+	
 
 	/**
 	 * There is at most one notification that contains information
@@ -236,6 +259,62 @@ public class NotificationManager extends BroadcastReceiver {
 	public static NotificationInformation getBLENotification(){
 		for(NotificationInformation info : notifications)
 			if(info.containsBLE)
+				return info;
+		return null;
+	}
+	
+	
+	public static NotificationInformation getOrCreateBLEButtonNotification(Context context){
+		NotificationInformation bleButtonNotification = getBLEButtonNotification();
+		if(bleButtonNotification != null){
+			// if BLE Button is already in a Notification
+			// Do nothing
+			return bleButtonNotification;
+		}else{
+			// check if there is already a notification with BLE running and use this one then
+			bleButtonNotification = getBLENotification();
+			if(bleButtonNotification !=null) {
+				bleButtonNotification.BLEButton = true;
+				return bleButtonNotification;
+			}
+			//There is no Notification yet
+			else {
+				bleButtonNotification = getNotificationForBLEButton(context);			
+			}
+			if(bleButtonNotification.type == NotificationInformation.Type.Place)
+				bleButtonNotification.notification = getExpandedNotification((Place)bleButtonNotification.object,bleButtonNotification,context);
+			return bleButtonNotification;
+		}
+	}
+	
+	public static void notifyBLEButtonNotificationDeleted() {
+		NotificationInformation bleButtonNotification = getBLEButtonNotification();
+		if(bleButtonNotification != null){
+			android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);
+			bleButtonNotification.BLEButton = false;
+			if(bleButtonNotification.type == Type.BLEOnly){
+				mNotificationManager.cancel(bleButtonNotification.notificationId);
+			}
+			else {
+				bleButtonNotification.notification = getExpandedNotification((Place) bleButtonNotification.object, bleButtonNotification, getDefaultContext());
+				mNotificationManager.notify(bleButtonNotification.notificationId, bleButtonNotification.notification);
+			}
+		}
+	}
+	
+	
+	
+	
+	/**
+	 * There is at most one notification that contains a button 
+	 * to turn on/off BLE. If this notification exists 
+	 * this will be returned, otherwise it returns null
+	 * @return Notification with BLE Button information, null if no such Notification exists
+	 */
+	
+	public static NotificationInformation getBLEButtonNotification() {
+		for (NotificationInformation info : notifications)
+			if (info.BLEButton)
 				return info;
 		return null;
 	}
@@ -312,6 +391,48 @@ public class NotificationManager extends BroadcastReceiver {
 		notifications.add(info);
 		return info;
 	}
+	
+	/**
+	 * Try to find a Notification that can include a Button to turn
+	 * on/off BLE. So far only Place Notifications can contain a BLE Button 
+	 * information.
+	 *  
+	 * @param context Context is needed for building the Notification
+	 * @return Returns a valid Notification object that contains a Notification that can be used
+	 */
+	public static NotificationInformation getNotificationForBLEButton(Context context){
+		for(NotificationInformation info : notifications){
+			if(info.type == Type.Place)
+				return info;
+		}
+		
+		NotificationInformation info = new NotificationInformation();
+
+		NotificationCompat.Builder nb = new NotificationCompat.Builder(context);	
+		nb.setSmallIcon(R.drawable.notification_icon);
+		nb.setContentTitle("KISI");
+	    nb.setDefaults(Notification.DEFAULT_ALL);
+	    nb.setOnlyAlertOnce(true);
+		nb.setWhen(0);
+		nb.setOngoing(true);
+		
+		//nb.setContentIntent(getPendingIntent(place.getId(),0));
+		RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_view);
+		if(info.BLEButton) {
+			RemoteViews bluetoothButton =  new RemoteViews(context.getPackageName(), R.layout.notification_bluetooth_button);
+			bluetoothButton.setOnClickPendingIntent(R.id.bluetoothButton, PendingIntentManager.getInstance().getPendingIntentForBluetooth());
+			contentView.addView(R.id.old_notification, bluetoothButton);
+		}
+		info.notification = nb.build();
+		info.notification.bigContentView = contentView;
+		info.notification.contentView =  contentView;
+		info.type = Type.BLEOnly;
+		info.BLEButton = true;
+		notifications.add(info);
+		return info;
+	}
+	
+	
 	
 	/**
 	 * Returns a new unused NotificationId

@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.KisiMain;
+import de.kisi.android.vicinity.manager.BluetoothLEManager;
 // TODO: Use this Manager also for the Widgets
 /**
  * This Manager manages the pending Intents,
@@ -30,6 +31,9 @@ public class PendingIntentManager {
 	private Hashtable<Integer,Integer> usedPlaces = new Hashtable<Integer,Integer>();
 	private Hashtable<Integer,Integer> usedLocks = new Hashtable<Integer,Integer>();
 	
+	//index for the bluetooth intent
+	private int bluetoothIntent = -1;
+	
 	// private constructor for singleton instance
 	private PendingIntentManager(){
 	}
@@ -46,6 +50,14 @@ public class PendingIntentManager {
 		return createPendingIntent(placeId,lockId,usedLocks.get(lockId));
 	}
 	
+	public PendingIntent getPendingIntentForBluetooth() {
+		if(bluetoothIntent == -1) {
+			bluetoothIntent = index++;
+		}
+		Intent intent = new Intent(BluetoothLEManager.BLUETOOTH_INTENT);
+		return PendingIntent.getBroadcast(KisiApplication.getApplicationInstance(), bluetoothIntent, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	}
+	
 	
 	private PendingIntent createPendingIntent(Integer placeId, Integer lockId, int pendingIntentId){
 		Intent intent = new Intent(KisiApplication.getApplicationInstance(), KisiMain.class);
@@ -55,4 +67,5 @@ public class PendingIntentManager {
 		intent.putExtra("Lock", lockId);
 		return PendingIntent.getActivity(KisiApplication.getApplicationInstance(), pendingIntentId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
+
 }

@@ -107,6 +107,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         mLocationRequest.setInterval(15000);
         // Set the fastest update interval to 1 second
         mLocationRequest.setFastestInterval(1000);
+        mLocation = mLocationClient.getLastLocation();
         mLocationClient.requestLocationUpdates(mLocationRequest, new LocationListener() {
 
 			@Override
@@ -178,7 +179,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
         		// Create the Geofence
         		fences.add(new Geofence.Builder()
         		.setRequestId("Place: "+p.getId())
-        		.setCircularRegion(p.getLatitude(), p.getLongitude(), GEOFENCE_RADIUS) // radius 75 meter
+        		.setCircularRegion(p.getLatitude(), p.getLongitude(), GEOFENCE_RADIUS) 
         		.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT|Geofence.GEOFENCE_TRANSITION_ENTER)
         		.setExpirationDuration(Geofence.NEVER_EXPIRE) //infinite  
         		.build());

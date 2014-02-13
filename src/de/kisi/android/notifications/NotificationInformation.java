@@ -19,8 +19,8 @@ public class NotificationInformation {
 	public int typeId;
 	public Object object;
 	public boolean containsBLE = false;
+	public boolean BLEButton = false;
 	public boolean valid = true;
-	
 	// Only allow the NotificatioManager to create instances
 	protected NotificationInformation(){
 	}

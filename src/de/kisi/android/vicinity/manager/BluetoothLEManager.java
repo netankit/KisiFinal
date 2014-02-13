@@ -1,11 +1,13 @@
 package de.kisi.android.vicinity.manager;
 
 import de.kisi.android.KisiApplication;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 
-public class BluetoothLEManager {
+public class BluetoothLEManager  extends BroadcastReceiver {
 
 	/**
 	 * This Thread is responsible for shutting down the
@@ -47,8 +49,13 @@ public class BluetoothLEManager {
 	private Intent bluetoothServiceIntent;
 	private ShutDownThread shutDownThread;
 	private boolean bleRunning = false;
+	
+	public static String BLUETOOTH_INTENT = "de.kisi.android.BLUETOOTH_INTENT";
+	
 	private BluetoothLEManager(){
 		context = KisiApplication.getApplicationInstance();
+		//register as a lister to receive broadcasts to start and stop the BLE service
+		context.registerReceiver(this, new IntentFilter(BLUETOOTH_INTENT));
 		// BLE Feature is available since Android 4.3, do nothing for lower versions
 		// Also BLE hardware is not in all Android 4.3 and higher phones available
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
@@ -99,5 +106,14 @@ public class BluetoothLEManager {
 	
 	public boolean getServiceStatus() {
 		return bleRunning;
+	}
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		if(bleRunning)
+			stopService();
+		else
+			startService(true);
+		
 	}
 }
