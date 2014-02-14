@@ -64,35 +64,35 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
 		placeLocation.setLongitude(place.getLongitude());
 		if(currentLocation != null) {
 			if(currentLocation.getAccuracy() >= 100.0f) {
-				NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-						KisiApplication.getApplicationInstance())
-						.setSmallIcon(R.drawable.notification_icon)
-						.setContentTitle("Geofence error. Place: " + place.getName())
-						.setContentText(
-								"The  inaccuracy is too large to triger geofence: Accuracy:  "
-										+ currentLocation.getAccuracy());
-				NotificationManager mNotificationManager = (NotificationManager) KisiApplication
-						.getApplicationInstance().getSystemService(
-								Context.NOTIFICATION_SERVICE);
-
-				mNotificationManager.notify(place.getId(), mBuilder.build());
+//				NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+//						KisiApplication.getApplicationInstance())
+//						.setSmallIcon(R.drawable.notification_icon)
+//						.setContentTitle("Geofence error. Place: " + place.getName())
+//						.setContentText(
+//								"The  inaccuracy is too large to triger geofence: Accuracy:  "
+//										+ currentLocation.getAccuracy());
+//				NotificationManager mNotificationManager = (NotificationManager) KisiApplication
+//						.getApplicationInstance().getSystemService(
+//								Context.NOTIFICATION_SERVICE);
+//
+//				mNotificationManager.notify(place.getId(), mBuilder.build());
 				return false;
 			} else if((currentLocation.distanceTo(placeLocation) - currentLocation.getAccuracy()) >= 2.0*GeofenceManager.GEOFENCE_RADIUS) {
-				NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-						KisiApplication.getApplicationInstance())
-						.setSmallIcon(R.drawable.notification_icon)
-						.setContentTitle("Geofence error. Place: " + place.getName())
-						.setContentText(
-								"The current location is too far away from the geofence: Distance : "
-										+ currentLocation
-												.distanceTo(placeLocation)
-										+ " Accuracy : "
-										+ currentLocation.getAccuracy());
-				NotificationManager mNotificationManager = (NotificationManager) KisiApplication
-						.getApplicationInstance().getSystemService(
-								Context.NOTIFICATION_SERVICE);
-
-				mNotificationManager.notify(place.getId(), mBuilder.build());
+//				NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+//						KisiApplication.getApplicationInstance())
+//						.setSmallIcon(R.drawable.notification_icon)
+//						.setContentTitle("Geofence error. Place: " + place.getName())
+//						.setContentText(
+//								"The current location is too far away from the geofence: Distance : "
+//										+ currentLocation
+//												.distanceTo(placeLocation)
+//										+ " Accuracy : "
+//										+ currentLocation.getAccuracy());
+//				NotificationManager mNotificationManager = (NotificationManager) KisiApplication
+//						.getApplicationInstance().getSystemService(
+//								Context.NOTIFICATION_SERVICE);
+//
+//				mNotificationManager.notify(place.getId(), mBuilder.build());
 				return false;
 			} else {
 				return true;

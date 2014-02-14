@@ -24,7 +24,7 @@ import de.kisi.android.model.User;
 
 public class KisiRestClient {
 
-	private static KisiRestClient instance =  new KisiRestClient();
+	private static KisiRestClient instance;
 	
 	private static final String BASE_URL = "https://www.kisi.de/";
 	private static final String URL_SUFFIX = ".json";
@@ -32,6 +32,9 @@ public class KisiRestClient {
 	private  AsyncHttpClient client;
 	
 	public static KisiRestClient getInstance() {
+		if(instance == null){
+			instance =  new KisiRestClient();
+		}
 		return instance;
 	}
 	

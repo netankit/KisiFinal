@@ -128,17 +128,24 @@ public class NotificationManager extends BroadcastReceiver {
 		//nb.setContentIntent(getPendingIntent(place.getId(),0));
 		RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_view);
 		contentView.setTextViewText(R.id.place, place.getName());
-		if(info.containsBLE){			
-			contentView.setTextViewText(R.id.bleInfo, "Bluetooth LE running");
-		}
-		else {
-			contentView.setTextViewText(R.id.bleInfo, "");
-		}
+//		if(info.containsBLE){			
+//			contentView.setTextViewText(R.id.bleInfo, "Bluetooth LE running");
+//		}
+//		else {
+//			contentView.setTextViewText(R.id.bleInfo, "Bluetooth LE stopped");
+//		} 
 		
 		if(info.BLEButton) {
 			RemoteViews bluetoothButton =  new RemoteViews(context.getPackageName(), R.layout.notification_bluetooth_button);
 			bluetoothButton.setOnClickPendingIntent(R.id.bluetoothButton, PendingIntentManager.getInstance().getPendingIntentForBluetooth());
-			contentView.addView(R.id.old_notification, bluetoothButton);
+			contentView.addView(R.id.bluetoothframelayout, bluetoothButton);
+			if(!info.containsBLE) {
+				contentView.setImageViewResource(R.id.bluetoothButton, R.drawable.ic_action_bluetooth);	
+				contentView.setTextViewText(R.id.bleInfo, getDefaultContext().getText(R.string.bluetooth_off));
+			} else {
+				contentView.setImageViewResource(R.id.bluetoothButton, R.drawable.ic_action_bluetooth_searching);
+				contentView.setTextViewText(R.id.bleInfo, getDefaultContext().getText(R.string.bluetooth_on));
+			}
 		}
 		
 		contentView.removeAllViews(R.id.widget2);
@@ -146,7 +153,7 @@ public class NotificationManager extends BroadcastReceiver {
 		for(Lock lock : place.getLocks()){
 			// do not display more than 5 lock button, because otherwise each button is too small
 			// just show then three dots
-			if(buttonCount >= 5) {
+			if(buttonCount >= 3) {
 				RemoteViews textView;
 				textView = new RemoteViews(context.getPackageName(), R.layout.notifcation_text);
 				contentView.addView(R.id.widget2, textView);

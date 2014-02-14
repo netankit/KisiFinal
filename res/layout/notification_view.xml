@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="?android:buttonBarStyle"
     android:id="@+id/widget"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,14 +9,12 @@
     <LinearLayout
 	    android:id="@+id/old_notification"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_height="wrap_content">
 
         <FrameLayout
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:background="#FF1D3741" >
-            
+            android:background="#2eaadc" >
 	        <ImageView
 	            android:id="@+id/imageView1"
 	            android:layout_width="48dp"
@@ -25,11 +24,18 @@
 
         </FrameLayout>
 
+            <LinearLayout 
+           style="?android:buttonBarStyle"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content" >
+        
         <LinearLayout
+            android:id="@+id/notificationtextlinearlayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+        	android:layout_weight="1"
             android:orientation="vertical" >
-
+	<!-- text linksbündig -->
             <TextView
                 android:id="@+id/place"
                 android:layout_width="wrap_content"
@@ -37,7 +43,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:text=""
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                style="@android:style/TextAppearance.StatusBar.EventContent.Title"/>
             
             <TextView
                 android:id="@+id/bleInfo"
@@ -46,14 +52,25 @@
                 android:layout_marginLeft="7dp"
                 android:layout_marginTop="2dp"
                 android:text=""
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+ 				style="@android:style/TextAppearance.StatusBar.EventContent" />
             
         </LinearLayout>
+      
+
+        <FrameLayout
+            android:id="@+id/bluetoothframelayout"
+    		android:layout_width="wrap_content"
+            android:layout_height="wrap_content" 
+            android:layout_gravity="center">
+
+        </FrameLayout>
+   
+         </LinearLayout>
         
-       
     </LinearLayout>
     
 	<LinearLayout
+		style="?android:buttonBarStyle"
 	    android:id="@+id/widget2"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"

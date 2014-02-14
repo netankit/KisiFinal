@@ -63,7 +63,8 @@
 	<string name="location">Location Service</string>
 	<string name="wifi">Wi-Fi</string>
 	<string name="bluetooth">Bluetooth</string>
-	
+	<string name="bluetooth_on">Bluetooth detection on</string>
+	<string name="bluetooth_off">Bluetooth detection off</string>
 	
 	
 	

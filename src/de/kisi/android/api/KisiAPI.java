@@ -172,11 +172,6 @@ public class KisiAPI {
 				for(Place p: pl) {
 					KisiAPI.getInstance().updateLocks(p, listener);
 				}
-				//update locators for places
-				for(Place p: pl) {
-					KisiAPI.getInstance().updateLocators(p);
-				}
-				
 			}
 			
 		});
@@ -192,6 +187,8 @@ public class KisiAPI {
 				for(Lock l: locks) {
 					l.setPlace(instance.getPlaceById(l.getPlaceId()));
 				}
+				//get also locators for this place
+				KisiAPI.getInstance().updateLocators(place);
 				DataManager.getInstance().saveLocks(locks);
 				listener.onPlaceChanged(getPlaces());
 				notifyAllOnPlaceChangedListener();
