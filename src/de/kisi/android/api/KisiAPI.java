@@ -372,7 +372,7 @@ public class KisiAPI {
 	
 	
 	public void refresh(OnPlaceChangedListener listener) {
-		DataManager.getInstance().deleteDB();
+		DataManager.getInstance().deletePlaceLockLocatorFromDB();
 		this.updatePlaces(listener);
 	}
 	

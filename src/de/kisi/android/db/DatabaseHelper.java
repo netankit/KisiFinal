@@ -193,6 +193,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		}
 	}
 	
+	public void clearPlaceLockLocator() {
+		try {
+			TableUtils.clearTable(connectionSource, Place.class);
+			TableUtils.clearTable(connectionSource, Lock.class);
+			TableUtils.clearTable(connectionSource, Locator.class);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	
 	
 
 	/**

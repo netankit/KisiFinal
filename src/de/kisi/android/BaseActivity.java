@@ -1,5 +1,7 @@
 package de.kisi.android;
 
+import java.util.Date;
+
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.vicinity.manager.BluetoothLEManager;
 import android.app.AlertDialog;
@@ -8,6 +10,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
@@ -22,12 +25,14 @@ public class BaseActivity extends FragmentActivity{
 	
 	private	Dialog permissionDialog;
 	
+	private static long TWO_WEEKS_IN_MS = 1209600000;
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		//check if there is already a dialog and if the user is already log in
 		if(KisiAPI.getInstance().getUser() != null) {
-			if(permissionDialog != null)
+			if(permissionDialog != null) 
 				permissionDialog.dismiss();
 			checkForServices();
 		}
@@ -38,6 +43,23 @@ public class BaseActivity extends FragmentActivity{
 		boolean locationEnabled = true;
 		boolean wifiEnabled = true;
 		boolean bluetoothEnabled = true;
+		
+		SharedPreferences prefs = KisiApplication.getApplicationInstance().getSharedPreferences("userconfig", Context.MODE_PRIVATE);
+		boolean disableDialog = prefs.getBoolean(KisiAPI.getInstance().getUser().getId() + "-dontAskAgain", false);
+		long datePerfMS = prefs.getLong(KisiAPI.getInstance().getUser().getId() + "-dontAskAgainDate", -1);
+		//asked user again if more than 2 weeks have elapsed since the last checkbox
+		if(datePerfMS != -1) {
+			if(System.currentTimeMillis() - datePerfMS > TWO_WEEKS_IN_MS) {
+				disableDialog = false;
+			}
+		}
+		else {
+			disableDialog = false;
+		}
+		
+		if(disableDialog) {
+			return; 
+		}
 		
 		String locationProviders = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 		if(!locationProviders.contains("gps") || !locationProviders.contains("network")) {
@@ -97,6 +119,19 @@ public class BaseActivity extends FragmentActivity{
 						dialog = null;
 					}
 				});
+		
+		builder.setNegativeButton(R.string.dontaskagain,  new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				SharedPreferences prefs = KisiApplication.getApplicationInstance().getSharedPreferences("userconfig", Context.MODE_PRIVATE);
+				Date date = new Date(System.currentTimeMillis());
+				
+				SharedPreferences.Editor editor = prefs.edit();
+				editor.putBoolean(KisiAPI.getInstance().getUser().getId() + "-dontAskAgain" , true);
+				editor.putLong(KisiAPI.getInstance().getUser().getId() + "-dontAskAgainDate", date.getTime());
+				editor.commit();
+			} });
 		
 
 		permissionDialog = builder.create();

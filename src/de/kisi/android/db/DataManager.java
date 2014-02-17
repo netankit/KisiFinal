@@ -170,6 +170,10 @@ public class DataManager {
     	db.clear();
     }
     
+    public void deletePlaceLockLocatorFromDB() {
+    	db.clearPlaceLockLocator();
+    }
+    
     public void close() {
     	db.close();
     	dbManager.releaseHelper(db);
