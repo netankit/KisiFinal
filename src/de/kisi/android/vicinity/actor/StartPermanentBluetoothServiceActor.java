@@ -20,7 +20,7 @@ public class StartPermanentBluetoothServiceActor implements LockInVicinityActorI
 		Place place = KisiAPI.getInstance().getPlaceById(placeID);
 		for(Lock lock:place.getLocks())
 			for(Locator locator:lock.getLocators())
-				if(locator.getType().equals("BLE")){
+				if("BLE".equals(locator.getType())){
 					BluetoothLEManager.getInstance().startService(true);
 					NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getApplicationInstance());
 					return;

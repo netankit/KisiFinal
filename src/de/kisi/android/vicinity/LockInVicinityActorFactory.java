@@ -9,6 +9,7 @@ import de.kisi.android.vicinity.actor.*;
 public class LockInVicinityActorFactory {
 
 	private static DelayedExitActor delayedBluetoothActor = new DelayedExitActor(new StartPermanentBluetoothServiceActor());
+	
 	public static LockInVicinityActorInterface getActor(VicinityTypeEnum type){
 		
 		switch(type){

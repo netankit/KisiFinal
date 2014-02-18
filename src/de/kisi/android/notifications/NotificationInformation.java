@@ -11,7 +11,8 @@ public class NotificationInformation {
 	public enum Type{
 		Place,
 		Lock,
-		BLEOnly
+		BLEOnly, 
+		AutoUnlock
 	}
 	public Notification notification;
 	public Type type;

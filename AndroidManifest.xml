@@ -192,7 +192,13 @@
             android:name="com.radiusnetworks.ibeacon.IBeaconIntentProcessor"
             android:enabled="true" >
         </service>
-        <!-- Bluetooth end--> 
+        <!-- Bluetooth end-->
+        <service
+        	android:name="de.kisi.android.vicinity.manager.BluetoothAutoUnlockService"
+            android:enabled="true"
+            android:exported="false"
+            android:label="BLEAutoUnlockService" >
+        </service> 
         
     </application>
 

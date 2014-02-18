@@ -187,11 +187,11 @@ public class KisiAPI {
 				for(Lock l: locks) {
 					l.setPlace(instance.getPlaceById(l.getPlaceId()));
 				}
-				//get also locators for this place
-				KisiAPI.getInstance().updateLocators(place);
 				DataManager.getInstance().saveLocks(locks);
 				listener.onPlaceChanged(getPlaces());
 				notifyAllOnPlaceChangedListener();
+				//get also locators for this place
+				KisiAPI.getInstance().updateLocators(place);
 			}
 		});		
 	}
@@ -202,6 +202,18 @@ public class KisiAPI {
 		for(Lock l: locks) {
 			if(l.getId() == lockId) {
 				return l;
+			}
+		}
+		return null;
+	}
+	
+	
+	public Lock getLockById(int lockId) {
+		for(Place p: this.getPlaces()){
+			for(Lock l: p.getLocks()) {
+				if(l.getId() == lockId){
+					return l;
+				}
 			}
 		}
 		return null;

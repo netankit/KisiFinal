@@ -1,7 +1,10 @@
 package de.kisi.android.notifications;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
+
+
 
 
 import android.annotation.TargetApi;
@@ -9,6 +12,7 @@ import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -169,6 +173,12 @@ public class NotificationManager extends BroadcastReceiver {
 		Notification notification = nb.build();
 		notification.bigContentView = contentView;
 		notification.contentView = contentView;
+		//keep the notification with the BLE button at the top by set its timestamp to the future 
+		if(info.BLEButton) {
+			notification.flags |= Notification.FLAG_ONGOING_EVENT;
+			notification.when = System.currentTimeMillis()+100000000;
+		}
+		
 		return notification;
 	}
 	
@@ -183,6 +193,7 @@ public class NotificationManager extends BroadcastReceiver {
 		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
 		nc.setSmallIcon(R.drawable.notification_icon);
+		nc.setLargeIcon(( (BitmapDrawable)getDefaultContext().getResources().getDrawable(R.drawable.ic_notification_icon)).getBitmap());
 		nc.setContentText("Touch to Unlock");
 		nc.setContentTitle(lock.getName() + " - " + place.getName());
 		nc.setDefaults(Notification.DEFAULT_ALL);
@@ -388,6 +399,7 @@ public class NotificationManager extends BroadcastReceiver {
 		NotificationInformation info = new NotificationInformation();
 		NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
 		nc.setSmallIcon(R.drawable.notification_icon);
+		nc.setLargeIcon(( (BitmapDrawable)getDefaultContext().getResources().getDrawable(R.drawable.ic_notification_icon)).getBitmap());
 		nc.setContentText("KISI");
 		nc.setContentTitle("BluetoothLE running");
 		nc.setWhen(0);
@@ -417,6 +429,7 @@ public class NotificationManager extends BroadcastReceiver {
 
 		NotificationCompat.Builder nb = new NotificationCompat.Builder(context);	
 		nb.setSmallIcon(R.drawable.notification_icon);
+		nb.setLargeIcon(( (BitmapDrawable)getDefaultContext().getResources().getDrawable(R.drawable.ic_notification_icon)).getBitmap());
 		nb.setContentTitle("KISI");
 	    nb.setDefaults(Notification.DEFAULT_ALL);
 	    nb.setOnlyAlertOnce(true);
@@ -438,6 +451,59 @@ public class NotificationManager extends BroadcastReceiver {
 		notifications.add(info);
 		return info;
 	}
+	
+	public static AutoUnlockNotificationInfo getBLEAutoUnlockNotifiction(Lock lock) {
+		
+		AutoUnlockNotificationInfo info = new AutoUnlockNotificationInfo();
+		info.type = NotificationInformation.Type.AutoUnlock;
+		info.typeId = lock.getId();
+		info.object = lock;
+		info.notificationId = getUnusedId();
+		info.unlocking = true;
+		
+		Context context = KisiApplication.getApplicationInstance();
+		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
+		nc.setSmallIcon(R.drawable.notification_icon);
+		nc.setLargeIcon(( (BitmapDrawable)getDefaultContext().getResources().getDrawable(R.drawable.ic_notification_icon)).getBitmap());
+		nc.setContentTitle("Unlocking " + lock.getName() + " ...");
+		nc.setDefaults(Notification.DEFAULT_ALL);
+		nc.setWhen((new Date()).getTime());
+
+		info.notification = nc.build();
+		notifications.add(info);
+		mNotificationManager.notify(info.notificationId, info.notification);
+		return info;
+	}
+	
+	public static NotificationInformation getBLEAutoUnlockNotifictionResult(AutoUnlockNotificationInfo info) {
+		
+		notifications.remove(info);
+		Context context = KisiApplication.getApplicationInstance();
+		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		
+		//remove unlocking notification
+		mNotificationManager.cancel(info.notificationId);
+		NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
+		nc.setDefaults(Notification.DEFAULT_ALL);
+		nc.setSmallIcon(R.drawable.notification_icon);
+		nc.setLargeIcon(( (BitmapDrawable)getDefaultContext().getResources().getDrawable(R.drawable.ic_notification_icon)).getBitmap());
+		nc.setWhen((new Date()).getTime());
+		//unlock was successful
+		if(info.success) {
+			nc.setContentTitle("Unlocked  " + ((Lock) (info.object)).getName());
+		}else {
+			nc.setContentTitle("Unlocking " +  ((Lock) (info.object)).getName() + " failed");
+			nc.setContentTitle(info.message);
+		}
+			
+		info.notificationId = getUnusedId();
+		Notification notification = nc.build();
+		mNotificationManager.notify(info.notificationId, notification);
+		return info;
+	}
+
+	
 	
 	
 	
