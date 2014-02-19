@@ -56,6 +56,7 @@ public class BluetoothLEManager  extends BroadcastReceiver {
 		context = KisiApplication.getApplicationInstance();
 		//register as a lister to receive broadcasts to start and stop the BLE service
 		context.registerReceiver(this, new IntentFilter(BLUETOOTH_INTENT));
+		
 		// BLE Feature is available since Android 4.3, do nothing for lower versions
 		// Also BLE hardware is not in all Android 4.3 and higher phones available
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 

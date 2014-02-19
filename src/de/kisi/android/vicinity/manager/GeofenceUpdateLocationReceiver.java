@@ -59,7 +59,7 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
 	//accuracy < 100 && (distance_to_place - accuracy) < 2*geofence_radius
 	private boolean checkLocation(Place place) {
 		Location currentLocation = GeofenceManager.getInstance().getLocation();
-		Location placeLocation = new Location("place");
+		Location placeLocation = new Location("mPlace");
 		placeLocation.setLatitude(place.getLatitude());
 		placeLocation.setLongitude(place.getLongitude());
 		if(currentLocation != null) {
@@ -97,8 +97,9 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
 			} else {
 				return true;
 			}	
+		} else {
+			return false;
 		}
-		return true;
 	}
 
 }

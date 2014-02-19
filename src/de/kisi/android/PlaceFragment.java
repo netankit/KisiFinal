@@ -153,7 +153,7 @@ public class PlaceFragment extends Fragment {
 						final ProgressDialog progressDialog = new ProgressDialog(mActivity);
 						progressDialog.setMessage(fragment.getString(R.string.opening));
 						progressDialog.show();
-						
+
 						KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
 							
 							

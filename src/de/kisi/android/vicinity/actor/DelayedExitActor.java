@@ -28,9 +28,9 @@ public class DelayedExitActor implements LockInVicinityActorInterface{
 			synchronized(this){
 				if(valid){
 					if(placeLock != null)
-						actOnExit(placeLock.first,placeLock.second);
+						actor.actOnExit(placeLock.first,placeLock.second);
 					if(locator != null)
-						actOnExit(locator);
+						actor.actOnExit(locator);
 				}
 				valid=false;
 			}

@@ -29,14 +29,12 @@ public class BluetoothAutoUnlockService extends Service {
 	
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	
 	private void  unlockLock(final Lock lock) {
 		final AutoUnlockNotificationInfo info = de.kisi.android.notifications.NotificationManager.getBLEAutoUnlockNotifiction(lock);
-		final Thread myThread = new Thread();
 		KisiAPI.getInstance().unlock(lock, new  UnlockCallback(){
 			@Override
 			public void onUnlockSuccess(String message) {

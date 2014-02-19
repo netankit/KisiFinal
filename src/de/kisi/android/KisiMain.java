@@ -83,6 +83,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 
 		if(intent.hasExtra("Type")) {
 			handleUnlockIntent(intent);
+			intent.removeCategory("Type");
 		}
 	}
 

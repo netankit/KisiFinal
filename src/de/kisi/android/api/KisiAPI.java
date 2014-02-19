@@ -199,6 +199,8 @@ public class KisiAPI {
 	//helper method for updateLocators
 	public Lock getLockById(Place place, int lockId){ 
 		List<Lock> locks  = place.getLocks();
+		if(locks == null)
+			return null;
 		for(Lock l: locks) {
 			if(l.getId() == lockId) {
 				return l;
@@ -209,7 +211,11 @@ public class KisiAPI {
 	
 	
 	public Lock getLockById(int lockId) {
-		for(Place p: this.getPlaces()){
+		Place[] places = this.getPlaces();
+		if(places == null)
+			return null;
+		
+		for(Place p: places){
 			for(Lock l: p.getLocks()) {
 				if(l.getId() == lockId){
 					return l;

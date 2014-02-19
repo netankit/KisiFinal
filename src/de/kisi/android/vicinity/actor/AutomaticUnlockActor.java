@@ -1,16 +1,11 @@
 package de.kisi.android.vicinity.actor;
 
-import android.app.NotificationManager;
 import android.content.Intent;
-import android.os.Looper;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
-import de.kisi.android.notifications.AutoUnlockNotificationInfo;
-import de.kisi.android.notifications.NotificationInformation;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.manager.BluetoothAutoUnlockService;
 

@@ -494,7 +494,7 @@ public class NotificationManager extends BroadcastReceiver {
 			nc.setContentTitle("Unlocked  " + ((Lock) (info.object)).getName());
 		}else {
 			nc.setContentTitle("Unlocking " +  ((Lock) (info.object)).getName() + " failed");
-			nc.setContentTitle(info.message);
+			nc.setContentText(info.message);
 		}
 			
 		info.notificationId = getUnusedId();
