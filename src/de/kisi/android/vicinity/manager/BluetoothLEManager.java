@@ -111,6 +111,8 @@ public class BluetoothLEManager  extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		// run constructor before evaluating broadcast
+		getInstance();
 		if(bleRunning)
 			stopService();
 		else

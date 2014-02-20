@@ -21,8 +21,8 @@ public class StartPermanentBluetoothServiceActor implements LockInVicinityActorI
 		for(Lock lock:place.getLocks())
 			for(Locator locator:lock.getLocators())
 				if("BLE".equals(locator.getType())){
+					NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getApplicationInstance(), place);
 					BluetoothLEManager.getInstance().startService(true);
-					NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getApplicationInstance());
 					return;
 				}
 		
@@ -35,15 +35,14 @@ public class StartPermanentBluetoothServiceActor implements LockInVicinityActorI
 		// we do not need to run the service in Background mode
 		
 		//BluetoothLEManager.getInstance().startService(false);
-		NotificationManager.notifyBLEButtonNotificationDeleted();
 		BluetoothLEManager.getInstance().stopService();
-		
+		NotificationManager.notifyBLEButtonNotificationDeleted();
 	}
 
 	@Override
 	public void actOnEntry(Locator locator) {
 		// Start BLE and make sure it runs in foreground mode
-		NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getApplicationInstance());
+		NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getApplicationInstance(), locator.getPlace());
 		BluetoothLEManager.getInstance().startService(true);
 		
 	}
@@ -53,9 +52,8 @@ public class StartPermanentBluetoothServiceActor implements LockInVicinityActorI
 		// Stop the BLE Service, because it needs a lot of power
 		// It is very unlikely that an iBeacon is outside of a Geofence, so 
 		// we do not need to run the service in Background mode
-		NotificationManager.notifyBLEButtonNotificationDeleted();
 		BluetoothLEManager.getInstance().stopService();//.startService(false);
-		
+		NotificationManager.notifyBLEButtonNotificationDeleted();
 	}
 
 }

@@ -41,7 +41,7 @@ public class KisiRestClient {
 	private KisiRestClient() {
 		 client = new AsyncHttpClient();
 		 client.setCookieStore(new BlackholeCookieStore());
-		 client.setUserAgent("Android_Kisi");
+		 client.setUserAgent("de.kisi.android");
 	}
 
 
