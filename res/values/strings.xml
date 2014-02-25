@@ -63,4 +63,7 @@
 	<string name="wifi_not_available_title">Location accuracy tips</string>
 	<string name="wifi_not_available_text">You can improve the accuracy of your location by turning on the WiFi</string>
 	<string name="dont_ask_again">Don\'t ask me again</string>
+	<string name="update_message">There is a newer version of this app available. Please update.</string>
+	<string name="update"> New version available.\n<u>Touch here to update</u></string>
+	
 </resources>

@@ -151,7 +151,9 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 	
 	@Override
 	public void onBackPressed() {
-		progressDialog.dismiss();
+		if(progressDialog != null) {
+			progressDialog.dismiss();
+		}
 		setResult(LOGIN_FAILED);
 		finish();
 	}

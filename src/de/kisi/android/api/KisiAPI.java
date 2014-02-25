@@ -398,4 +398,34 @@ public class KisiAPI {
 	}
 	
 	
+	public void getLatestVerion(final VersionCheckCallback callback) {
+		KisiRestClient.getInstance().get("stats", new JsonHttpResponseHandler() {
+			
+			public void onSuccess(org.json.JSONObject response) {
+				String result = null;
+				JSONObject JsonAndroid = null;
+				try {
+					JsonAndroid = (JSONObject) response.get("android");
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
+				if(JsonAndroid != null) {
+					try {
+						result = JsonAndroid.getString("latest_version");
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				callback.onVersionResult(result);
+			}
+			
+			public void onFailure(java.lang.Throwable e, org.json.JSONArray errorResponse) {
+				callback.onVersionResult("error");
+			}
+		});
+	}
+	
+	
 }
