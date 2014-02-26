@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.kisi.android"
-    android:versionCode="19"
-    android:versionName="2.1.0 beta" >
+    android:versionCode="18"
+    android:versionName="2.1.0" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -192,13 +192,7 @@
             android:name="com.radiusnetworks.ibeacon.IBeaconIntentProcessor"
             android:enabled="true" >
         </service>
-        <!-- Bluetooth end-->
-        <service
-        	android:name="de.kisi.android.vicinity.manager.BluetoothAutoUnlockService"
-            android:enabled="true"
-            android:exported="false"
-            android:label="BLEAutoUnlockService" >
-        </service> 
+        <!-- Bluetooth end--> 
         
     </application>
 
