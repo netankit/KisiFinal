@@ -145,6 +145,7 @@ public class NotificationManager extends BroadcastReceiver {
 			RemoteViews bluetoothButton =  new RemoteViews(context.getPackageName(), R.layout.notification_bluetooth_button);
 			bluetoothButton.setOnClickPendingIntent(R.id.bluetoothButton, PendingIntentManager.getInstance().getPendingIntentForBluetooth());
 			contentView.addView(R.id.bluetoothframelayout, bluetoothButton);
+			contentView.setViewVisibility(R.id.bluetoothButton, View.VISIBLE);
 			if(!info.containsBLE) {
 				contentView.setImageViewResource(R.id.bluetoothButton, R.drawable.ic_action_bluetooth);	
 				contentView.setTextViewText(R.id.bleInfo, getDefaultContext().getText(R.string.bluetooth_off));
@@ -259,12 +260,13 @@ public class NotificationManager extends BroadcastReceiver {
 			
 			//TODO: implement solution for place with disabled notification
 			if(bleNotification.type == Type.BLEOnly){
-				//				bleNotification.notification = getNotificationForBLEButton();
+				//	bleNotification.notification = getNotificationForBLEButton();
 			}
 			else {
 				bleNotification.notification = getExpandedNotification((Place) bleNotification.object, bleNotification, getDefaultContext());
 				mNotificationManager.notify(bleNotification.notificationId, bleNotification.notification);
 			}
+			LockInVicinityDisplayManager.getInstance().update();
 		}
 	}
 	
@@ -310,8 +312,8 @@ public class NotificationManager extends BroadcastReceiver {
 			}else {
 				bleButtonNotification.notification = getExpandedNotification((Place) bleButtonNotification.object, bleButtonNotification, getDefaultContext());
 				mNotificationManager.notify(bleButtonNotification.notificationId, bleButtonNotification.notification);
-				LockInVicinityDisplayManager.getInstance().update();
 			}
+			LockInVicinityDisplayManager.getInstance().update();
 		}
 	}
 	

@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 
 /**
  * GeofenceManager is realized as a Singleton.
@@ -35,7 +36,7 @@ import android.os.Bundle;
 public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallbacks,
 										GooglePlayServicesClient.OnConnectionFailedListener,
 										OnAddGeofencesResultListener,
-										OnPlaceChangedListener
+										OnPlaceChangedListener, LocationListener
 										{
 	// Instance for Singleton Access
 	private static GeofenceManager instance;
@@ -98,32 +99,20 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	public void onConnected(Bundle arg0) {
 		initialized = true;
 		reconnectTries = 0;
-		
-		mLocationRequest = LocationRequest.create();
-
-		// Use high accuracy
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        // Set the update interval to 15 seconds
-        mLocationRequest.setInterval(15000);
-        // Set the fastest update interval to 1 second
-        mLocationRequest.setFastestInterval(1000);
-        mLocation = mLocationClient.getLastLocation();
-        mLocationClient.requestLocationUpdates(mLocationRequest, new LocationListener() {
-
-			@Override
-			public void onLocationChanged(Location location) {
-				mLocation = location;
-
-			}
-        });
+		startLocationUpdate();
         // Show interest on any change of the Places
         KisiAPI.getInstance().registerOnPlaceChangedListener(this);
         // Register Places as Geofences
         registerGeofences(KisiAPI.getInstance().getPlaces());
-		
-	
 	}
 
+	@Override
+	public void onLocationChanged(Location location) {
+		mLocation = location;
+		Log.d("KisiAPP", "onLocationChanged");
+	}
+	
+	
 	
 	@Override
 	public void onDisconnected() {
@@ -242,7 +231,28 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 		});
 	}
 	
+	public void startLocationUpdate() {
+		if(mLocationClient.isConnected()) {
+			mLocationRequest = LocationRequest.create();
+			// Use high accuracy
+	        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+	        // Set the update interval to 15 seconds
+	        mLocationRequest.setInterval(15000);
+	        // Set the fastest update interval to 1 second
+	        mLocationRequest.setFastestInterval(1000);
+	        mLocation = mLocationClient.getLastLocation();
+	        mLocationClient.requestLocationUpdates(mLocationRequest, this);
+		}
+	}
+	
+	public void stopLocationUpdate() {
+		mLocationClient.removeLocationUpdates(this);
+	}
+	
+	
 	public Location getLocation() {
 		return mLocation;
 	}
+
+
 }

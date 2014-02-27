@@ -4,6 +4,7 @@ import java.util.Date;
 
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.vicinity.manager.BluetoothLEManager;
+import de.kisi.android.vicinity.manager.GeofenceManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
@@ -137,5 +138,21 @@ public class BaseActivity extends FragmentActivity{
 		permissionDialog = builder.create();
 		permissionDialog.setCanceledOnTouchOutside(false);
 		permissionDialog.show();
+	}
+	
+	@Override
+	protected void onStart() {
+		if(KisiAPI.getInstance().getUser() != null) {
+			GeofenceManager.getInstance().startLocationUpdate();
+		}
+		super.onStart();
+	}
+	
+	@Override
+	protected void onStop() {
+		if(KisiAPI.getInstance().getUser() != null) {
+			GeofenceManager.getInstance().stopLocationUpdate();;
+		}
+		super.onStop();
 	}
 }

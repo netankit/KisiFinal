@@ -199,20 +199,10 @@ public class PlaceFragment extends Fragment {
 		final Drawable currentBackground = currentButton.getBackground();
 		//final Button currentButton = button;
 		final String currentText = (String) button.getText();
-		final int actualPadding = currentButton.getPaddingLeft();
-		final float density = mActivity.getResources().getDisplayMetrics().density;
-		final int shift = (int) (138 * density); // 95
 
 		// change to unlocked design
-
-		currentButton.setBackgroundDrawable(mActivity.getResources()
-				.getDrawable(R.drawable.unlocked));
-		currentButton.setPadding(shift, 0, 0, 0);
-		currentButton.setText("");
-
-		currentButton.setCompoundDrawablesWithIntrinsicBounds(
-				R.drawable.kisi_lock_open2, 0, 0, 0);
-
+		currentButton.setBackgroundDrawable(mActivity.getResources().getDrawable(R.drawable.unlocked));
+		currentButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.kisi_lock_open2, 0, 0, 0);
 		// disable click
 		currentButton.setClickable(false);
 
@@ -222,12 +212,9 @@ public class PlaceFragment extends Fragment {
 
 				// after delay back to old design re-enable click
 				currentButton.setBackgroundDrawable(currentBackground);
-				currentButton.setCompoundDrawablesWithIntrinsicBounds(
-						R.drawable.kisi_lock, 0, 0, 0);
-				currentButton.setPadding(actualPadding, 0, 0, 0);
+				currentButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.kisi_lock, 0, 0, 0);
 				currentButton.setText(currentText);
 				currentButton.setClickable(true);
-
 			}
 		}, delay);
 
@@ -243,16 +230,9 @@ public class PlaceFragment extends Fragment {
 		final Drawable currentBackground = currentButton.getBackground();
 		//final Button currentButton = button;
 		final String currentText = (String) button.getText();
-		final int actualPadding = currentButton.getPaddingLeft();
-		final float density = mActivity.getResources().getDisplayMetrics().density;
-		final int shift = (int) (138 * density); // 95
-
+		
 		// change to failure design
-
-		currentButton.setBackgroundDrawable(mActivity.getResources()
-				.getDrawable(R.drawable.lockfailure));
-		currentButton.setPadding(shift, 0, 0, 0);
-		currentButton.setText("");
+		currentButton.setBackgroundDrawable(mActivity.getResources().getDrawable(R.drawable.lockfailure));
 		currentButton.requestLayout();
 		// disable click
 		currentButton.setClickable(false);
@@ -263,9 +243,7 @@ public class PlaceFragment extends Fragment {
 
 				// after delay back to old design re-enable click
 				currentButton.setBackgroundDrawable(currentBackground);
-				currentButton.setCompoundDrawablesWithIntrinsicBounds(
-						R.drawable.kisi_lock, 0, 0, 0);
-				currentButton.setPadding(actualPadding, 0, 0, 0);
+				currentButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.kisi_lock, 0, 0, 0);
 				currentButton.setText(currentText);
 				currentButton.setClickable(true);
 
