@@ -29,9 +29,6 @@ public class KisiApplication extends Application {
 		// Every Manager who needs a Context object uses the method 
 		// getApplicationInstance()
 		instance = this;	
-		// Start LocationManager for location Updates
-		de.kisi.android.api.KisiLocationManager.getInstance();
-
 		// Start GeofenceManager for registering all Geofences
 		GeofenceManager.getInstance();
 		// Bluetooth gets triggered by Geofences
