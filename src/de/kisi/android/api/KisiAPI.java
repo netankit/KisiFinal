@@ -25,6 +25,7 @@ import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
+import de.kisi.android.notifications.NotificationManager;
 import de.kisi.android.rest.KisiRestClient;
 import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 import de.kisi.android.vicinity.manager.BluetoothLEManager;
@@ -117,6 +118,7 @@ public class KisiAPI {
 		clearCache();
 		BluetoothLEManager.getInstance().stopService();
 		LockInVicinityDisplayManager.getInstance().update();
+		NotificationManager.removeAllNotification();
 		KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
 			public void onSuccess(String msg) {
 	
@@ -448,7 +450,8 @@ public class KisiAPI {
     		if(currentLocation != null) {
     			location.put("latitude", currentLocation.getLatitude());
     			location.put("longitude", currentLocation.getLongitude());
-    			location.put("horizontalAccuracy", currentLocation.getAccuracy());
+    			location.put("horizontal_accuracy", currentLocation.getAccuracy());
+    			location.put("altitude", currentLocation.getAltitude());
     			location.put("age", (System.currentTimeMillis() - currentLocation.getTime())/1000.0);
     		} else { 
 	 			location.put("error:", "Location data not accessible");
@@ -460,4 +463,32 @@ public class KisiAPI {
 	}
 	
 	
+	public void getLatestVerion(final VersionCheckCallback callback) {
+		KisiRestClient.getInstance().get("stats", new JsonHttpResponseHandler() {
+
+			public void onSuccess(org.json.JSONObject response) {
+				String result = null;
+				JSONObject JsonAndroid = null;
+				try {
+					JsonAndroid = (JSONObject) response.get("android");
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				if(JsonAndroid != null) {
+					try {
+						result = JsonAndroid.getString("latest_version");
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+
+				callback.onVersionResult(result);
+			}
+
+			public void onFailure(java.lang.Throwable e, org.json.JSONArray errorResponse) {
+				callback.onVersionResult("error");
+			}
+		});
+	}
 }

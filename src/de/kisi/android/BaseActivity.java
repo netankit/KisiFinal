@@ -3,6 +3,7 @@ package de.kisi.android;
 import java.util.Date;
 
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.VersionCheckCallback;
 import de.kisi.android.vicinity.manager.BluetoothLEManager;
 import de.kisi.android.vicinity.manager.GeofenceManager;
 import android.app.AlertDialog;
@@ -12,20 +13,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.CheckBox;
 
 
 // base activity for the main activity 
 // by extending this class the activity always checks if the location and the wifi is available  when it getting started
-public class BaseActivity extends FragmentActivity{
+public class BaseActivity extends FragmentActivity implements VersionCheckCallback{
 	
 	private	Dialog permissionDialog;
-	
+	private Dialog mUpdateDialog;
 	private static long TWO_WEEKS_IN_MS = 1209600000;
 	
 	@Override
@@ -36,8 +41,9 @@ public class BaseActivity extends FragmentActivity{
 			if(permissionDialog != null) 
 				permissionDialog.dismiss();
 			checkForServices();
+			KisiAPI.getInstance().getLatestVerion(this);
 		}
-
+		
 	}
 	
 	private void checkForServices() {
@@ -63,7 +69,7 @@ public class BaseActivity extends FragmentActivity{
 		}
 		
 		String locationProviders = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-		if(!locationProviders.contains("gps") || !locationProviders.contains("network")) {
+		if(!locationProviders.contains("gps") && !locationProviders.contains("network")) {
 			locationEnabled = false;
 		}
 		
@@ -154,5 +160,49 @@ public class BaseActivity extends FragmentActivity{
 			GeofenceManager.getInstance().stopLocationUpdate();;
 		}
 		super.onStop();
+	}
+	
+	
+	private void updateButton() {
+
+		Button updateButton = (Button) findViewById(R.id.update_button);
+		updateButton.setVisibility(View.VISIBLE);
+		final String appPackageName = getPackageName();
+
+		updateButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+			}
+
+		});
+	}
+
+
+	@Override
+	public void onVersionResult(String result) {
+		if(mUpdateDialog == null){
+			String versionName[] = null;
+			try {
+				versionName = (this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName).split("\\.");
+			} catch (NameNotFoundException e) {
+				e.printStackTrace();
+			}
+
+			if(result != null || "error".equals(result) ) {
+				String newstVersion[] = result.split("\\.");
+				for(int i = 0; i < versionName.length; i++) {
+					//version in stats is older the current version 
+					if(Integer.valueOf(versionName[i]) > Integer.valueOf(newstVersion[i]) ){
+						break;
+					}
+					
+					if(Integer.valueOf(versionName[i]) < Integer.valueOf(newstVersion[i]) ){
+						updateButton();
+					}
+				}
+			}
+		}
 	}
 }

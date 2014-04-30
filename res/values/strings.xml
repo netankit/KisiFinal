@@ -46,7 +46,7 @@
 	<string name="forgot_html"><a href="https://www.kisi.de/users/password/new">Forgot your password?</a></string>
 	<string name="missing_login_data">Please type in EMail and Password first</string>
 	<string name="no_network">No network connectivity</string>
-	<string name="login_loading_message">Loggin in...</string>
+	<string name="login_loading_message">Logging you in...</string>
 	<string name="account_type">de.kisi</string>
 	<string name="add_new_account_done">Account created</string>
 	<string name="error_creating_account">Error creating account</string>
@@ -66,6 +66,7 @@
 	<string name="bluetooth">Bluetooth</string>
 	<string name="bluetooth_on">Bluetooth detection on</string>
 	<string name="bluetooth_off">Bluetooth detection off</string>
+	<string name="update"> New version available.\n<u>Touch here to update</u></string>
 	
 	
 	

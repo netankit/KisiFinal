@@ -233,6 +233,13 @@ public class NotificationManager extends BroadcastReceiver {
 	
 	private static LinkedList<NotificationInformation> notifications = new LinkedList<NotificationInformation>();
 
+	public static void removeAllNotification() {
+		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancelAll();
+	}
+	
+	
+	
 	public static NotificationInformation getOrCreateBLEServiceNotification(Context context){
 		NotificationInformation bleNotification = getBLEButtonNotification();
 		if(bleNotification != null){

@@ -246,7 +246,9 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	}
 	
 	public void stopLocationUpdate() {
-		mLocationClient.removeLocationUpdates(this);
+		if(mLocationClient.isConnected()) {
+			mLocationClient.removeLocationUpdates(this);
+		}
 	}
 	
 	
