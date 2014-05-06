@@ -25,7 +25,7 @@ import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
-public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickListener {
+public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickListener,OnPlaceChangedListener {
 
 	private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
 
@@ -95,16 +95,14 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 			setupView(places);
 		}
 		
-		kisiAPI.updatePlaces(new OnPlaceChangedListener() {
+		kisiAPI.updatePlaces(this);
+	}
 
-			@Override
-			public void onPlaceChanged(Place[] newPlaces) {
-				// build the UI again with fresh data from the server
-				setupView(newPlaces);
+	@Override
+	public void onPlaceChanged(Place[] newPlaces) {
+		// build the UI again with fresh data from the server
+		setupView(newPlaces);
 
-			}
-			
-		});
 	}
 	
 
@@ -132,15 +130,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		switch (item.getItemId()) {
 		case R.id.refresh:
 			// Trigger a refresh of the data
-			kisiAPI.refresh(new OnPlaceChangedListener() {
-
-				@Override
-				public void onPlaceChanged(Place[] newPlaces) {
-					// refresh the view with the new data
-					setupView(newPlaces);
-				}
-
-			});
+			kisiAPI.refresh(this);
 			return true;
 
 		case R.id.share:
@@ -220,12 +210,16 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 
 	}
 
-	// callback for blinkup
+	// callback for blinkup and login
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == LOGIN_REQUEST_CODE) {
 			if (resultCode == AccountPickerActivity.LOGIN_FAILED) {
-				finish();
+				kisiAPI.logout();
+				Intent login = new Intent(this, AccountPickerActivity.class);
+				startActivityForResult(login, LOGIN_REQUEST_CODE);
+
+				//TODO: Go to login screen 
 				return;
 			}
 			if (resultCode == AccountPickerActivity.LOGIN_SUCCESS) {
@@ -239,7 +233,10 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 
 	private void logout() {
 		kisiAPI.logout();
-		finish();
+		// Go back to the login screen
+		Intent login = new Intent(this, AccountPickerActivity.class);
+		startActivityForResult(login, LOGIN_REQUEST_CODE);
+		//finish();
 	}
 
 	private void setupView(Place[] places) {
