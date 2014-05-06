@@ -113,15 +113,17 @@ public class KisiAPI {
 	
 	
 	public void logout(){
-		KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
-		clearCache();
-		BluetoothLEManager.getInstance().stopService();
-		LockInVicinityDisplayManager.getInstance().update();
-		KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
-			public void onSuccess(String msg) {
-	
-			}
-		});
+		if(KisiAPI.getInstance().getUser()!=null && KisiAPI.getInstance().getUser().getEmail()!=null){
+			KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
+			clearCache();
+			BluetoothLEManager.getInstance().stopService();
+			LockInVicinityDisplayManager.getInstance().update();
+			KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
+				public void onSuccess(String msg) {
+		
+				}
+			});
+		}
 	}
 	
 	/**
@@ -232,12 +234,14 @@ public class KisiAPI {
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
 				Locator[] locators = gson.fromJson(response.toString(), Locator[].class);
-				for(Locator l: locators) {
-					l.setLock(KisiAPI.getInstance().getLockById(KisiAPI.getInstance().getPlaceById(l.getPlaceId()), l.getLockId()));
-					l.setPlace(KisiAPI.getInstance().getPlaceById(l.getPlaceId()));
-				}
-				DataManager.getInstance().saveLocators(locators);
-				notifyAllOnPlaceChangedListener();
+				try{//Prevent App from crashing when closing during a refresh
+					for(Locator l: locators) {
+						l.setLock(KisiAPI.getInstance().getLockById(KisiAPI.getInstance().getPlaceById(l.getPlaceId()), l.getLockId()));
+						l.setPlace(KisiAPI.getInstance().getPlaceById(l.getPlaceId()));
+					}
+					DataManager.getInstance().saveLocators(locators);
+					notifyAllOnPlaceChangedListener();
+				}catch(NullPointerException e){}
 			}
 			
 		});
@@ -369,7 +373,6 @@ public class KisiAPI {
 						 callback.onUnlockFail(errormessage);
 					 return;
 				 }
-				
 				if(errorResponse != null) {
 					if(errorResponse.has("alert")) {
 						try {
@@ -377,10 +380,15 @@ public class KisiAPI {
 						} catch (JSONException je) {
 							e.printStackTrace();
 						}
+					}else if(errorResponse.has("error")) {
+						try {
+							errormessage = errorResponse.getString("error");
+						} catch (JSONException je) {
+							e.printStackTrace();
+						}
 					}
-				}
-				else {
-					errormessage = "Error!";
+				} else {
+					errormessage = "Unknown Error!";
 				}
 				if(callback != null)
 					callback.onUnlockFail(errormessage);

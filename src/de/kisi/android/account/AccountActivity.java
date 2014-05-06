@@ -141,6 +141,7 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
         setResult(RESULT_OK, intent);
         finish();
     }
+    
 
 	@Override
 	public void onLoginSuccess(String authToken) {

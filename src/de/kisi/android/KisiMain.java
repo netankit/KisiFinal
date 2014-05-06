@@ -214,17 +214,20 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == LOGIN_REQUEST_CODE) {
-			if (resultCode == AccountPickerActivity.LOGIN_FAILED) {
-				kisiAPI.logout();
-				Intent login = new Intent(this, AccountPickerActivity.class);
-				startActivityForResult(login, LOGIN_REQUEST_CODE);
-
-				//TODO: Go to login screen 
-				return;
-			}
-			if (resultCode == AccountPickerActivity.LOGIN_SUCCESS) {
-				buildUI();
-				return;
+			switch(resultCode){
+				case AccountPickerActivity.LOGIN_FAILED:
+					kisiAPI.logout();
+					Intent login = new Intent(this, AccountPickerActivity.class);
+					startActivityForResult(login, LOGIN_REQUEST_CODE);
+					return;
+					
+				case AccountPickerActivity.LOGIN_OPTIMISTIC_SUCCESS:
+				case AccountPickerActivity.LOGIN_REAL_SUCCESS:
+					buildUI();
+					return;
+					
+				case AccountPickerActivity.LOGIN_CANCELED:
+					finish();
 			}
 		} else {
 			BlinkupController.getInstance().handleActivityResult(this,requestCode, resultCode, data);

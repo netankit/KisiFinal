@@ -58,6 +58,8 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
 	//check if current location confirms the geofence by checking this formalar (Feature #515)
 	//accuracy < 100 && (distance_to_place - accuracy) < 2*geofence_radius
 	private boolean checkLocation(Place place) {
+		if(place==null)
+			return false;
 		Location currentLocation = GeofenceManager.getInstance().getLocation();
 		Location placeLocation = new Location("mPlace");
 		placeLocation.setLatitude(place.getLatitude());
