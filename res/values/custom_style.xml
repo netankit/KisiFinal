@@ -5,12 +5,14 @@
         <item name="android:background">#2ca9dc</item>
     </style>
 
-	<color name="custom_theme_color">#A96E37</color>
+	<color name="custom_theme_color">#2b4978</color>
 
     <style name="CustomTheme" parent="android:Theme.Holo.Light.NoActionBar">
         <item name="android:windowTitleSize">67dp</item>
         <item name="android:windowNoTitle">false</item>
-    </style>
+		<item name="android:windowBackground">@color/custom_theme_color</item>
+	    <item name="android:colorBackground">@color/custom_theme_color</item>
+	</style>
     
     <style name="CustomThemeLogin" parent="android:Theme.Holo.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
