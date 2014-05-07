@@ -1,19 +1,24 @@
 package de.kisi.android;
 
-import de.kisi.android.vicinity.manager.BluetoothLEManager;
-import de.kisi.android.vicinity.manager.GeofenceManager;
 import android.app.Application;
+import android.content.pm.PackageManager.NameNotFoundException;
+import de.kisi.android.vicinity.manager.GeofenceManager;
 
 
 public class KisiApplication extends Application {
 
-	private static Application instance;
+	private static KisiApplication instance;
 	/**
 	 * Retuns a valid Context object
 	 * @author Thomas Hoermann
 	 */
-	public static Application getApplicationInstance() {
+	public static KisiApplication getInstance() {
 		return instance;
+	}
+	
+	public String getVersion() throws NameNotFoundException {
+		String versionName = (this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);
+		return versionName;
 	}
 
 	/**

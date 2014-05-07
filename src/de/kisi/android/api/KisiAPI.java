@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.location.Location;
 import android.os.Build;
 import android.widget.Toast;
@@ -47,7 +48,7 @@ public class KisiAPI {
 	
 	public static KisiAPI getInstance(){
 		if(instance == null)
-			instance = new KisiAPI(KisiApplication.getApplicationInstance());
+			instance = new KisiAPI(KisiApplication.getInstance());
 		return instance;
 	}
 
@@ -57,18 +58,36 @@ public class KisiAPI {
 	
 	
 	public void login(String login, String password, final LoginCallback callback){
-
-		JSONObject login_data = new JSONObject();
-		JSONObject login_user = new JSONObject();
+		
+		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(login);
+		
+		JSONObject loginJSON = new JSONObject();
+		JSONObject userJSON = new JSONObject();
+		JSONObject deviceJSON = new JSONObject();
 		try {
-			login_data.put("email", login);
-			login_data.put("password", password);
-			login_user.put("user", login_data);
+			//build user object
+			userJSON.put("email", login);
+			userJSON.put("password", password);
+			loginJSON.put("user", userJSON);
+			
+			//build device object
+			if (deviceUUID != null) {
+				deviceJSON.put("uuid", deviceUUID);				
+			}
+			deviceJSON.put("plattform_name", "Android");
+			deviceJSON.put("plattform_version", Build.VERSION.RELEASE);
+			deviceJSON.put("model", Build.MANUFACTURER + " " + Build.MODEL);
+			try {
+				deviceJSON.put("app_version", KisiApplication.getInstance().getVersion());
+			} catch (NameNotFoundException e) {
+				//no app version for you then...
+			}
+			loginJSON.put("device", deviceJSON);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
 
-		KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", login_user,  new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", loginJSON,  new JsonHttpResponseHandler() {
 			
 			 public void onSuccess(org.json.JSONObject response) {
 				Gson gson = new Gson();
@@ -418,11 +437,8 @@ public class KisiAPI {
 		try {
 			gateway.put("name", "Gateway");
 			gateway.put("uri", agentUrl);
-			gateway.put("plattform_name", "Android");
-			gateway.put("plattform_version", Build.VERSION.RELEASE);
 			gateway.put("blinked_up", true);
 			gateway.put("ei_impee_id", impeeId);
-			gateway.put("device_model", Build.MANUFACTURER + " " + Build.MODEL);
 			gateway.put("location", location);
 		} catch (JSONException e) {
 			e.printStackTrace();

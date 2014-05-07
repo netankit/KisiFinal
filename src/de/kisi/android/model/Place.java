@@ -151,13 +151,13 @@ public class Place {
 
 	
 	public boolean getNotificationEnabled() {
-		Context context = KisiApplication.getApplicationInstance().getApplicationContext();
+		Context context = KisiApplication.getInstance().getApplicationContext();
 		SharedPreferences prefs = context.getSharedPreferences("userconfig", Context.MODE_PRIVATE);
 		return prefs.getBoolean(generateSharedPreferencesKey(), true);
 	}
 	
 	public void setNotificationEnabled(boolean value) {
-		Context context = KisiApplication.getApplicationInstance().getApplicationContext();
+		Context context = KisiApplication.getInstance().getApplicationContext();
 		SharedPreferences prefs = context.getSharedPreferences("userconfig", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(generateSharedPreferencesKey(), value);

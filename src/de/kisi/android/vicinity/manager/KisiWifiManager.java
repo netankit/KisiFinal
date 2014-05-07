@@ -23,7 +23,7 @@ public class KisiWifiManager {
 	}
 
 	private KisiWifiManager() {
-		mWifiManager = (WifiManager) KisiApplication.getApplicationInstance().getSystemService(Context.WIFI_SERVICE); 
+		mWifiManager = (WifiManager) KisiApplication.getInstance().getSystemService(Context.WIFI_SERVICE); 
 	}
 	
 	public void turnOffWifi() {

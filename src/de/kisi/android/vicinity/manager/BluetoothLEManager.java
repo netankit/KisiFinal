@@ -53,7 +53,7 @@ public class BluetoothLEManager  extends BroadcastReceiver {
 	public static String BLUETOOTH_INTENT = "de.kisi.android.BLUETOOTH_INTENT";
 	
 	private BluetoothLEManager(){
-		context = KisiApplication.getApplicationInstance();
+		context = KisiApplication.getInstance();
 		//register as a lister to receive broadcasts to start and stop the BLE service
 		context.registerReceiver(this, new IntentFilter(BLUETOOTH_INTENT));
 		

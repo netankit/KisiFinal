@@ -20,7 +20,7 @@ public class DataManager {
 	
 	public static DataManager getInstance() {
 		if(instance == null)
-			instance = new DataManager(KisiApplication.getApplicationInstance());
+			instance = new DataManager(KisiApplication.getInstance());
 		return instance;
 	}
 	

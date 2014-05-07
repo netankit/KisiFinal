@@ -55,17 +55,17 @@ public class PendingIntentManager {
 			bluetoothIntent = index++;
 		}
 		Intent intent = new Intent(BluetoothLEManager.BLUETOOTH_INTENT);
-		return PendingIntent.getBroadcast(KisiApplication.getApplicationInstance(), bluetoothIntent, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		return PendingIntent.getBroadcast(KisiApplication.getInstance(), bluetoothIntent, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 	
 	
 	private PendingIntent createPendingIntent(Integer placeId, Integer lockId, int pendingIntentId){
-		Intent intent = new Intent(KisiApplication.getApplicationInstance(), KisiMain.class);
+		Intent intent = new Intent(KisiApplication.getInstance(), KisiMain.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("Type", "unlock");
 		intent.putExtra("Place", placeId);
 		intent.putExtra("Lock", lockId);
-		return PendingIntent.getActivity(KisiApplication.getApplicationInstance(), pendingIntentId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		return PendingIntent.getActivity(KisiApplication.getInstance(), pendingIntentId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 }

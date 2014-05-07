@@ -51,7 +51,7 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 		boolean wifiEnabled = true;
 		boolean bluetoothEnabled = true;
 		
-		SharedPreferences prefs = KisiApplication.getApplicationInstance().getSharedPreferences("userconfig", Context.MODE_PRIVATE);
+		SharedPreferences prefs = KisiApplication.getInstance().getSharedPreferences("userconfig", Context.MODE_PRIVATE);
 		boolean disableDialog = prefs.getBoolean(KisiAPI.getInstance().getUser().getId() + "-dontAskAgain", false);
 		long datePerfMS = prefs.getLong(KisiAPI.getInstance().getUser().getId() + "-dontAskAgainDate", -1);
 		//asked user again if more than 2 weeks have elapsed since the last checkbox
@@ -131,7 +131,7 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				SharedPreferences prefs = KisiApplication.getApplicationInstance().getSharedPreferences("userconfig", Context.MODE_PRIVATE);
+				SharedPreferences prefs = KisiApplication.getInstance().getSharedPreferences("userconfig", Context.MODE_PRIVATE);
 				Date date = new Date(System.currentTimeMillis());
 				
 				SharedPreferences.Editor editor = prefs.edit();
@@ -185,7 +185,7 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 		if(mUpdateDialog == null){
 			String versionName[] = null;
 			try {
-				versionName = (this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName).split("\\.");
+				versionName = KisiApplication.getInstance().getVersion().split("\\.");
 			} catch (NameNotFoundException e) {
 				e.printStackTrace();
 			}

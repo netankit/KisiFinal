@@ -21,7 +21,7 @@ public class StartPermanentBluetoothServiceActor implements LockInVicinityActorI
 		for(Lock lock:place.getLocks())
 			for(Locator locator:lock.getLocators())
 				if("BLE".equals(locator.getType())){
-					NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getApplicationInstance(), place);
+					NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getInstance(), place);
 					BluetoothLEManager.getInstance().startService(true);
 					return;
 				}
@@ -42,7 +42,7 @@ public class StartPermanentBluetoothServiceActor implements LockInVicinityActorI
 	@Override
 	public void actOnEntry(Locator locator) {
 		// Start BLE and make sure it runs in foreground mode
-		NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getApplicationInstance(), locator.getPlace());
+		NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getInstance(), locator.getPlace());
 		BluetoothLEManager.getInstance().startService(true);
 		
 	}

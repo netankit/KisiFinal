@@ -65,16 +65,16 @@ public class KisiRestClient {
 			authToken = KisiAPI.getInstance().getUser().getAuthentication_token();
 		}
 		if(authToken != null) {
-			client.post(KisiApplication.getApplicationInstance(), getAbsoluteUrl(url, authToken), JSONtoStringEntity(data), "application/json", responseHandler);
+			client.post(KisiApplication.getInstance(), getAbsoluteUrl(url, authToken), JSONtoStringEntity(data), "application/json", responseHandler);
 		}
 		else {
-			client.post(KisiApplication.getApplicationInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
+			client.post(KisiApplication.getInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
 		}
 	}
 	
 	//workaround method so that the login call is done without the authtoken and so renews the old authtoken
 	public void postWithoutAuthToken (String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
-		client.post(KisiApplication.getApplicationInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
+		client.post(KisiApplication.getInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
 	}
 
 	

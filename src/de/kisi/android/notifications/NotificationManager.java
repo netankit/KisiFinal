@@ -50,7 +50,7 @@ public class NotificationManager extends BroadcastReceiver {
 	}
 	
 	private static Context getDefaultContext(){
-		return KisiApplication.getApplicationInstance();
+		return KisiApplication.getInstance();
 	}
 	
 	private void updateNotifications(){
@@ -196,7 +196,7 @@ public class NotificationManager extends BroadcastReceiver {
 		info.object = lock;
 		info.notificationId = getUnusedId();
 		
-		Context context = KisiApplication.getApplicationInstance();
+		Context context = KisiApplication.getInstance();
 		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
 		nc.setSmallIcon(R.drawable.notification_icon);
@@ -465,7 +465,7 @@ public class NotificationManager extends BroadcastReceiver {
 		info.notificationId = getUnusedId();
 		info.unlocking = true;
 		
-		Context context = KisiApplication.getApplicationInstance();
+		Context context = KisiApplication.getInstance();
 		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationCompat.Builder nc = new NotificationCompat.Builder(context);
 		nc.setSmallIcon(R.drawable.notification_icon);
@@ -483,7 +483,7 @@ public class NotificationManager extends BroadcastReceiver {
 	public static NotificationInformation getBLEAutoUnlockNotifictionResult(AutoUnlockNotificationInfo info) {
 		
 		notifications.remove(info);
-		Context context = KisiApplication.getApplicationInstance();
+		Context context = KisiApplication.getInstance();
 		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		
 		//remove unlocking notification

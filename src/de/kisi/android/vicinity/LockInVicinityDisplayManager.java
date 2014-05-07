@@ -22,7 +22,7 @@ public class LockInVicinityDisplayManager {
 	
 	public static LockInVicinityDisplayManager getInstance(){
 		if(instance == null)
-			instance = new LockInVicinityDisplayManager(KisiApplication.getApplicationInstance());
+			instance = new LockInVicinityDisplayManager(KisiApplication.getInstance());
 		return instance;
 	}
 	

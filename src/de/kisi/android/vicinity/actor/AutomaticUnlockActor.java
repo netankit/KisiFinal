@@ -17,9 +17,9 @@ public class AutomaticUnlockActor implements LockInVicinityActorInterface {
 		Place place = KisiAPI.getInstance().getPlaceById(placeID);
 		for(Lock lock : place.getLocks())
 			if(lock.getId()==lockId) {
-				Intent intent = new Intent(KisiApplication.getApplicationInstance(), BluetoothAutoUnlockService.class);
+				Intent intent = new Intent(KisiApplication.getInstance(), BluetoothAutoUnlockService.class);
 				intent.putExtra("Lock", lock.getId());
-				KisiApplication.getApplicationInstance().startService(intent);
+				KisiApplication.getInstance().startService(intent);
 			}
 	}
 
@@ -32,9 +32,9 @@ public class AutomaticUnlockActor implements LockInVicinityActorInterface {
 	// directly send a unlock process to the server
 	@Override
 	public void actOnEntry(Locator locator) {
-		Intent intent = new Intent(KisiApplication.getApplicationInstance(), BluetoothAutoUnlockService.class);
+		Intent intent = new Intent(KisiApplication.getInstance(), BluetoothAutoUnlockService.class);
 		intent.putExtra("Lock", locator.getLock().getId());
-		KisiApplication.getApplicationInstance().startService(intent);
+		KisiApplication.getInstance().startService(intent);
 	}
 
 	// wo do not have to do anything
