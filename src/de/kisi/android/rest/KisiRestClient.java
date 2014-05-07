@@ -15,6 +15,9 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 
+
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.loopj.android.http.*;
 
@@ -80,7 +83,15 @@ public class KisiRestClient {
 	
 	
 	public  void delete(String url, AsyncHttpResponseHandler responseHandler) {
-		client.delete(getAbsoluteUrl(url),  responseHandler);
+		String authToken = null;
+		if(KisiAPI.getInstance().getUser() != null) {
+			authToken = KisiAPI.getInstance().getUser().getAuthentication_token();
+			Log.i("KisiRestClient",getAbsoluteUrl(url,authToken));
+			client.delete(getAbsoluteUrl(url,authToken),  responseHandler);
+		}else{
+			client.delete(getAbsoluteUrl(url),  responseHandler);
+		}
+
 	}
 
 	//this method is for KisiAuthenticator.getAuthToken()

@@ -51,6 +51,7 @@ public class KisiAPI {
 	private Context context;
 	
 	private boolean oldAuthToken = true;
+	private Boolean reloginSuccess = false;
 	
 	public static KisiAPI getInstance(){
 		if(instance == null)
@@ -65,7 +66,13 @@ public class KisiAPI {
 	
 	public void login(String login, String password, final LoginCallback callback){
 		Log.i("KisiAPI","login");
-
+		synchronized(reloginSuccess){
+		
+			if(reloginSuccess){
+				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
+				return;
+			}
+			
 		JSONObject login_data = new JSONObject();
 		JSONObject login_user = new JSONObject();
 		try {
@@ -79,7 +86,7 @@ public class KisiAPI {
 		KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", login_user,  new JsonHttpResponseHandler() {
 			
 			 public void onSuccess(org.json.JSONObject response) {
-					Log.i("KisiAPI","login success");
+				 Log.i("KisiAPI","login success");
 				oldAuthToken = false;
 				Gson gson = new Gson();
 				User user = gson.fromJson(response.toString(), User.class);
@@ -114,7 +121,7 @@ public class KisiAPI {
 			
 		});
 		
-		
+		}
 		
 
 	}
@@ -126,15 +133,14 @@ public class KisiAPI {
 	
 	public void logout(){
 		if(KisiAPI.getInstance().getUser()!=null && KisiAPI.getInstance().getUser().getEmail()!=null){
+			KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
+				public void onSuccess(String msg) {
+				}
+			});
 			KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
 			clearCache();
 			BluetoothLEManager.getInstance().stopService();
 			LockInVicinityDisplayManager.getInstance().update();
-			KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
-				public void onSuccess(String msg) {
-		
-				}
-			});
 		}
 	}
 	
