@@ -51,7 +51,7 @@
         <activity
             android:name="de.kisi.android.KisiMain"
             android:configChanges="orientation|keyboardHidden"
-            android:label="@string/app_name"
+            android:label="@string/app_name_empty"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/CustomTheme" >

@@ -8,18 +8,24 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import de.kisi.android.KisiApplication;
+import de.kisi.android.KisiMain;
 import de.kisi.android.R;
 import de.kisi.android.account.KisiAccountManager;
+import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
@@ -44,6 +50,8 @@ public class KisiAPI {
 
 	private Context context;
 	
+	private boolean oldAuthToken = true;
+	
 	public static KisiAPI getInstance(){
 		if(instance == null)
 			instance = new KisiAPI(KisiApplication.getApplicationInstance());
@@ -56,6 +64,7 @@ public class KisiAPI {
 	
 	
 	public void login(String login, String password, final LoginCallback callback){
+		Log.i("KisiAPI","login");
 
 		JSONObject login_data = new JSONObject();
 		JSONObject login_user = new JSONObject();
@@ -70,6 +79,8 @@ public class KisiAPI {
 		KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", login_user,  new JsonHttpResponseHandler() {
 			
 			 public void onSuccess(org.json.JSONObject response) {
+					Log.i("KisiAPI","login success");
+				oldAuthToken = false;
 				Gson gson = new Gson();
 				User user = gson.fromJson(response.toString(), User.class);
 				DataManager.getInstance().saveUser(user);
@@ -78,6 +89,7 @@ public class KisiAPI {
 			}
 			
 			 public void onFailure(int statusCode, Throwable e, JSONObject response) {
+					Log.i("KisiAPI","login fail");
 				 String errormessage = null;
 				 //no network connectivity
 				 if(statusCode == 0) {
@@ -337,7 +349,8 @@ public class KisiAPI {
 	 * @param lock The lock that should be unlocked
 	 * @param callback Callback object for feedback, or null if no feedback is requested
 	 */
-	public void unlock(Lock lock, final UnlockCallback callback){
+	public void unlock(final Lock lock, final UnlockCallback callback){
+		Log.i("KisiAPI","unlock");
         JSONObject location =  generateJSONLocation();
 		JSONObject data = new JSONObject();
 		try {
@@ -360,11 +373,13 @@ public class KisiAPI {
 						e.printStackTrace();
 					}	
 				}
+				Log.i("KisiAPI","unlock success");
 				if(callback != null)
 					callback.onUnlockSuccess(message);
 			}
 			
 			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+				Log.i("KisiAPI","unlock fail");
 				//statusCode  == 0: no network connectivity
 				String errormessage = null;
 				if(statusCode == 0) {
@@ -373,27 +388,73 @@ public class KisiAPI {
 						 callback.onUnlockFail(errormessage);
 					 return;
 				 }
-				if(errorResponse != null) {
-					if(errorResponse.has("alert")) {
-						try {
-							errormessage = errorResponse.getString("alert");
-						} catch (JSONException je) {
-							e.printStackTrace();
+				Log.i("KisiAPI","statusCode: "+statusCode);
+				Log.i("KisiAPI","old_auth_token: "+oldAuthToken);
+				if(statusCode!=401){
+					Log.i("KisiAPI","unlock fail show error");
+
+					if(errorResponse != null) {
+						if(errorResponse.has("alert")) {
+							try {
+								errormessage = errorResponse.getString("alert");
+							} catch (JSONException je) {
+								e.printStackTrace();
+							}
+						}else if(errorResponse.has("error")) {
+							try {
+								errormessage = errorResponse.getString("error");
+							} catch (JSONException je) {
+								e.printStackTrace();
+							}
 						}
-					}else if(errorResponse.has("error")) {
-						try {
-							errormessage = errorResponse.getString("error");
-						} catch (JSONException je) {
-							e.printStackTrace();
-						}
+					} else {
+						errormessage = "Unknown Error!";
 					}
-				} else {
-					errormessage = "Unknown Error!";
+					if(callback != null)
+						callback.onUnlockFail(errormessage);
+				}else{
+					if(oldAuthToken==false)
+						showLoginScreen();
+					else{ // retry
+						Log.i("KisiAPI","unlock start retry");
+
+						AccountManager mAccountManager = AccountManager.get(KisiApplication.getApplicationInstance());
+						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
+						Account acc = availableAccounts[0];
+						for(Account a :availableAccounts)
+								if(a.name.equals(getUser().getEmail()))
+										acc = a;
+						String password = mAccountManager.getPassword(acc);
+						KisiAPI.getInstance().login(acc.name, password, new LoginCallback(){
+
+							@Override
+							public void onLoginSuccess(String authtoken) {
+								Log.i("KisiAPI","unlock again");
+								unlock(lock,callback);
+							}
+
+							@Override
+							public void onLoginFail(String errormessage) {
+								if(!KisiApplication.getApplicationInstance().getResources().getString(R.string.no_network).equals(errormessage))
+									showLoginScreen();
+							}
+							
+						});
+					}
 				}
-				if(callback != null)
-					callback.onUnlockFail(errormessage);
 			}	
 		});
+	}
+	
+	private void showLoginScreen(){
+		KisiAPI.getInstance().logout();
+		Intent login = new Intent(KisiApplication.getApplicationInstance(), KisiMain.class);
+		login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
+                Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                Intent.FLAG_ACTIVITY_NEW_TASK);				
+		KisiApplication.getApplicationInstance().startActivity(login);
+
+		Toast.makeText(KisiApplication.getApplicationInstance(), KisiApplication.getApplicationInstance().getResources().getString(R.string.automatic_relogin_failed), Toast.LENGTH_LONG).show();
 	}
 	
 	

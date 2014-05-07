@@ -3,6 +3,7 @@ package de.kisi.android;
 import java.util.List;
 import java.util.Vector;
 
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -20,6 +21,7 @@ import com.electricimp.blinkup.BlinkupController;
 import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import com.newrelic.agent.android.NewRelic;
 
+import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Lock;
@@ -42,20 +44,22 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		NewRelic.withApplicationToken("AAe80044cf73854b68f6e83881c9e61c0df9d92e56").start(this.getApplication());
 		
 		kisiAPI = KisiAPI.getInstance();
 
-		Intent login = new Intent(this, AccountPickerActivity.class);
-		startActivityForResult(login, LOGIN_REQUEST_CODE);
-
+		AccountManager mAccountManager = AccountManager.get(this);
+		if(mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE).length!=1){
+			if(kisiAPI.getUser()==null){
+				Intent login = new Intent(this, AccountPickerActivity.class);
+				startActivityForResult(login, LOGIN_REQUEST_CODE);
+			}
+		}
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
 		setContentView(R.layout.kisi_main);
 
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
-				R.layout.window_title);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
 
 		FragmentManager fm = getSupportFragmentManager();
 		pagerAdapter = new PlaceFragmentPagerAdapter(fm);
