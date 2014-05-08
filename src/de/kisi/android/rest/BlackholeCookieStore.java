@@ -9,7 +9,7 @@ import org.apache.http.cookie.Cookie;
 
 // This Cookie Store prevents that cookies get stored, because otherwise if the http-library uses
 // cookies and the auth_token, the cookie overwrites the auth_token. If this happens switching user 
-// accounts don't work
+// accounts doesn't work
 // see:  https://github.com/loopj/android-async-http/issues/177
 
 public class BlackholeCookieStore implements CookieStore {

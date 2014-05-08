@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -45,7 +44,6 @@ public class ShareKeyActivity extends Activity {
 		
 		final List<Lock> sendlocks = new ArrayList<Lock>();
 		
-		Typeface font = Typeface.createFromAsset(this.getApplicationContext().getAssets(), "Roboto-Light.ttf");
 		//Getting px form Scale-independent Pixels
 		Resources r = getResources();
 		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 350, r.getDisplayMetrics());

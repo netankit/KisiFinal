@@ -1,15 +1,6 @@
 package de.kisi.android.ui;
 
-import com.electricimp.blinkup.BlinkupController;
-import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
-import com.newrelic.agent.android.NewRelic;
-
-import de.kisi.android.BaseActivity;
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.model.Place;
-import android.app.Activity;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -23,6 +14,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.electricimp.blinkup.BlinkupController;
+import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
+import com.newrelic.agent.android.NewRelic;
+
+import de.kisi.android.BaseActivity;
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.model.Place;
 
 public class KisiMainActivity extends BaseActivity implements OnPlaceChangedListener{
     
@@ -59,24 +60,23 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		mDrawerList.setAdapter(mDrawerListAdapter);
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 		 
-		mDrawerToggle = new ActionBarDrawerToggle( this,  mDrawerLayout, R.drawable.logo,  R.string.place_overview,  R.string.kisi ) {
+		mDrawerToggle = new ActionBarDrawerToggle( this,  mDrawerLayout, R.drawable.ic_drawer,  R.string.place_overview,  R.string.kisi ) {
 	            public void onDrawerClosed(View view) {
 	                getActionBar().setTitle(getResources().getString(R.string.kisi));
-//	                super.onDrawerClosed(view);
+	                super.onDrawerClosed(view);
 	                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
 	            }
 
 	            public void onDrawerOpened(View drawerView) {
 	                getActionBar().setTitle(getResources().getString(R.string.place_overview));
-//	                super.onDrawerOpened(drawerView);
+	                super.onDrawerOpened(drawerView);
 	                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
 	            }
 		 };
 		 
-		 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		getActionBar().setHomeButtonEnabled(true);
-		 
+		getActionBar().setDisplayShowHomeEnabled(true);		 
 		 
 		KisiAPI.getInstance().registerOnPlaceChangedListener(this);
 		Intent login = new Intent(this, AccountPickerActivity.class);

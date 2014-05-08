@@ -1,12 +1,11 @@
 package de.kisi.android.ui;
 
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.webkit.WebView;
-import android.widget.ImageButton;
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
 
 public class LogInfo extends Activity {
 
