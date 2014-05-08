@@ -16,27 +16,31 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
-import android.widget.TextView;
 
 
-public class PlaceNotificationSettings extends Activity {
+public class PlaceNotificationSettings extends Activity implements OnClickListener {
 
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 
 //		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+
 		setContentView(R.layout.place_notification_settings);
 
-//		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.log_title);
+		//getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.log_title);
+
+		ImageButton backButton = (ImageButton) findViewById(R.id.back);
+		backButton.setOnClickListener(this);
 
 		buildShareDialog();
+
 
 	}
 
@@ -100,6 +104,11 @@ public class PlaceNotificationSettings extends Activity {
         default:
             return super.onOptionsItemSelected(item);
         }
+	}
+
+	@Override
+	public void onClick(View v) {
+		finish();
 	}
 
 

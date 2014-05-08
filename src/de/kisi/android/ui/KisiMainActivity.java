@@ -4,12 +4,15 @@ import com.electricimp.blinkup.BlinkupController;
 import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import com.newrelic.agent.android.NewRelic;
 
+import de.kisi.android.BaseActivity;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -21,7 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class KisiMainActivity extends Activity implements OnPlaceChangedListener{
+public class KisiMainActivity extends BaseActivity implements OnPlaceChangedListener{
     
 	private static final String IMP_API_KEY = "08a6dd6db0cd365513df881568c47a1c";
 	private static final String NEW_RELIC_API_KEY = "AAe80044cf73854b68f6e83881c9e61c0df9d92e56";
@@ -206,6 +209,21 @@ public class KisiMainActivity extends Activity implements OnPlaceChangedListener
 		case R.id.logout:
 			logout();
 			return true;
+			
+			
+		case R.id.about_version:
+			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+			alertDialog.setTitle(R.string.kisi);
+			String versionName = null;
+			try {
+				versionName = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
+			} catch (NameNotFoundException e) {
+				e.printStackTrace();
+			}
+			alertDialog.setMessage(getResources().getString(R.string.version) + versionName);
+			alertDialog.show();
+			return true;
+			
 			
 		case R.id.notification:
 			Intent settingsIntent = new Intent(this, PlaceNotificationSettings.class);

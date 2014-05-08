@@ -13,9 +13,7 @@ import com.j256.ormlite.field.ForeignCollectionField;
 
 import de.kisi.android.KisiApplication;
 import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.notifications.NotificationManager;
-import de.kisi.android.vicinity.manager.GeofenceManager;
+import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 
 
 
@@ -46,6 +44,10 @@ public class Place {
 	@DatabaseField
 	@SerializedName("user_id")
 	private int ownerId;
+
+	@ForeignCollectionField(eager=false)
+    private ForeignCollection<Locator> locators;	
+	
 //	@SerializedName("updated_at")
 //	private Date updatedAt;
 
@@ -64,7 +66,7 @@ public class Place {
 		return locksLoaded;
 	}
 	
-	//TODO: clean this up 
+	//TODO: clean this up
 	public List<Lock> getLocks() {
 		Lock[] lockArray = locks.toArray(new Lock[0]);
 		List<Lock> result = new ArrayList<Lock>();
@@ -73,6 +75,23 @@ public class Place {
 		}
 		return result;
 	}
+	
+	public Lock getLockById(int lockId) {
+		for(Lock l:locks)
+			if(l.getId()==lockId)
+				return l;
+		return null;
+	}
+
+	public List<Locator> getLocators() {
+		Locator[] locatorArray = locators.toArray(new Locator[0]);
+		List<Locator> result = new ArrayList<Locator>();
+		for(Locator l: locatorArray) {
+			result.add(l);
+		}
+		return result;
+	}
+	
 	
 
 	public double getLatitude() {
@@ -132,35 +151,18 @@ public class Place {
 
 	
 	public boolean getNotificationEnabled() {
-		Context context = KisiApplication.getApplicationInstance().getApplicationContext();
+		Context context = KisiApplication.getInstance().getApplicationContext();
 		SharedPreferences prefs = context.getSharedPreferences("userconfig", Context.MODE_PRIVATE);
 		return prefs.getBoolean(generateSharedPreferencesKey(), true);
 	}
 	
 	public void setNotificationEnabled(boolean value) {
-		Context context = KisiApplication.getApplicationInstance().getApplicationContext();
+		Context context = KisiApplication.getInstance().getApplicationContext();
 		SharedPreferences prefs = context.getSharedPreferences("userconfig", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(generateSharedPreferencesKey(), value);
 		editor.commit();
-		//remove  Geofence 
-		if(value == false) {
-			GeofenceManager.getInstance().removeGeofance(this); 
-			NotificationManager.removeNotifications(KisiApplication.getApplicationInstance(), this);
-			return;
-		}
-		//add Geofence
-		if(value == true) {
-			KisiAPI.getInstance().updatePlaces(new OnPlaceChangedListener() {
-
-				@Override
-				public void onPlaceChanged(Place[] newPlaces) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-			});
-		}
+		LockInVicinityDisplayManager.getInstance().update();
 	}
 	
 	private String generateSharedPreferencesKey() {

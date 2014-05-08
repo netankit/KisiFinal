@@ -3,33 +3,28 @@ package de.kisi.android.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.model.Lock;
-import de.kisi.android.model.Place;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.model.Lock;
+import de.kisi.android.model.Place;
 
 public class ShareKeyActivity extends Activity {
 
@@ -147,8 +142,5 @@ public class ShareKeyActivity extends Activity {
             return super.onOptionsItemSelected(item);
         }
 	}
-	
-	
-
 
 }

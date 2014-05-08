@@ -3,9 +3,9 @@
     <item android:id="@+id/refresh" android:title="@string/refresh"></item>
     <item android:id="@+id/share" android:title="@string/share"></item>
     <item android:id="@+id/showLog" android:title="@string/log"></item>
-    
     <item android:id="@+id/notification" android:title="@string/notification_settings"></item>
     <item android:id="@+id/setup" android:title="@string/setup"></item>
     <item android:id="@+id/logout" android:title="@string/logout"></item>
- 
+    <item android:id="@+id/about_version" android:title="@string/about"></item>
+
 </menu>

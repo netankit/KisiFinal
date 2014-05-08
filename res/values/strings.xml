@@ -34,7 +34,7 @@
     <string name="session_timeout_relogin">Session timeout. Please login again.</string>
     <string name="logout_in_progress">Logging out…</string>
     <string name="logout_successful">Logged out successfully.</string>
-    <string name="blinkup_error">Blickup failed. Please try agian.</string>
+    <string name="blinkup_error">Blickup failed. Please try again.</string>
     <string name="blinkup_setting_up">Setting up your KISI device</string>
     <string name="blinkup_success">Success!\nPlease go to the KISI website to configure your places and locks</string>
     <string name="no_lock">No locks for this place</string>
@@ -46,7 +46,7 @@
 	<string name="forgot_html"><a href="https://www.kisi.de/users/password/new">Forgot your password?</a></string>
 	<string name="missing_login_data">Please type in EMail and Password first</string>
 	<string name="no_network">No network connectivity</string>
-	<string name="login_loading_message">Loggin in...</string>
+	<string name="login_loading_message">Logging you in...</string>
 	<string name="account_type">de.kisi</string>
 	<string name="add_new_account_done">Account created</string>
 	<string name="error_creating_account">Error creating account</string>
@@ -55,4 +55,17 @@
 	<string name="close_app">Exit</string>
 	<string name="notification_settings">Notification settings</string>
 	<string name="place_overview">Places</string>
+	<string name="about">About</string>
+	<string name="version">Version:\t</string>
+	<string name="location_not_available_title">Improve security of keys</string>
+	<string name="location_not_available_text">KISI needs to use the following services to improve the security of your keys.</string>
+	<string name="cancel">Cancel</string>
+	<string name="dontaskagain">Later</string>
+	<string name="ok">OK</string>
+	<string name="location">Location Service</string>
+	<string name="wifi">Wi-Fi</string>
+	<string name="bluetooth">Bluetooth</string>
+	<string name="bluetooth_on">Bluetooth detection on</string>
+	<string name="bluetooth_off">Bluetooth detection off</string>
+	<string name="update"> New version available.\n<u>Touch here to update</u></string>
 </resources>

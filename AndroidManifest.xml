@@ -1,26 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.kisi.android"
-    android:versionCode="16"
-    android:versionName="2.0.0" >
+    android:versionCode="23"
+    android:versionName="2.1.x" >
 
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     
-
+    <!-- Geofence feature -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    
+    <!-- Authentication Manager -->
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    
+    <!-- Bluetooth Feature -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    
+    <!-- NFC Feature -->
+    <uses-permission android:name="android.permission.NFC" />
+    
+    <!-- Notification Manager -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    
+    <!-- Wifi Manager -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    
+    
+    
     <application
         android:name="de.kisi.android.KisiApplication"
         android:allowBackup="true"
@@ -29,6 +46,26 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <!-- UI Activities -->
+         <activity
+            android:name=".account.AccountActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomThemeLogin" >
+        </activity>
+        <activity android:name=".ui.PlaceNotificationSettings" android:screenOrientation="portrait" android:configChanges="orientation" android:theme="@android:style/Theme.Holo.Light"></activity>
+        <activity android:name=".ui.KisiMainActivity" 
+            android:screenOrientation="portrait"
+            android:configChanges="orientation"
+             android:theme="@android:style/Theme.Holo.Light" android:launchMode="singleTop">
+              <intent-filter android:label="@string/app_name" >
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
         <activity
             android:name="de.kisi.android.ui.ShareKeyActivity"
             android:configChanges="orientation|keyboardHidden"
@@ -43,6 +80,11 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light" >
         </activity>
+        <activity 
+            android:name="PlaceNotificationSettings" 
+            android:screenOrientation="portrait" 
+            android:configChanges="orientation" 
+            android:theme="@style/CustomTheme" />
         <activity
             android:name="com.electricimp.blinkup.WifiSelectActivity"
             android:configChanges="orientation"
@@ -73,16 +115,17 @@
             android:screenOrientation="portrait"
             android:theme="@style/CustomThemeLogin" />
 
-   
-        <receiver
-            android:name="de.kisi.android.notifications.NotificationManager"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="de.kisi.android.VICINITY_CHANGED" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name="de.kisi.android.vicinity.manager.GeofenceUpdateLocationReceiver" >
-        </receiver><receiver
+          <activity
+            android:name="de.kisi.android.ui.BlinkupCompleteActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation" />
+         
+  
+ 
+        <!-- UI Activities end -->
+        
+		<!-- Start on Boot -->
+		<receiver
             android:name="de.kisi.android.StartOnBootReceiver"
             android:enabled="true"
             android:exported="true" >
@@ -90,8 +133,26 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
-        <service android:name="de.kisi.android.account.KisiAuthenticatorService" >
+        <!-- Start on Boot end -->
+        
+        <!-- Notification -->
+        <receiver
+            android:name="de.kisi.android.notifications.NotificationManager"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="de.kisi.android.VICINITY_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <!-- Notification end -->
+        
+        <!-- Geofence -->
+		<receiver android:name="de.kisi.android.vicinity.manager.GeofenceUpdateLocationReceiver"
+		    android:exported="false">
+		</receiver>
+		<!-- Geofence end -->
+		
+        <!-- Account Manager -->
+        <service android:name="de.kisi.android.account.KisiAuthenticatorService" android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -100,24 +161,60 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+		<activity android:name="AccountPickerActivity" android:theme="@style/CustomThemeLogin" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
+		<!-- Account Manager end-->
+		
+		<!-- NFC -->
+		<activity android:name="de.kisi.android.vicinity.manager.NFCReceiver">
+			<intent-filter>
+		        <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+		        <data android:mimeType="application/de.kisi.android"/>
+		        <category android:name="android.intent.category.DEFAULT"/>
+		    </intent-filter>
+		    <!-- This intent-filter is only needed to detect empty NFC Tags, in case we allow the
+		         user to write their own tags -->
+		    <!-- 
+		    <intent-filter>
+		        <action android:name="android.nfc.action.TECH_DISCOVERED" />
+		    </intent-filter>
+		    <meta-data
+		        android:name="android.nfc.action.TECH_DISCOVERED"
+		        android:resource="@xml/nfc_tech_filter" />
+			-->
+			</activity>
+		<!-- NFC end -->
+		
+		<!-- Bluetooth --> 
+		<service
+            android:name="de.kisi.android.vicinity.manager.BluetoothLEService"
+            android:enabled="true"
+            android:exported="false"
+            android:isolatedProcess="false"
+            >
+        </service>
+        
+		<service
+            android:name="com.radiusnetworks.ibeacon.service.IBeaconService"
+            android:enabled="true"
+            android:exported="false"
+            android:isolatedProcess="false"
+            android:label="iBeacon" >
+        </service>
+        
+        <service
+            android:name="com.radiusnetworks.ibeacon.IBeaconIntentProcessor"
+            android:enabled="true" >
+        </service>
+       
+        <service
+            android:name="de.kisi.android.vicinity.manager.BluetoothAutoUnlockService"
+           	android:enabled="true"
+            android:exported="false" >
+        </service> 
+        
+        <!-- Bluetooth end-->
 
-        <activity
-            android:name=".account.AccountActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"
-            android:theme="@style/CustomThemeLogin" >
-        </activity>
-        <activity android:name=".ui.PlaceNotificationSettings" android:screenOrientation="portrait" android:configChanges="orientation" android:theme="@android:style/Theme.Holo.Light"></activity>
-        <activity android:name=".ui.KisiMainActivity" 
-            android:screenOrientation="portrait"
-            android:configChanges="orientation"
-             android:theme="@android:style/Theme.Holo.Light" android:launchMode="singleTop">
-              <intent-filter android:label="@string/app_name" >
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+    
     </application>
 
 

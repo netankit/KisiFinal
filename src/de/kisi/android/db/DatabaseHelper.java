@@ -12,6 +12,7 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
@@ -25,7 +26,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	// name of the database file for your application -- change to something appropriate for your app
 	private static final String DATABASE_NAME = "Kisi.db";
 	// any time you make changes to your database objects, you may have to increase the database version
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
 	// the DAO object we use to access the Lock table;
 
@@ -34,9 +35,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	
     private Dao<Place, Integer> placeDao = null;
     private RuntimeExceptionDao<Place, Integer> placeRuntimeDao = null;
-
+    
     private Dao<User, Integer> userDao = null;
     private RuntimeExceptionDao<User, Integer> userRuntimeDao = null;
+
+    private Dao<Locator, Integer> locatorDao = null;
+    private RuntimeExceptionDao<Locator, Integer> locatorRuntimeDao = null;
+    
 	
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION, de.kisi.android.R.raw.ormlite_config );
@@ -53,6 +58,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			TableUtils.createTable(connectionSource, Place.class);
 			TableUtils.createTable(connectionSource, Lock.class);
 			TableUtils.createTable(connectionSource, User.class);
+			TableUtils.createTable(connectionSource, Locator.class);
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 			throw new RuntimeException(e);
@@ -66,14 +72,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
-		//Added in version 2 the user table
-		if(oldVersion < 2) {
-			try {
+		try {
+			// Added in version 2 the user table
+			if (oldVersion < 2) {
 				TableUtils.createTable(connectionSource, User.class);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+			// Added in version 3 the locator table
+			if (oldVersion < 3) {
+				TableUtils.createTable(connectionSource, Locator.class);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -120,6 +130,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		}
 		return placeRuntimeDao;
 	}
+	
 
 	/**
 	 * Returns the Database Access Object (DAO) for our Place class. It will create it or just give the cached
@@ -142,28 +153,57 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		}
 		return userRuntimeDao;
 	}
+
 	
 	
+	
+	
+	/**
+	 * Returns the Database Access Object (DAO) for our Locator class. It will create it or just give the cached
+	 * value.
+	 */
+	public Dao<Locator, Integer> getLocatorDao() throws SQLException {
+		if (locatorDao == null) {
+			locatorDao = getDao(Locator.class);
+		}
+		return locatorDao;
+	}
+
+	/**
+	 * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our Place class. It will
+	 * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
+	 */
+	public RuntimeExceptionDao<Locator, Integer> getLocatorDataDao() {
+		if (locatorRuntimeDao == null) {
+			locatorRuntimeDao = getRuntimeExceptionDao(Locator.class);
+		}
+		return locatorRuntimeDao;
+	}
+	
+
 
 	public void clear() {
 		try {
 			TableUtils.clearTable(connectionSource, Place.class);
 			TableUtils.clearTable(connectionSource, Lock.class);
 			TableUtils.clearTable(connectionSource, User.class);
+			TableUtils.clearTable(connectionSource, Locator.class);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void clearPlaceLock() {
-			try {
-				TableUtils.clearTable(connectionSource, Place.class);
-				TableUtils.clearTable(connectionSource, Lock.class);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+	public void clearPlaceLockLocator() {
+		try {
+			TableUtils.clearTable(connectionSource, Place.class);
+			TableUtils.clearTable(connectionSource, Lock.class);
+			TableUtils.clearTable(connectionSource, Locator.class);
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-	
+	}
+
+
 	
 	
 
@@ -175,5 +215,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		super.close();
 		lockRuntimeDao = null;
 		placeRuntimeDao = null;
+		locatorRuntimeDao = null;
 	}
 }

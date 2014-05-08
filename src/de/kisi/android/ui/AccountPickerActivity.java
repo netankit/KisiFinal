@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -22,9 +21,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.kisi.android.R;
-import de.kisi.android.R.id;
-import de.kisi.android.R.layout;
-import de.kisi.android.R.string;
 import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
@@ -156,7 +152,9 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 	
 	@Override
 	public void onBackPressed() {
-		progressDialog.dismiss();
+		if(progressDialog != null) {
+			progressDialog.dismiss();
+		}
 		setResult(LOGIN_FAILED);
 		finish();
 	}

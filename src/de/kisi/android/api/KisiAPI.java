@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.location.Location;
 import android.os.Build;
 import android.widget.Toast;
@@ -17,14 +18,18 @@ import android.widget.Toast;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
+import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.db.DataManager;
+import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
 import de.kisi.android.notifications.NotificationManager;
 import de.kisi.android.rest.KisiRestClient;
+import de.kisi.android.vicinity.LockInVicinityDisplayManager;
+import de.kisi.android.vicinity.manager.BluetoothLEManager;
 import de.kisi.android.vicinity.manager.GeofenceManager;
 
 import com.google.gson.Gson;
@@ -35,20 +40,15 @@ public class KisiAPI {
 	private static KisiAPI instance;  
 	
 	
-	private Place[] places = new Place[0];
 	private List<OnPlaceChangedListener> registeredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> unregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> newregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
-	
-	private User user;
 
 	private Context context;
 	
-	public static void initialize(Context context){
-		instance = new KisiAPI(context);
-	}
-	
 	public static KisiAPI getInstance(){
+		if(instance == null)
+			instance = new KisiAPI(KisiApplication.getInstance());
 		return instance;
 	}
 
@@ -58,25 +58,42 @@ public class KisiAPI {
 	
 	
 	public void login(String login, String password, final LoginCallback callback){
-
-		JSONObject login_data = new JSONObject();
-		JSONObject login_user = new JSONObject();
+		
+		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(login);
+		
+		JSONObject loginJSON = new JSONObject();
+		JSONObject userJSON = new JSONObject();
+		JSONObject deviceJSON = new JSONObject();
 		try {
-			login_data.put("email", login);
-			login_data.put("password", password);
-			login_user.put("user", login_data);
+			//build user object
+			userJSON.put("email", login);
+			userJSON.put("password", password);
+			loginJSON.put("user", userJSON);
+			
+			//build device object
+			if (deviceUUID != null) {
+				deviceJSON.put("uuid", deviceUUID);				
+			}
+			deviceJSON.put("platform_name", "Android");
+			deviceJSON.put("platform_version", Build.VERSION.RELEASE);
+			deviceJSON.put("model", Build.MANUFACTURER + " " + Build.MODEL);
+			try {
+				deviceJSON.put("app_version", KisiApplication.getInstance().getVersion());
+			} catch (NameNotFoundException e) {
+				//no app version for you then...
+			}
+			loginJSON.put("device", deviceJSON);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
 
-		KisiRestClient.getInstance().post("users/sign_in", login_user,  new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", loginJSON,  new JsonHttpResponseHandler() {
 			
 			 public void onSuccess(org.json.JSONObject response) {
 				Gson gson = new Gson();
-				user = gson.fromJson(response.toString(), User.class);
+				User user = gson.fromJson(response.toString(), User.class);
 				DataManager.getInstance().saveUser(user);
-				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-				callback.onLoginSuccess(KisiAPI.getInstance().getAuthToken());
+				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
 				return;
 			}
 			
@@ -110,10 +127,7 @@ public class KisiAPI {
 
 	}
 	
-	public void clearCache() {
-		user = null;
-		places = null;
-		
+	public void clearCache() {		
 		DataManager.getInstance().deleteDB();
 	}
 	
@@ -121,8 +135,9 @@ public class KisiAPI {
 	public void logout(){
 		KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
 		clearCache();
-		GeofenceManager.getInstance().removeAllGeofances();
-		NotificationManager.removeAllNotifications(context);
+		BluetoothLEManager.getInstance().stopService();
+		LockInVicinityDisplayManager.getInstance().update();
+		NotificationManager.removeAllNotification();
 		KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
 			public void onSuccess(String msg) {
 	
@@ -136,17 +151,18 @@ public class KisiAPI {
 	 * @return Array of all Places the user has access to
 	 */
 	public Place[] getPlaces(){
-		return places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+		return DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 	}
 	
 	public Place getPlaceAt(int index){
-		places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+		Place[] places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		if(places != null && index>=0 && index<places.length)
 			return places[index];
 		return null;
 	}
+	
 	public Place getPlaceById(int num){
-		places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+		Place[]  places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		for(Place p : places)
 			if(p.getId() == num)
 				return p;
@@ -158,11 +174,14 @@ public class KisiAPI {
 		return 	DataManager.getInstance().getUser();
 	}
 
-	
+	/**
+	 * 
+	 * @param listener
+	 */
 	public void updatePlaces(final OnPlaceChangedListener listener) {
-		if(user == null)
+		if(getUser() == null)
 			return;
-		places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+
 		
 		KisiRestClient.getInstance().get("places",  new JsonHttpResponseHandler() { 
 			
@@ -170,22 +189,13 @@ public class KisiAPI {
 				Gson gson = new Gson();
 				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
 				DataManager.getInstance().savePlaces(pl);
-				places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-				for(Place p: places) {
+				//update locks for places
+				for(Place p: pl) {
 					KisiAPI.getInstance().updateLocks(p, listener);
 				}
-//				listener.onPlaceChanged(places);
-//				notifyAllOnPlaceChangedListener();	
 			}
 			
 		});
-	}
-	
-
-	
-	//TODO: security
-	public String getAuthToken() {
-		return user.getAuthentication_token();
 	}
 	
 	
@@ -199,14 +209,19 @@ public class KisiAPI {
 					l.setPlace(instance.getPlaceById(l.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocks(locks);
-				listener.onPlaceChanged(places);
+				listener.onPlaceChanged(getPlaces());
 				notifyAllOnPlaceChangedListener();
+				//get also locators for this place
+				KisiAPI.getInstance().updateLocators(place);
 			}
 		});		
 	}
 	
+	//helper method for updateLocators
 	public Lock getLockById(Place place, int lockId){ 
 		List<Lock> locks  = place.getLocks();
+		if(locks == null)
+			return null;
 		for(Lock l: locks) {
 			if(l.getId() == lockId) {
 				return l;
@@ -215,6 +230,39 @@ public class KisiAPI {
 		return null;
 	}
 	
+	
+	public Lock getLockById(int lockId) {
+		Place[] places = this.getPlaces();
+		if(places == null)
+			return null;
+		
+		for(Place p: places){
+			for(Lock l: p.getLocks()) {
+				if(l.getId() == lockId){
+					return l;
+				}
+			}
+		}
+		return null;
+	}
+	
+	
+	public void updateLocators(final Place place) {
+		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locators", new JsonHttpResponseHandler() {
+			
+			public void onSuccess(JSONArray response) {
+				Gson gson = new Gson();
+				Locator[] locators = gson.fromJson(response.toString(), Locator[].class);
+				for(Locator l: locators) {
+					l.setLock(KisiAPI.getInstance().getLockById(KisiAPI.getInstance().getPlaceById(l.getPlaceId()), l.getLockId()));
+					l.setPlace(KisiAPI.getInstance().getPlaceById(l.getPlaceId()));
+				}
+				DataManager.getInstance().saveLocators(locators);
+				notifyAllOnPlaceChangedListener();
+			}
+			
+		});
+	}
 	
 
 	public boolean createNewKey(Place p, String email, List<Lock> locks, final Activity activity) {
@@ -255,7 +303,10 @@ public class KisiAPI {
 	/**
 	 * Register for interest in any changes in the Places.
 	 * The listener is fired when a Place was added or deleted
-	 * or any change occur within the Place like a Lock has been added. 
+	 * or any change occur within the Place like a Lock or Locator has been added. 
+	 * 
+	 * Sometimes on a total refresh there can be a lot of PlaceChanges in a short
+	 * period of time, so make sure that the client can handle this.
 	 * @param listener
 	 */
 	public void registerOnPlaceChangedListener(OnPlaceChangedListener listener){
@@ -276,34 +327,40 @@ public class KisiAPI {
 	 * the Places has changed.
 	 */
 	private void notifyAllOnPlaceChangedListener(){
+		// This have to be done this way, lists are not allowed to be modified 
+		// during a foreach loop
 		for(OnPlaceChangedListener listener : unregisteredOnPlaceChangedListener)
 			registeredOnPlaceChangedListener.remove(listener);
 		registeredOnPlaceChangedListener.addAll(newregisteredOnPlaceChangedListener);
 		newregisteredOnPlaceChangedListener.clear();
 		for(OnPlaceChangedListener listener : registeredOnPlaceChangedListener)
-			listener.onPlaceChanged(places);
+			listener.onPlaceChanged(getPlaces());
 	}
 	
-	
+	/**
+	 * Checks if the place is owned by the user or just shared
+	 * 
+	 * @param place Place to be checked
+	 * @return true if user is owner, false if someone else shares this place with the user
+	 */
 	public boolean userIsOwner(Place place){
-		return place.getOwnerId()==this.user.getId();
+		return place.getOwnerId()==this.getUser().getId();
 	}
 	
+	/**
+	 * Send a request to the server to unlock this lock. The callback will
+	 * run on another Thread, so do no direct UI modifications in there
+	 * 
+	 * @param lock The lock that should be unlocked
+	 * @param callback Callback object for feedback, or null if no feedback is requested
+	 */
 	public void unlock(Lock lock, final UnlockCallback callback){
-        KisiLocationManager locationManager = KisiLocationManager.getInstance();
-		Location currentLocation = locationManager.getCurrentLocation();;
-		JSONObject location = new JSONObject();
+        JSONObject location =  generateJSONLocation();
 		JSONObject data = new JSONObject();
 		try {
-			if(currentLocation != null) {
-				location.put("latitude", currentLocation.getLatitude());
-				location.put("longitude", currentLocation.getLongitude());
-			}
-			else {
-		 		location.put("error:", "Location data not accessible");
-			}
 			data.put("location", location);
 		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
@@ -314,14 +371,14 @@ public class KisiAPI {
 			public void onSuccess(JSONObject response) {
 				String message = null;
 				if(response.has("notice")) {
-					// change button design
 					try {
 						message = response.getString("notice");
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}	
 				}
-				callback.onUnlockSuccess(message);
+				if(callback != null)
+					callback.onUnlockSuccess(message);
 			}
 			
 			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
@@ -329,7 +386,8 @@ public class KisiAPI {
 				String errormessage = null;
 				if(statusCode == 0) {
 					 errormessage = context.getResources().getString(R.string.no_network);
-					 callback.onUnlockFail(errormessage);
+					 if(callback != null)
+						 callback.onUnlockFail(errormessage);
 					 return;
 				 }
 				
@@ -345,14 +403,15 @@ public class KisiAPI {
 				else {
 					errormessage = "Error!";
 				}
-				callback.onUnlockFail(errormessage);
+				if(callback != null)
+					callback.onUnlockFail(errormessage);
 			}	
 		});
 	}
 	
 	
 	public void refresh(OnPlaceChangedListener listener) {
-		DataManager.getInstance().deletePlaceLockFromDB();
+		DataManager.getInstance().deletePlaceLockLocatorFromDB();
 		this.updatePlaces(listener);
 	}
 	
@@ -373,28 +432,13 @@ public class KisiAPI {
         if (impeeId != null) 
             impeeId = impeeId.trim();
 
-        JSONObject location = new JSONObject();
-        KisiLocationManager locationManager = KisiLocationManager.getInstance();
-		Location currentLocation = locationManager.getCurrentLocation();
-        try {
-    		if(currentLocation != null) {
-    			location.put("latitude", currentLocation.getLatitude());
-    			location.put("longitude", currentLocation.getLongitude());
-    		} else { 
-	 			location.put("error:", "Location data not accessible");
-    		}
-		} catch (JSONException e1) {
-			e1.printStackTrace();
-		}
+        JSONObject location = generateJSONLocation();
     	JSONObject gateway = new JSONObject();
 		try {
 			gateway.put("name", "Gateway");
 			gateway.put("uri", agentUrl);
-			gateway.put("plattform_name", "Android");
-			gateway.put("plattform_version", Build.VERSION.RELEASE);
 			gateway.put("blinked_up", true);
 			gateway.put("ei_impee_id", impeeId);
-			gateway.put("device_model", Build.MANUFACTURER + " " + Build.MODEL);
 			gateway.put("location", location);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -414,6 +458,53 @@ public class KisiAPI {
 		KisiRestClient.getInstance().post("gateways", data, new JsonHttpResponseHandler() {});	
 		
 	}
+
+	private JSONObject generateJSONLocation() {
+		JSONObject location = new JSONObject();
+		Location currentLocation = GeofenceManager.getInstance().getLocation();
+		try {
+    		if(currentLocation != null) {
+    			location.put("latitude", currentLocation.getLatitude());
+    			location.put("longitude", currentLocation.getLongitude());
+    			location.put("horizontal_accuracy", currentLocation.getAccuracy());
+    			location.put("altitude", currentLocation.getAltitude());
+    			location.put("age", (System.currentTimeMillis() - currentLocation.getTime())/1000.0);
+    		} else { 
+	 			location.put("error:", "Location data not accessible");
+    		}
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+        return location;
+	}
 	
 	
+	public void getLatestVerion(final VersionCheckCallback callback) {
+		KisiRestClient.getInstance().get("stats", new JsonHttpResponseHandler() {
+
+			public void onSuccess(org.json.JSONObject response) {
+				String result = null;
+				JSONObject JsonAndroid = null;
+				try {
+					JsonAndroid = (JSONObject) response.get("android");
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				if(JsonAndroid != null) {
+					try {
+						result = JsonAndroid.getString("latest_version");
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+
+				callback.onVersionResult(result);
+			}
+
+			public void onFailure(java.lang.Throwable e, org.json.JSONArray errorResponse) {
+				callback.onVersionResult("error");
+			}
+		});
+	}
 }

@@ -27,7 +27,7 @@ public class WebClient extends WebViewClient {
 	public boolean shouldOverrideUrlLoading(WebView view, String url) {
 		if ( url.indexOf("https://kisi.de/") == 0 ) {
 			url += url.contains("?") ? "&" : "?";
-			url += "auth_token=" + KisiAPI.getInstance().getAuthToken();
+			url += "auth_token=" + KisiAPI.getInstance().getUser().getAuthentication_token();
 		}
 		view.loadUrl(url);
 		return true;

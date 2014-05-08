@@ -1,7 +1,12 @@
 package de.kisi.android.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 
 
 
@@ -16,12 +21,35 @@ public class Lock {
 	private int placeId;
 	@DatabaseField(foreign = true, foreignAutoRefresh=true, maxForeignAutoRefreshLevel=1)
 	private Place place;
-//	@SerializedName("updated_at")
+
+	@ForeignCollectionField(eager=false)
+    private ForeignCollection<Locator> locators;	
+	
+	
+	//	@SerializedName("updated_at")
 //	private Date updatedAt;
 //	@SerializedName("last_accessed_at")
 //	private Date lastAccessedAt;
 	
 	public Lock() {};
+	
+	//TODO: clean this up later
+	public List<Locator> getLocators() {
+		Locator[] locatorArray = locators.toArray(new Locator[0]);
+		List<Locator> result = new ArrayList<Locator>();
+		for(Locator l: locatorArray) {
+			result.add(l);
+		}
+		return result;
+	}
+	
+	public Locator getLocatorById(int locatorId) {
+		for(Locator l:locators)
+			if(l.getId() == locatorId)
+				return l;
+		return null;
+	}
+	
 	
 	public int getId() {
 		return id;

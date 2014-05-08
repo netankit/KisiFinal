@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.widget.ImageButton;
 
 public class LogInfo extends Activity {
 
@@ -24,8 +25,9 @@ public class LogInfo extends Activity {
 		 // gets the previously created intent
 		int place_id = getIntent().getIntExtra("place_id", 0);
 		webView.loadUrl(String.format("https://kisi.de/places/%d/events?auth_token=%s", 
-			place_id,  KisiAPI.getInstance().getAuthToken()));
 
+			place_id,  KisiAPI.getInstance().getUser().getAuthentication_token())
+		);
 	}
 	
 	//listener for the backbutton of the action bar

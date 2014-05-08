@@ -8,6 +8,8 @@ import android.content.Context;
 
 import com.j256.ormlite.dao.Dao;
 
+import de.kisi.android.KisiApplication;
+import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
@@ -17,17 +19,15 @@ public class DataManager {
 	private static DataManager instance;
 	
 	public static DataManager getInstance() {
+		if(instance == null)
+			instance = new DataManager(KisiApplication.getInstance());
 		return instance;
 	}
-	
-	public static void initialize(Context context){
-		instance =  new DataManager(context);
-	}
-	
 	
 	private DatabaseHelper db;
     private Dao<Lock, Integer> lockDao;
     private Dao<Place, Integer> placeDao;
+    private Dao<Locator, Integer> locatorDao;
     private Dao<User, Integer> userDao;
     private DatabaseManager dbManager;
  
@@ -39,6 +39,7 @@ public class DataManager {
             lockDao = db.getLockDao();
             placeDao = db.getPlaceDao();
             userDao = db.getUserDao();
+            locatorDao = db.getLocatorDao();
         }catch (SQLException e) {
             e.printStackTrace();
         }
@@ -82,11 +83,8 @@ public class DataManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	
-    	
-    	
     }
-
+    
     public void saveUser(User user) {
     	try {
 			userDao.createOrUpdate(user);
@@ -97,6 +95,26 @@ public class DataManager {
     }
     
     
+    
+    public void saveLocators(final Locator[] locators) {
+    	try {
+			//put the hole operation into one transaction
+			locatorDao.callBatchTasks(new Callable<Void>() {
+
+				@Override
+				public Void call() throws Exception {
+
+					for (Locator l : locators) {
+						locatorDao.createOrUpdate(l);
+					}
+					return null;
+				}
+
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
     
     public List<Place> getAllPlaces() {
     	List<Place> result = null;
@@ -134,15 +152,26 @@ public class DataManager {
     		return result.get(0);
     	}
     }
+    
+    
+    public List<Locator> getAllLocators() {
+    	List<Locator> result = null;
+    	try {
+    		result =  locatorDao.queryForAll();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	return result;
+    }
+    
  
     
     public void deleteDB() {
     	db.clear();
     }
     
-    
-    public void deletePlaceLockFromDB() {
-    	db.clearPlaceLock();
+    public void deletePlaceLockLocatorFromDB() {
+    	db.clearPlaceLockLocator();
     }
     
     public void close() {

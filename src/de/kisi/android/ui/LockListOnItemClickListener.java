@@ -32,7 +32,7 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 	@Override
 	public void  onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
 		final ProgressDialog progressDialog = new ProgressDialog(view.getContext());
-		progressDialog.setMessage(KisiApplication.getApplicationInstance().getString(R.string.opening));
+		progressDialog.setMessage(KisiApplication.getInstance().getString(R.string.opening));
 		progressDialog.setCancelable(false);
 		progressDialog.show();
 		final Lock lock = place.getLocks().get(position);
@@ -42,7 +42,7 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 			@Override
 			public void onUnlockSuccess(String message) {
 				progressDialog.dismiss();
-				Toast.makeText(KisiApplication.getApplicationInstance(), message, Toast.LENGTH_SHORT).show();
+				Toast.makeText(KisiApplication.getInstance(), message, Toast.LENGTH_SHORT).show();
 				final Button currentButton = (Button) parent.getChildAt(position);
 				// save button design
 				final Drawable currentBackground = currentButton.getBackground();
@@ -68,7 +68,7 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 			@Override
 			public void onUnlockFail(String alertMsg) {
 				progressDialog.dismiss();
-				Toast.makeText(KisiApplication.getApplicationInstance(), alertMsg, Toast.LENGTH_SHORT).show();
+				Toast.makeText(KisiApplication.getInstance(), alertMsg, Toast.LENGTH_SHORT).show();
 				final Button currentButton = (Button) parent.getChildAt(position);
 				// save button design
 				final Drawable currentBackground = currentButton.getBackground();

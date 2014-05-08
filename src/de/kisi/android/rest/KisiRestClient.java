@@ -24,7 +24,7 @@ import de.kisi.android.model.User;
 
 public class KisiRestClient {
 
-	private static KisiRestClient instance =  new KisiRestClient();
+	private static KisiRestClient instance;
 	
 	private static final String BASE_URL = "https://www.kisi.de/";
 	private static final String URL_SUFFIX = ".json";
@@ -32,13 +32,16 @@ public class KisiRestClient {
 	private  AsyncHttpClient client;
 	
 	public static KisiRestClient getInstance() {
+		if(instance == null){
+			instance =  new KisiRestClient();
+		}
 		return instance;
 	}
 	
 	private KisiRestClient() {
 		 client = new AsyncHttpClient();
 		 client.setCookieStore(new BlackholeCookieStore());
-		 client.setUserAgent("Android_Kisi");
+		 client.setUserAgent("de.kisi.android");
 	}
 
 
@@ -62,12 +65,18 @@ public class KisiRestClient {
 			authToken = KisiAPI.getInstance().getUser().getAuthentication_token();
 		}
 		if(authToken != null) {
-			client.post(KisiApplication.getApplicationInstance(), getAbsoluteUrl(url, authToken), JSONtoStringEntity(data), "application/json", responseHandler);
+			client.post(KisiApplication.getInstance(), getAbsoluteUrl(url, authToken), JSONtoStringEntity(data), "application/json", responseHandler);
 		}
 		else {
-			client.post(KisiApplication.getApplicationInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
+			client.post(KisiApplication.getInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
 		}
 	}
+	
+	//workaround method so that the login call is done without the authtoken and so renews the old authtoken
+	public void postWithoutAuthToken (String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
+		client.post(KisiApplication.getInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
+	}
+
 	
 	
 	public  void delete(String url, AsyncHttpResponseHandler responseHandler) {
