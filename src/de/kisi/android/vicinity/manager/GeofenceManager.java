@@ -109,7 +109,6 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 	@Override
 	public void onLocationChanged(Location location) {
 		mLocation = location;
-		Log.d("KisiAPP", "onLocationChanged");
 	}
 	
 	

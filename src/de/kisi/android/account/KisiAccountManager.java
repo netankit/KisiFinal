@@ -87,7 +87,7 @@ public class KisiAccountManager {
 	    for (int i = 0; i < names.length; i++) {
 	        names[i] = accounts[i].name;
 	    }
-	    return names.length > 0 ? names[1] : null;
+	    return names.length > 0 ? names[0] : null;
 	}
 	
 	//can be null if Wifi is turned off (not true for Moto X, as always visible)

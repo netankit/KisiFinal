@@ -34,7 +34,7 @@
     <string name="session_timeout_relogin">Session timeout. Please login again.</string>
     <string name="logout_in_progress">Logging out…</string>
     <string name="logout_successful">Logged out successfully.</string>
-    <string name="blinkup_error">Blickup failed. Please try agian.</string>
+    <string name="blinkup_error">Blickup failed. Please try again.</string>
     <string name="blinkup_setting_up">Setting up your KISI device</string>
     <string name="blinkup_success">Success!\nPlease go to the KISI website to configure your places and locks</string>
     <string name="no_lock">No locks for this place</string>
@@ -60,7 +60,7 @@
 	<string name="location_not_available_text">KISI needs to use the following services to improve the security of your keys.</string>
 	<string name="cancel">Cancel</string>
 	<string name="dontaskagain">Later</string>
-	<string name="ok">Ok</string>
+	<string name="ok">OK</string>
 	<string name="location">Location Service</string>
 	<string name="wifi">Wi-Fi</string>
 	<string name="bluetooth">Bluetooth</string>
