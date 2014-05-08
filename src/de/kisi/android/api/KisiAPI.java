@@ -74,8 +74,8 @@ public class KisiAPI {
 			if (deviceUUID != null) {
 				deviceJSON.put("uuid", deviceUUID);				
 			}
-			deviceJSON.put("plattform_name", "Android");
-			deviceJSON.put("plattform_version", Build.VERSION.RELEASE);
+			deviceJSON.put("platform_name", "Android");
+			deviceJSON.put("platform_version", Build.VERSION.RELEASE);
 			deviceJSON.put("model", Build.MANUFACTURER + " " + Build.MODEL);
 			try {
 				deviceJSON.put("app_version", KisiApplication.getInstance().getVersion());
