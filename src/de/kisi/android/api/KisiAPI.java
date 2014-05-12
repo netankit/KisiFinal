@@ -13,6 +13,7 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -46,8 +47,9 @@ public class KisiAPI {
 	private Context context;
 
 	private boolean oldAuthToken = true;
-	private Boolean reloginSuccess = false;
-
+	private boolean reloginSuccess = false;
+	private final Object syncObject = new Object();
+	private boolean loginInProgress = false; 
 	public static KisiAPI getInstance() {
 		if (instance == null)
 			instance = new KisiAPI(KisiApplication.getInstance());
@@ -59,17 +61,29 @@ public class KisiAPI {
 	}
 
 	public void login(String login, String password, final LoginCallback callback) {
+		Log.i("KisiAPI", "login");
 
-		synchronized (reloginSuccess) {
+		/*while(false && loginInProgress)
+			try {
+				Log.i("KisiAPI", "sleep "+Thread.currentThread().getId());
+				Thread.sleep(250);
+			} catch (InterruptedException e2) {
+				e2.printStackTrace();
+			}*/
+		synchronized (syncObject) {
+			Log.i("KisiAPI","sync");
 			if (reloginSuccess) {
-				try{
+				Log.i("KisiAPI","use relogin");
+				try {
 					callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
 					return;
-				}catch(NullPointerException e){
-					//This might happen if the user login after automatic unlock
+				} catch (NullPointerException e) {
+					// This might happen if the user login after automatic
+					// unlock
 				}
 			}
 			if (oldAuthToken) {
+				Log.i("KisiAPI","reallogin");
 				JSONObject login_data = new JSONObject();
 				JSONObject login_user = new JSONObject();
 				try {
@@ -79,20 +93,26 @@ public class KisiAPI {
 				} catch (JSONException e1) {
 					e1.printStackTrace();
 				}
-
+				/*for (StackTraceElement e : Thread.currentThread().getStackTrace())
+					Log.d("KisiAPI", " " + e.toString());*/
+				loginInProgress = true;
 				KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", login_user, new JsonHttpResponseHandler() {
 
 					public void onSuccess(org.json.JSONObject response) {
+						Log.i("KisiAPI","success");
 						oldAuthToken = false;
 						reloginSuccess = true;
 						Gson gson = new Gson();
 						User user = gson.fromJson(response.toString(), User.class);
 						DataManager.getInstance().saveUser(user);
 						callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
+						Log.i("KisiAPI","loginInProgress = false;");
+						loginInProgress = false;
 						return;
 					}
 
 					public void onFailure(int statusCode, Throwable e, JSONObject response) {
+						Log.i("KisiAPI","failure");
 						oldAuthToken = false;
 						reloginSuccess = false;
 						String errormessage = null;
@@ -100,6 +120,8 @@ public class KisiAPI {
 						if (statusCode == 0) {
 							errormessage = context.getResources().getString(R.string.no_network);
 							callback.onLoginFail(errormessage);
+							Log.i("KisiAPI","loginInProgress = false;");
+							loginInProgress = false;
 							return;
 						}
 
@@ -113,11 +135,15 @@ public class KisiAPI {
 							errormessage = "Error!";
 						}
 						callback.onLoginFail(errormessage);
+						Log.i("KisiAPI","loginInProgress = false;");
+						loginInProgress = false;
 						return;
 					};
 
 				});
 			}
+			Log.i("KisiAPI","sync end");
+
 		}
 
 	}
@@ -186,13 +212,18 @@ public class KisiAPI {
 					KisiAPI.getInstance().updateLocks(p, listener);
 				}
 			}
+
 			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-				if(statusCode == 401){
+				if (statusCode == 401) {
 					if (oldAuthToken == false)
 						showLoginScreen();
 					else { // retry
 						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
+						if(availableAccounts.length==0){
+							showLoginScreen();
+							return;
+						}
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
 							if (a.name.equals(getUser().getEmail()))
@@ -233,14 +264,19 @@ public class KisiAPI {
 				// get also locators for this place
 				KisiAPI.getInstance().updateLocators(place);
 			}
+
 			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-				if(statusCode == 401){
+				if (statusCode == 401) {
 					if (oldAuthToken == false)
 						showLoginScreen();
 					else { // retry
 
 						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
+						if(availableAccounts.length==0){
+							showLoginScreen();
+							return;
+						}
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
 							if (a.name.equals(getUser().getEmail()))
@@ -311,14 +347,19 @@ public class KisiAPI {
 				} catch (NullPointerException e) {
 				}
 			}
+
 			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-				if(statusCode == 401){
+				if (statusCode == 401) {
 					if (oldAuthToken == false)
 						showLoginScreen();
 					else { // retry
 
 						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
+						if(availableAccounts.length==0){
+							showLoginScreen();
+							return;
+						}
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
 							if (a.name.equals(getUser().getEmail()))
@@ -366,19 +407,25 @@ public class KisiAPI {
 
 			public void onSuccess(JSONObject data) {
 				try {
-					Toast.makeText(KisiApplication.getInstance(), String.format(context.getResources().getString(R.string.share_success), data.getString("issued_to_email")), Toast.LENGTH_LONG).show();
+					Toast.makeText(KisiApplication.getInstance(), String.format(context.getResources().getString(R.string.share_success), data.getString("issued_to_email")),
+							Toast.LENGTH_LONG).show();
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
+
 			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-				if(statusCode == 401){
+				if (statusCode == 401) {
 					if (oldAuthToken == false)
 						showLoginScreen();
 					else { // retry
 
 						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
+						if(availableAccounts.length==0){
+							showLoginScreen();
+							return;
+						}
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
 							if (a.name.equals(getUser().getEmail()))
@@ -388,7 +435,7 @@ public class KisiAPI {
 
 							@Override
 							public void onLoginSuccess(String authtoken) {
-								createNewKey(p, email,locks);
+								createNewKey(p, email, locks);
 							}
 
 							@Override
@@ -531,6 +578,10 @@ public class KisiAPI {
 
 						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
+						if(availableAccounts.length==0){
+							showLoginScreen();
+							return;
+						}
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
 							if (a.name.equals(getUser().getEmail()))
@@ -564,8 +615,7 @@ public class KisiAPI {
 		login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 		KisiApplication.getInstance().startActivity(login);
 
-		Toast.makeText(KisiApplication.getInstance(), KisiApplication.getInstance().getResources().getString(R.string.automatic_relogin_failed),
-				Toast.LENGTH_LONG).show();
+		Toast.makeText(KisiApplication.getInstance(), KisiApplication.getInstance().getResources().getString(R.string.automatic_relogin_failed), Toast.LENGTH_LONG).show();
 	}
 
 	public void refresh(OnPlaceChangedListener listener) {
@@ -645,7 +695,7 @@ public class KisiAPI {
 					e.printStackTrace();
 				}
 
-				if(JsonAndroid != null) {
+				if (JsonAndroid != null) {
 					try {
 						result = JsonAndroid.getString("latest_version");
 					} catch (JSONException e) {
