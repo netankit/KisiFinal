@@ -11,9 +11,8 @@ import org.json.JSONObject;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
-import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.Intent;
 import android.location.Location;
-import android.os.Build;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -192,7 +191,7 @@ public class KisiAPI {
 					if (oldAuthToken == false)
 						showLoginScreen();
 					else { // retry
-						AccountManager mAccountManager = AccountManager.get(KisiApplication.getApplicationInstance());
+						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
@@ -208,7 +207,7 @@ public class KisiAPI {
 
 							@Override
 							public void onLoginFail(String errormessage) {
-								if (!KisiApplication.getApplicationInstance().getResources().getString(R.string.no_network).equals(errormessage))
+								if (!KisiApplication.getInstance().getResources().getString(R.string.no_network).equals(errormessage))
 									showLoginScreen();
 							}
 
@@ -240,7 +239,7 @@ public class KisiAPI {
 						showLoginScreen();
 					else { // retry
 
-						AccountManager mAccountManager = AccountManager.get(KisiApplication.getApplicationInstance());
+						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
@@ -256,7 +255,7 @@ public class KisiAPI {
 
 							@Override
 							public void onLoginFail(String errormessage) {
-								if (!KisiApplication.getApplicationInstance().getResources().getString(R.string.no_network).equals(errormessage))
+								if (!KisiApplication.getInstance().getResources().getString(R.string.no_network).equals(errormessage))
 									showLoginScreen();
 							}
 
@@ -318,7 +317,7 @@ public class KisiAPI {
 						showLoginScreen();
 					else { // retry
 
-						AccountManager mAccountManager = AccountManager.get(KisiApplication.getApplicationInstance());
+						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
@@ -334,7 +333,7 @@ public class KisiAPI {
 
 							@Override
 							public void onLoginFail(String errormessage) {
-								if (!KisiApplication.getApplicationInstance().getResources().getString(R.string.no_network).equals(errormessage))
+								if (!KisiApplication.getInstance().getResources().getString(R.string.no_network).equals(errormessage))
 									showLoginScreen();
 							}
 
@@ -367,7 +366,7 @@ public class KisiAPI {
 
 			public void onSuccess(JSONObject data) {
 				try {
-					Toast.makeText(KisiApplication.getApplicationInstance(), String.format(context.getResources().getString(R.string.share_success), data.getString("issued_to_email")), Toast.LENGTH_LONG).show();
+					Toast.makeText(KisiApplication.getInstance(), String.format(context.getResources().getString(R.string.share_success), data.getString("issued_to_email")), Toast.LENGTH_LONG).show();
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -378,7 +377,7 @@ public class KisiAPI {
 						showLoginScreen();
 					else { // retry
 
-						AccountManager mAccountManager = AccountManager.get(KisiApplication.getApplicationInstance());
+						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
@@ -394,7 +393,7 @@ public class KisiAPI {
 
 							@Override
 							public void onLoginFail(String errormessage) {
-								if (!KisiApplication.getApplicationInstance().getResources().getString(R.string.no_network).equals(errormessage))
+								if (!KisiApplication.getInstance().getResources().getString(R.string.no_network).equals(errormessage))
 									showLoginScreen();
 							}
 
@@ -530,7 +529,7 @@ public class KisiAPI {
 						showLoginScreen();
 					else { // retry
 
-						AccountManager mAccountManager = AccountManager.get(KisiApplication.getApplicationInstance());
+						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());
 						Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
 						Account acc = availableAccounts[0];
 						for (Account a : availableAccounts)
@@ -546,7 +545,7 @@ public class KisiAPI {
 
 							@Override
 							public void onLoginFail(String errormessage) {
-								if (!KisiApplication.getApplicationInstance().getResources().getString(R.string.no_network).equals(errormessage))
+								if (!KisiApplication.getInstance().getResources().getString(R.string.no_network).equals(errormessage))
 									showLoginScreen();
 							}
 
@@ -561,11 +560,11 @@ public class KisiAPI {
 		oldAuthToken = true;
 		reloginSuccess = false;
 		KisiAPI.getInstance().logout();
-		Intent login = new Intent(KisiApplication.getApplicationInstance(), KisiMain.class);
+		Intent login = new Intent(KisiApplication.getInstance(), KisiMain.class);
 		login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-		KisiApplication.getApplicationInstance().startActivity(login);
+		KisiApplication.getInstance().startActivity(login);
 
-		Toast.makeText(KisiApplication.getApplicationInstance(), KisiApplication.getApplicationInstance().getResources().getString(R.string.automatic_relogin_failed),
+		Toast.makeText(KisiApplication.getInstance(), KisiApplication.getInstance().getResources().getString(R.string.automatic_relogin_failed),
 				Toast.LENGTH_LONG).show();
 	}
 
