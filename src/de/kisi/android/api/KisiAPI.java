@@ -13,7 +13,6 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -48,8 +47,8 @@ public class KisiAPI {
 
 	private boolean oldAuthToken = true;
 	private boolean reloginSuccess = false;
-	private final Object syncObject = new Object();
 	private boolean loginInProgress = false; 
+	private final LinkedList<LoginCallback> loginCallbacks = new LinkedList<LoginCallback>();
 	public static KisiAPI getInstance() {
 		if (instance == null)
 			instance = new KisiAPI(KisiApplication.getInstance());
@@ -61,29 +60,25 @@ public class KisiAPI {
 	}
 
 	public void login(String login, String password, final LoginCallback callback) {
-		Log.i("KisiAPI", "login");
 
-		/*while(false && loginInProgress)
-			try {
-				Log.i("KisiAPI", "sleep "+Thread.currentThread().getId());
-				Thread.sleep(250);
-			} catch (InterruptedException e2) {
-				e2.printStackTrace();
-			}*/
-		synchronized (syncObject) {
-			Log.i("KisiAPI","sync");
-			if (reloginSuccess) {
-				Log.i("KisiAPI","use relogin");
-				try {
-					callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
-					return;
-				} catch (NullPointerException e) {
-					// This might happen if the user login after automatic
-					// unlock
-				}
+		synchronized(loginCallbacks){
+			if ( loginInProgress){
+				loginCallbacks.add(callback);
+				return;
 			}
+		}
+		
+		if (reloginSuccess) {
+			try {
+				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
+				return;
+			} catch (NullPointerException e) {
+				// This might happen if the user logout during a call
+			}
+		}
+		
+		synchronized(loginCallbacks){
 			if (oldAuthToken) {
-				Log.i("KisiAPI","reallogin");
 				JSONObject login_data = new JSONObject();
 				JSONObject login_user = new JSONObject();
 				try {
@@ -99,29 +94,38 @@ public class KisiAPI {
 				KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", login_user, new JsonHttpResponseHandler() {
 
 					public void onSuccess(org.json.JSONObject response) {
-						Log.i("KisiAPI","success");
 						oldAuthToken = false;
 						reloginSuccess = true;
 						Gson gson = new Gson();
 						User user = gson.fromJson(response.toString(), User.class);
 						DataManager.getInstance().saveUser(user);
 						callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
-						Log.i("KisiAPI","loginInProgress = false;");
-						loginInProgress = false;
+						synchronized(loginCallbacks){
+							loginInProgress = false;
+							for(LoginCallback cb:loginCallbacks)
+								cb.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
+							loginCallbacks.clear();
+						}
+
 						return;
 					}
 
 					public void onFailure(int statusCode, Throwable e, JSONObject response) {
-						Log.i("KisiAPI","failure");
 						oldAuthToken = false;
 						reloginSuccess = false;
 						String errormessage = null;
 						// no network connectivity
 						if (statusCode == 0) {
+							Toast.makeText(KisiApplication.getInstance(), context.getResources().getString(R.string.no_network),Toast.LENGTH_LONG).show();
+
 							errormessage = context.getResources().getString(R.string.no_network);
 							callback.onLoginFail(errormessage);
-							Log.i("KisiAPI","loginInProgress = false;");
-							loginInProgress = false;
+							synchronized(loginCallbacks){
+								loginInProgress = false;
+								for(LoginCallback cb:loginCallbacks)
+									cb.onLoginFail(errormessage);
+								loginCallbacks.clear();
+							}
 							return;
 						}
 
@@ -135,16 +139,19 @@ public class KisiAPI {
 							errormessage = "Error!";
 						}
 						callback.onLoginFail(errormessage);
-						Log.i("KisiAPI","loginInProgress = false;");
-						loginInProgress = false;
+						synchronized(loginCallbacks){
+							loginInProgress = false;
+							for(LoginCallback cb:loginCallbacks)
+								cb.onLoginFail(errormessage);
+							loginCallbacks.clear();
+						}
 						return;
 					};
 
 				});
 			}
-			Log.i("KisiAPI","sync end");
-
 		}
+		
 
 	}
 
