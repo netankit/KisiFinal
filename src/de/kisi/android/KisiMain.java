@@ -227,8 +227,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 			if (resultCode == AccountPickerActivity.LOGIN_FAILED) {
 				finish();
 				return;
-			}
-			if (resultCode == AccountPickerActivity.LOGIN_SUCCESS) {
+			}else if (resultCode == AccountPickerActivity.LOGIN_SUCCESS) {
 				buildUI();
 				return;
 			}
@@ -239,7 +238,8 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 
 	private void logout() {
 		kisiAPI.logout();
-		finish();
+		Intent login = new Intent(this, AccountPickerActivity.class);
+		startActivityForResult(login, LOGIN_REQUEST_CODE);
 	}
 
 	private void setupView(Place[] places) {
