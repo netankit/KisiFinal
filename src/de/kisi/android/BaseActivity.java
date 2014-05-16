@@ -165,11 +165,16 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 	@Override
 	protected void onStop() {
 		if(KisiAPI.getInstance().getUser() != null) {
-			GeofenceManager.getInstance().stopLocationUpdate();;
+			GeofenceManager.getInstance().stopLocationUpdate();
 		}
 		super.onStop();
 	}
 	
+	@Override
+	protected void onDestroy(){
+		GeofenceManager.getInstance().stopLocationUpdate();
+		super.onDestroy();
+	}
 	
 	private void updateButton() {
 
