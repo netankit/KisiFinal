@@ -178,21 +178,17 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		
 		if(!username.isEmpty() && !password.isEmpty())
 			loginButton.setEnabled(true);
+		else
+			loginButton.setEnabled(false);
 	}
 
 	@Override
-	public void beforeTextChanged(CharSequence s, int start, int count,
-			int after) {
-		// TODO Auto-generated method stub
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		
 	}
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
-		// TODO Auto-generated method stub
 		
 	}
-	
-	
-
 }
