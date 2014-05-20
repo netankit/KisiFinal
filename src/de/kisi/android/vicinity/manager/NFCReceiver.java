@@ -6,7 +6,6 @@ import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
-import de.kisi.android.vicinity.VicinityTypeEnum;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -35,17 +34,16 @@ public class NFCReceiver extends Activity{
 	        // Display the data on the tag for debuging
 	        Toast.makeText(this, nfcData, Toast.LENGTH_SHORT).show();
 	        
-	        // get actor for NFC
-			LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.NFC);
 	        
-	        // Test all locators for equality to the data string 
+	        // Test all locators for equality to the data string
 	        for(Place place : KisiAPI.getInstance().getPlaces()){
 	        	for(Lock lock : place.getLocks()){
 	        		for(Locator locator : lock.getLocators()){
 	        			if (nfcData.equals(locator.getTag())){
-	        				// user has a locator for this tag, so the user is
-	        				// allowed to act for this tag
-	        				actor.actOnEntry(place.getId(),lock.getId());
+	        		        // get actor for NFC
+	        				LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
+	        				// act
+	        				actor.actOnEntry(locator);
 	        			}
 	        		}
 	        	}
