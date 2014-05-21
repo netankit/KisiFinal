@@ -38,7 +38,7 @@ public class LockInVicinityActorFactory {
 			if(locator.isAutoUnlockEnabled())
 				return new NFCAutomaticUnlockActor();
 			if(locator.isSuggestUnlockEnabled())
-				return new OpenActivityActor();
+				return new HighlightLockActor();
 		}
 		return new ConfirmToUnlockActor();
 	}

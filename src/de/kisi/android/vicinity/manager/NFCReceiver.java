@@ -32,7 +32,7 @@ public class NFCReceiver extends Activity{
 	        String nfcData = new String(relayRecord.getPayload());
 	        
 	        // Display the data on the tag for debuging
-	        Toast.makeText(this, nfcData, Toast.LENGTH_SHORT).show();
+	        //Toast.makeText(this, nfcData, Toast.LENGTH_SHORT).show();
 	        
 	        
 	        // Test all locators for equality to the data string

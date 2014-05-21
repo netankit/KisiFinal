@@ -6,16 +6,15 @@ import de.kisi.android.KisiMain;
 import de.kisi.android.model.Locator;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 
-public class OpenActivityActor implements LockInVicinityActorInterface {
+public class HighlightLockActor implements LockInVicinityActorInterface {
 
 	@Override
 	public void actOnEntry(int placeID, int lockId) {
 		Intent intent = new Intent(KisiApplication.getInstance(), KisiMain.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		//TODO: replace this with another type
-		intent.putExtra("Type", "unlock");
+		intent.putExtra("Type", "highlight");
 		intent.putExtra("Place", placeID);
-		intent.putExtra("Lock", -1);
+		intent.putExtra("Lock", lockId);
 		KisiApplication.getInstance().startActivity(intent);
 	}
 

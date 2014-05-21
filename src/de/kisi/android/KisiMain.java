@@ -22,8 +22,11 @@ import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
+import de.kisi.android.vicinity.LockInVicinityActorFactory;
+import de.kisi.android.vicinity.LockInVicinityActorInterface;
 
 public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickListener {
 
@@ -70,7 +73,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		
 		//receives intents when activity is started by an intent
 		if(getIntent().hasExtra("Type")) {
-			handleUnlockIntent(getIntent());
+			handleIntent(getIntent());
 			//removing the unlock intent, because otherwise the lock would be unlock every time the app is start from the background
 			getIntent().removeExtra("Type");
 		}
@@ -82,7 +85,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		super.onNewIntent(intent);
 
 		if(intent.hasExtra("Type")) {
-			handleUnlockIntent(intent);
+			handleIntent(intent);
 			intent.removeCategory("Type");
 		}
 	}
@@ -202,6 +205,18 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 			return true;
 			
 		case R.id.about_version:
+			/*for(Place place2 : KisiAPI.getInstance().getPlaces()){
+	        	for(Lock lock : place2.getLocks()){
+	        		for(Locator locator : lock.getLocators()){
+	        			if ("bla".equals(locator.getTag())){
+	        		        // get actor for NFC
+	        				LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
+	        				// act
+	        				actor.actOnEntry(locator);
+	        			}
+	        		}
+	        	}
+	        }*/
 			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 			alertDialog.setTitle(R.string.kisi);
 			String versionName = null;
@@ -266,11 +281,17 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		pager.invalidate();
 	}
 
-	private void handleUnlockIntent(Intent intent) {
+	private void handleIntent(Intent intent) {
 		// No extras, nothing to do
 		if (intent.getExtras() == null)
 			return;
-		
+		if (intent.getStringExtra("Type").equals("unlock"))
+			handleUnlockIntent(intent);
+		if (intent.getStringExtra("Type").equals("highlight"))
+			handleHighlightIntent(intent);
+	}
+	
+	private void handleUnlockIntent(Intent intent){
 		// Its not a unlock request, nothing to do
 		if (!intent.getStringExtra("Type").equals("unlock"))
 			return;
@@ -300,5 +321,34 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		}
 	}
 	
+
+	private void handleHighlightIntent(Intent intent){
+		// Its not a unlock request, nothing to do
+		if (!intent.getStringExtra("Type").equals("highlight"))
+			return;
 		
+		
+		int placeId = intent.getIntExtra("Place", -1);
+		for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
+			if (kisiAPI.getPlaces()[j].getId() == placeId) {
+				int lockId = intent.getIntExtra("Lock", -1);
+				Lock lockToUnlock = kisiAPI.getLockById(kisiAPI.getPlaceById(placeId), lockId);
+				pager.setCurrentItem(j, false);
+				int id  = pager.getCurrentItem();
+				// http://tofu0913.blogspot.de/2013/06/adnroid-get-current-fragment-when-using.html
+				// BAD HACK see: String android.support.v4.app.FragmentPagerAdapter.makeFragmentName(int viewId, long id)
+				PlaceFragment placeFragment = (PlaceFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+id); 
+				currentPage = j;
+				//check if fragment got already attach to the pager and otherwise get fragment from pagerAdapter
+				if(placeFragment != null) {
+					placeFragment.setLockToHighlight(lockToUnlock);
+				}
+				else {
+					placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
+					placeFragment.setLockToUnlock(lockToUnlock);
+				}
+				break;
+			}
+		}
+	}	
 }
