@@ -2,16 +2,17 @@ package de.kisi.android.ui;
 
 import java.util.List;
 
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.model.Lock;
-import de.kisi.android.model.Place;
 import android.content.Context;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.model.Lock;
+import de.kisi.android.model.Place;
 
 
 public class LockListAdapter extends BaseAdapter {
@@ -81,11 +82,13 @@ public class LockListAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Place place = KisiAPI.getInstance().getPlaceById(placeId);
 		LayoutInflater li = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		Button button = (Button) li.inflate(R.layout.place_button, null);
+		final Button button = (Button) li.inflate(R.layout.lock_button, parent, false);
 		button.setText(place.getLocks().get(position).getName());
 		//disable the clickability of the buttons so that the OnItemClickListner of the ListView handels the clicks 
 		button.setFocusable(false);
 		button.setClickable(false);
+		
+		
 		return button;
 	}
 	

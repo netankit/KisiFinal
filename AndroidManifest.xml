@@ -2,10 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.kisi.android"
     android:versionCode="23"
-    android:versionName="2.1.x" >
+    android:versionName="2.2.0-newUI" >
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="15"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -80,11 +80,6 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light" >
         </activity>
-        <activity 
-            android:name="PlaceNotificationSettings" 
-            android:screenOrientation="portrait" 
-            android:configChanges="orientation" 
-            android:theme="@style/CustomTheme" />
         <activity
             android:name="com.electricimp.blinkup.WifiSelectActivity"
             android:configChanges="orientation"

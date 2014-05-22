@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -78,9 +79,14 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 			wifiEnabled = false;
 		}
 		
-		BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		if(!mBluetoothAdapter.isEnabled()) {
-			bluetoothEnabled = false;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
+				 KisiApplication.getInstance().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+			BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+			if(!mBluetoothAdapter.isEnabled()) {
+				bluetoothEnabled = false;
+			}
+		}else{
+			bluetoothEnabled = true;
 		}
 		
 		//check if there is a need to enable anything

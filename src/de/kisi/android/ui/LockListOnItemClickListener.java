@@ -57,7 +57,8 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 					public void run() {
 
 						// after delay back to old design re-enable click
-						currentButton.setBackgroundDrawable(currentBackground);
+						//currentButton.setBackgroundDrawable(currentBackground);
+						currentButton.setBackgroundColor(KisiApplication.getInstance().getResources().getColor(R.color.kisi_color));
 						currentButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.kisi_lock, 0, 0, 0);
 						currentButton.setText(currentText);
 
@@ -73,17 +74,17 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 				// save button design
 				final Drawable currentBackground = currentButton.getBackground();
 				final String currentText = (String) currentButton.getText();
-
 				// change to failure design
 				currentButton.setBackgroundColor(Color.RED);
-				currentButton.setText("");
+				currentButton.setText(alertMsg);
 
 				Handler handler = new Handler();
 				handler.postDelayed(new Runnable() {
 					public void run() {
 
 						// after delay back to old design re-enable click
-						currentButton.setBackgroundDrawable(currentBackground);
+//						currentButton.setBackgroundDrawable(currentBackground);
+						currentButton.setBackgroundColor(KisiApplication.getInstance().getResources().getColor(R.color.kisi_color));
 						currentButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.kisi_lock, 0, 0, 0);
 						currentButton.setText(currentText);
 					}
