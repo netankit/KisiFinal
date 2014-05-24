@@ -1,5 +1,6 @@
 package de.kisi.android.account;
 
+import de.kisi.android.AccountPickerActivity;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
@@ -48,7 +49,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	private String mAuthTokenType;
 
 	
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -66,7 +66,9 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	    
 		Button loginButton = (Button) findViewById(R.id.loginButton);
 		loginButton.setOnClickListener(this);
-
+		Button registerButton = (Button) findViewById(R.id.registerButton);
+		registerButton.setOnClickListener(this);
+		
 		userNameField = (EditText) findViewById(R.id.email);
 		passwordField = (EditText) findViewById(R.id.password);
 		passwordField.setTypeface(Typeface.DEFAULT);
@@ -108,15 +110,25 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onClick(View v) {
-		progressDialog = new ProgressDialog(this);
-		progressDialog.setMessage(getString(R.string.login_loading_message));
-		progressDialog.setCancelable(false);
-		progressDialog.show();
-		
-		username = userNameField.getText().toString();
-		password = passwordField.getText().toString();
+		switch (v.getId()) {
+		case R.id.loginButton:
+			progressDialog = new ProgressDialog(this);
+			progressDialog.setMessage(getString(R.string.login_loading_message));
+			progressDialog.setCancelable(false);
+			progressDialog.show();
+			
+			username = userNameField.getText().toString();
+			password = passwordField.getText().toString();
 
-        KisiAPI.getInstance().login(username, password, this);
+	        KisiAPI.getInstance().login(username, password, this);
+			break;
+		case R.id.registerButton:
+			Intent login = new Intent(this, RegisterActivity.class);
+			startActivityForResult(login, REQ_SIGNUP);
+			break;
+		default:
+			break;
+		}
 	}
 
     private void finishLogin(Intent intent) {

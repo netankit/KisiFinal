@@ -5,8 +5,10 @@
 
     <string name="Email">Email</string>
     <string name="Password">Password</string>
+    <string name="PasswordConfirm">Confirm password</string>
     <string name="RememberMe">Remember password</string>
     <string name="Login">Login</string>
+    <string name="Register">Register</string>
     <string name="slogan">The key in your phone</string>
     <string name="kisi">KISI</string>
     <string name="logo">Logo</string>
@@ -68,6 +70,7 @@
 	<string name="bluetooth_off">Bluetooth detection off</string>
 	<string name="update"> New version available.\n<u>Touch here to update</u></string>
 	
+	<string name="passwords_not_match"> Passwords do not match!</string>
 	
 	
 	
