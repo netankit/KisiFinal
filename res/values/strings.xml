@@ -71,6 +71,7 @@
 	<string name="update"> New version available.\n<u>Touch here to update</u></string>
 	
 	<string name="passwords_not_match"> Passwords do not match!</string>
+	<string name="fields_cannot_be_empty"> Fields cannot be empty!</string>
 	
 	
 	
