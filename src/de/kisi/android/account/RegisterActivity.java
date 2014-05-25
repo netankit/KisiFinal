@@ -45,7 +45,8 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 				Toast.makeText(getApplicationContext(), R.string.passwords_not_match, Toast.LENGTH_SHORT).show();
 				break;
 			}
-//			KisiAPI.getInstance().register(username, password, passwordConfirm, this);
+			// TODO Change true to the value from user interface
+			KisiAPI.getInstance().register(username, password, passwordConfirm, true, this);
 			
 			break;
 		default:
