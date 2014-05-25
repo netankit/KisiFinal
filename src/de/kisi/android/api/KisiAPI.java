@@ -56,6 +56,74 @@ public class KisiAPI {
 		this.context = context;
 	}
 	
+	// Registration: Registers user by sending in a JSON object with user information.
+		public void register(String user_email, String password, String password_confirmation, Boolean terms_and_conditions,  final RegisterCallback callback){
+		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(user_email);
+		
+		JSONObject registerJSON = new JSONObject();
+		JSONObject userJSON = new JSONObject();
+		JSONObject deviceJSON = new JSONObject();
+		try {
+			//build user object
+			userJSON.put("email", user_email);
+			userJSON.put("password", password);
+			userJSON.put("password_confirmation", password_confirmation);
+			userJSON.put("terms_and_conditions", terms_and_conditions);
+			registerJSON.put("user", userJSON);
+			
+			//build device object
+			if (deviceUUID != null) {
+				deviceJSON.put("uuid", deviceUUID);				
+			}
+			deviceJSON.put("platform_name", "Android");
+			deviceJSON.put("platform_version", Build.VERSION.RELEASE);
+			deviceJSON.put("model", Build.MANUFACTURER + " " + Build.MODEL);
+			try {
+				deviceJSON.put("app_version", KisiApplication.getInstance().getVersion());
+			} catch (NameNotFoundException e) {
+				//no app version for you then...
+			}
+			registerJSON.put("device", deviceJSON);
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+	}
+	KisiRestClient.getInstance().postWithoutAuthToken("users/sign_up", registerJSON,  new JsonHttpResponseHandler() {
+			
+			 public void onSuccess(org.json.JSONObject response) {
+				Gson gson = new Gson();
+				User user = gson.fromJson(response.toString(), User.class);
+				DataManager.getInstance().saveUser(user);
+				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
+				return;
+			}
+			
+			 public void onFailure(int statusCode, Throwable e, JSONObject response) {
+				 String errormessage = null;
+				 //no network connectivity
+				 if(statusCode == 0) {
+					 errormessage = context.getResources().getString(R.string.no_network);
+					 callback.onLoginFail(errormessage);
+					 return;
+				 }
+	
+				 if(response != null) {
+					try {
+						errormessage = response.getString("error");
+					} catch (JSONException ej) {
+						ej.printStackTrace();
+					}
+				}
+				else {
+					errormessage = "Error!";
+				}
+				callback.onLoginFail(errormessage);
+				return;
+			};
+			
+		});
+		
+}
+	
 	
 	public void login(String login, String password, final LoginCallback callback){
 		
