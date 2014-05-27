@@ -68,7 +68,24 @@ public class KisiAPI {
 			}
 		}
 		
-		if (reloginSuccess) {
+		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(login);
+		
+		JSONObject loginJSON = new JSONObject();
+		JSONObject userJSON = new JSONObject();
+		JSONObject deviceJSON = new JSONObject();
+		try {
+			//build user object
+			userJSON.put("email", login);
+			userJSON.put("password", password);
+			loginJSON.put("user", userJSON);
+			
+			//build device object
+			if (deviceUUID != null) {
+				deviceJSON.put("uuid", deviceUUID);				
+			}
+			deviceJSON.put("platform_name", "Android");
+			deviceJSON.put("platform_version", Build.VERSION.RELEASE);
+			deviceJSON.put("model", Build.MANUFACTURER + " " + Build.MODEL);
 			try {
 				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
 				return;

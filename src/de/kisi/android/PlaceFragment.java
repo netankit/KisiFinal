@@ -4,15 +4,18 @@ import java.util.Hashtable;
 
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -67,7 +70,7 @@ public class PlaceFragment extends Fragment {
 		final Place place = KisiAPI.getInstance().getPlaceAt(index);
 		if(place != null)
 			setupButtons(place);
-		if(lockToUnlock == null)  {
+		/*if(lockToUnlock == null)  {
 		KisiAPI.getInstance().updateLocks(place, new OnPlaceChangedListener() {
 
 				@Override
@@ -76,7 +79,7 @@ public class PlaceFragment extends Fragment {
 				}
 			
 			});
-		}
+		}*/
 		unlockLock();
 		
 		return layout;
@@ -183,7 +186,9 @@ public class PlaceFragment extends Fragment {
 	private void unlockLock() {
 		if(lockToUnlock != null) {
 			if(buttonHashtable.containsKey(lockToUnlock.getId())) {
-				buttonHashtable.get(lockToUnlock.getId()).callOnClick();
+				Button button = buttonHashtable.get(lockToUnlock.getId());
+				layout.scrollTo(0, button.getTop());
+				button.callOnClick();
 			}
 			lockToUnlock = null;
 		}
@@ -259,5 +264,29 @@ public class PlaceFragment extends Fragment {
 		}
 	}
 	
+	public void setLockToHighlight(Lock lockToUnlock) {
+		if(this.isVisible()){
+			if(buttonHashtable.containsKey(lockToUnlock.getId())) {
+				Button button = buttonHashtable.get(lockToUnlock.getId());
+				layout.scrollTo(0, button.getTop());
+				Drawable d = button.getBackground();
+				int w = button.getWidth();
+				int h = button.getHeight();
+				Paint p = new Paint();
+				p.setARGB(255, 255, 255, 0);
+				float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
+				p.setStrokeWidth(px+1);
+				Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+				Canvas c = new Canvas(bitmap);
+				d.draw(c);
+				c.drawLine(0, 0, w, 0, p);
+				c.drawLine(0, 0, 0, h, p);
+				c.drawLine(0, h, w, h, p);
+				c.drawLine(w, 0, w, h, p);
+				BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
+				button.setBackgroundDrawable(drawable);
+			}
+		}
+	}
 
 }

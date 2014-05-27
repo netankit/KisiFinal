@@ -1,13 +1,13 @@
 package de.kisi.android.vicinity.manager;
 
+import de.kisi.android.KisiApplication;
+import de.kisi.android.KisiMain;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
-import de.kisi.android.vicinity.VicinityTypeEnum;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -33,24 +33,31 @@ public class NFCReceiver extends Activity{
 	        String nfcData = new String(relayRecord.getPayload());
 	        
 	        // Display the data on the tag for debuging
-	        Toast.makeText(this, nfcData, Toast.LENGTH_SHORT).show();
+	        //Toast.makeText(this, nfcData, Toast.LENGTH_SHORT).show();
 	        
-	        // get actor for NFC
-			LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.NFC);
 	        
-	        // Test all locators for equality to the data string 
+	        // Test all locators for equality to the data string
+	        boolean foundLock = false;
 	        for(Place place : KisiAPI.getInstance().getPlaces()){
 	        	for(Lock lock : place.getLocks()){
 	        		for(Locator locator : lock.getLocators()){
 	        			if (nfcData.equals(locator.getTag())){
-	        				// user has a locator for this tag, so the user is
-	        				// allowed to act for this tag
-	        				actor.actOnEntry(place.getId(),lock.getId());
+	        		        // get actor for NFC
+	        				LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
+	        				// act
+	        				actor.actOnEntry(locator);
+	        				foundLock = true;
 	        			}
 	        		}
 	        	}
 	        }
-	 
+	
+	        if (!foundLock){
+	    		Intent i = new Intent(KisiApplication.getInstance(), KisiMain.class);
+	    		//i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	    		i.putExtra("Type", "nfcNoLock");
+	    		startActivity(i);
+	        }
 	    }catch(Exception e){
 	    }finally{
 	        // Just finish the activity
