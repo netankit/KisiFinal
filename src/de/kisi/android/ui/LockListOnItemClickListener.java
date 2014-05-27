@@ -8,8 +8,8 @@ import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import android.app.ProgressDialog;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -25,17 +25,17 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 	public LockListOnItemClickListener(Place place) {
 		this.place = place;
 	}
-	
-	
 
 	
 	@Override
-	public void  onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
-		final ProgressDialog progressDialog = new ProgressDialog(view.getContext());
+	public void  onItemClick(final AdapterView<?> parent,final View view, final int position, long id) {
+		final ProgressDialog progressDialog = new ProgressDialog(parent.getContext());
 		progressDialog.setMessage(KisiApplication.getInstance().getString(R.string.opening));
 		progressDialog.setCancelable(false);
 		progressDialog.show();
 		final Lock lock = place.getLocks().get(position);
+		Log.d("LockListOnItemClick", String.valueOf(parent.getAdapter().getCount()));
+		
 		KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
 			
 			
@@ -43,9 +43,11 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 			public void onUnlockSuccess(String message) {
 				progressDialog.dismiss();
 				Toast.makeText(KisiApplication.getInstance(), message, Toast.LENGTH_SHORT).show();
+				//final Button currentButton = (Button) parent.getChildAt(position);
 				final Button currentButton = (Button) parent.getChildAt(position);
+				parent.invalidate();
 				// save button design
-				final Drawable currentBackground = currentButton.getBackground();
+				//final Drawable currentBackground = currentButton.getBackground();
 				final String currentText = (String) currentButton.getText();
 
 				// change to unlocked design
@@ -70,9 +72,21 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 			public void onUnlockFail(String alertMsg) {
 				progressDialog.dismiss();
 				Toast.makeText(KisiApplication.getInstance(), alertMsg, Toast.LENGTH_SHORT).show();
-				final Button currentButton = (Button) parent.getChildAt(position);
+//				Log.d("LockListOnItemClickListener" , view.toString() + "  " + ((Button) view).getText());
+//				Log.d("LockListOnItemClickListener" , parent.getChildAt(position).toString() + "  " + ((Button)parent.getChildAt(position)).getText());
+				Button button = null ;
+				if( parent.getChildAt(position) == null) {
+					button = (Button) view;
+				}
+				else {
+					button = (Button) parent.getChildAt(position);
+				}
+				final Button currentButton = button;
+				parent.invalidate();
+
+//						(Button) parent.getChildAt(position);
 				// save button design
-				final Drawable currentBackground = currentButton.getBackground();
+				//final Drawable currentBackground = currentButton.getBackground();
 				final String currentText = (String) currentButton.getText();
 				// change to failure design
 				currentButton.setBackgroundColor(Color.RED);

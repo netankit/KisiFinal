@@ -1,34 +1,28 @@
 package de.kisi.android.ui;
 
 import android.app.ActionBar;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.commonsware.cwac.merge.MergeAdapter;
 import com.electricimp.blinkup.BlinkupController;
-import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.BaseActivity;
-import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
@@ -47,7 +41,9 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
     private ListView mLockList;
     private LockListAdapter mLockListAdapter; 
     private ActionBarDrawerToggle mDrawerToggle;
-
+    private int selectedPosition = 0;
+    private Intent mStartIntent;
+    
     private MergeAdapter  mMergeAdapter;
     
 	// just choose a random value
@@ -65,15 +61,12 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		mLockList = (ListView) findViewById(R.id.lock_list);
-
+		mDrawerList.setFocusableInTouchMode(false);
 		mMergeAdapter = new MergeAdapter();
 		mDrawerListAdapter = new DrawerListAdapter(this);
 		mMergeAdapter.addAdapter(mDrawerListAdapter);
 		
-		
 		buildStaticMenuItems();
-		
-		
 		
 		mDrawerList.setAdapter(mMergeAdapter);
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
@@ -84,8 +77,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		mDrawerToggle = new ActionBarDrawerToggle( this,  mDrawerLayout, R.drawable.ic_drawer,  R.string.place_overview,  R.string.kisi ) {
 	            public void onDrawerClosed(View view) {
 	            	super.onDrawerClosed(view);
-//	            	getActionBar().setTitle(getResources().getString(R.string.kisi));
-	                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+	            	getActionBar().setTitle(((Place)mDrawerListAdapter.getItem(selectedPosition)).getName());
+	            	invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
 	            }
 
 	            public void onDrawerOpened(View drawerView) {
@@ -96,7 +89,6 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		 };
 		 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);	 
-		 
 		KisiAPI.getInstance().registerOnPlaceChangedListener(this);
 		Intent login = new Intent(this, AccountPickerActivity.class);
 		startActivityForResult(login, LOGIN_REQUEST_CODE);
@@ -113,10 +105,10 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	@Override
 	protected void onStart() {
 		super.onStart();
-		
 		if(getIntent().hasExtra("Type")) {
+			Log.d("Onstart", String.valueOf(mLockList.getCount()) );
 			handleUnlockIntent(getIntent());
-			getIntent().removeCategory("Type");
+			getIntent().removeExtra("Type");
 		}
 	}
 	
@@ -127,14 +119,13 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		
 		if(intent.hasExtra("Type")) {
 			handleUnlockIntent(intent);
-			intent.removeCategory("Type");
+			intent.removeExtra("Type");
 		}
 	}
 	
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 	    @Override
 	    public void onItemClick(AdapterView parent, View view, int position, long id) {
-	    	
 	    	selectItem(position, id);
 	    }
 	}
@@ -142,7 +133,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	private void setUiIntoStartState() {
 		Place place = KisiAPI.getInstance().getPlaceAt(0);
 		if(place != null) {
-			selectItem(0, place.getId());
+			selectItem(selectedPosition, mDrawerListAdapter.getItemId(selectedPosition));
 		}
 		else {
 			//check if user is even login 
@@ -157,12 +148,21 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	private void selectItem(int position, long id) {
 		getActionBar().setTitle(KisiAPI.getInstance().getPlaceById((int) id).getName());
+		selectedPosition = position;
+		mDrawerListAdapter.selectItem(position);
 		mLockListAdapter = new LockListAdapter(this, (int) id);
 		mLockList.setAdapter(mLockListAdapter);
 		mLockList.setOnItemClickListener(new LockListOnItemClickListener(KisiAPI.getInstance().getPlaceById((int) id)));
 		mLockList.invalidate();
-	    // Highlight the selected item, update the title, and close the drawer
-	    mDrawerList.setItemChecked(position, true);
+	    // Highlight the selected item, update the title, and close the drawer and check if the position is available 
+		if( position < mDrawerListAdapter.getCount()) {
+			mDrawerList.setItemChecked(position, true);
+			mDrawerList.setSelection(position);
+		}
+		else {
+			mDrawerList.setItemChecked(0, true);
+			mDrawerList.setSelection(0);
+		}
 	    mDrawerLayout.closeDrawer(mDrawerList);
 	}
 	
@@ -227,8 +227,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.settings, menu);
-	    return true;
+	    inflater.inflate(R.menu.main, menu);
+	    return super.onCreateOptionsMenu(menu);
 	}
 	
 	
@@ -246,6 +246,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 						//check if there is a lockId in the intent and then unlock the right lock
 						if(lockId != -1) {
 							int mActivePosition = mLockListAdapter.getItemPosition(lockId);
+							mLockList.invalidate();
+							Log.d("handle intent", String.valueOf(mLockList.getCount()) );
 							mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition,
 						        mLockList.getAdapter().getItemId(mActivePosition));
 						}
@@ -265,6 +267,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 			}
 			if (resultCode == AccountPickerActivity.LOGIN_SUCCESS) {
 				//start an update of the places
+			
 				KisiAPI.getInstance().refresh(new OnPlaceChangedListener() {
 					@Override
 					public void onPlaceChanged(Place[] newPlaces) {
@@ -279,9 +282,10 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		}
 	}
 
-	private void logout() {
+	public void logout() {
 		KisiAPI.getInstance().logout();
-		finish();
+		Intent login = new Intent(this, AccountPickerActivity.class);
+		startActivityForResult(login, LOGIN_REQUEST_CODE);
 	}
 
 	@Override
@@ -292,132 +296,48 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		
 	private void buildStaticMenuItems() {
 	
-		StaticMenuOnClickListener listener =  new StaticMenuOnClickListener(this);
-		
 		LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View divider =  (View) li.inflate(R.layout.drawer_list_divider, null);
 		mMergeAdapter.addView(divider);
+	
+		StaticMenuOnClickListener listener =  new StaticMenuOnClickListener(this);
 		
-		TextView refreshButton = (TextView) li.inflate(R.layout.drawer_list_item, null);
+		final TextView refreshButton = (TextView) li.inflate(R.layout.drawer_list_item, null);
 		refreshButton.setId(R.id.refreshButton);
 		refreshButton.setText(getResources().getText(R.string.refresh));
 		refreshButton.setClickable(true);
 		refreshButton.setOnClickListener(listener);
 		mMergeAdapter.addView(refreshButton);
 		
-		TextView setup_kisi_button = (TextView) li.inflate(R.layout.drawer_list_item, null);
+		final TextView setup_kisi_button = (TextView) li.inflate(R.layout.drawer_list_item, null);
 		setup_kisi_button.setId(R.id.setup_kisi_button);
 		setup_kisi_button.setText(getResources().getText(R.string.setup));
 		setup_kisi_button.setClickable(true);
 		setup_kisi_button.setOnClickListener(listener);
 		mMergeAdapter.addView(setup_kisi_button);
 		
-		TextView about = (TextView) li.inflate(R.layout.drawer_list_item, null);
-		about.setId(R.id.about_button);
-		about.setText(getResources().getText(R.string.about));
-		about.setClickable(true);
-		about.setOnClickListener(listener);
-		mMergeAdapter.addView(about);
-		
-		TextView notification = (TextView) li.inflate(R.layout.drawer_list_item, null);
+		final TextView notification = (TextView) li.inflate(R.layout.drawer_list_item, null);
 		notification.setId(R.id.notification_settings_button);
 		notification.setText(getResources().getText(R.string.notification_settings));
 		notification.setClickable(true);
 		notification.setOnClickListener(listener);
 		mMergeAdapter.addView(notification);
 		
-		TextView logout = (TextView) li.inflate(R.layout.drawer_list_item, null);	
+		final TextView about = (TextView) li.inflate(R.layout.drawer_list_item, null);
+		about.setId(R.id.about_button);
+		about.setText(getResources().getText(R.string.about));
+		about.setClickable(true);
+		about.setOnClickListener(listener);
+		mMergeAdapter.addView(about);
+		
+		
+		final TextView logout = (TextView) li.inflate(R.layout.drawer_list_item, null);	
 		logout.setId(R.id.logout_button);
-		notification.setText(getResources().getText(R.string.logout));
-		notification.setClickable(true);
-		notification.setOnClickListener(listener);
+		logout.setText(getResources().getText(R.string.logout));
+		logout.setClickable(true);
+		logout.setOnClickListener(listener);
 		mMergeAdapter.addView(logout);
 
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	private  class StaticMenuOnClickListener implements OnClickListener {
-
-		private Activity activity;
-			
-		public StaticMenuOnClickListener(Activity activity){
-			this.activity = activity;
-		}
-		
-		@Override
-		public void onClick(View v) {
-			TextView textView =  (TextView) v;
-			
-			
-			
-			switch(v.getId()) {
-				case R.id.refreshButton:
-					KisiAPI.getInstance().refresh(new OnPlaceChangedListener() {
-		
-						@Override
-						public void onPlaceChanged(Place[] newPlaces) {
-		
-							
-						}
-		
-					});
-				return;
-			
-
-			case R.id.setup_kisi_button:
-
-				BlinkupController blinkup = BlinkupController.getInstance();
-				blinkup.intentBlinkupComplete = new Intent(activity, BlinkupCompleteActivity.class);
-
-				if (KisiAPI.getInstance().getUser().getEiPlanId() != null) {
-					blinkup.setPlanID(KisiAPI.getInstance().getUser().getEiPlanId());
-				}
-				blinkup.selectWifiAndSetupDevice(activity, KisiMainActivity.IMP_API_KEY, new ServerErrorHandler() {
-							@Override
-							public void onError(String errorMsg) {
-								Toast.makeText(KisiApplication.getInstance(), errorMsg, Toast.LENGTH_SHORT).show();
-							}
-						});
-				return ;
-
-			case R.id.logout_button:
-				logout();
-				return;
-				
-				
-			case R.id.about_button:
-				AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
-				alertDialog.setTitle(R.string.kisi);
-				String versionName = null;
-				try {
-					versionName = KisiApplication.getInstance().getPackageManager().getPackageInfo(KisiApplication.getInstance().getPackageName(), 0).versionName;
-				} catch (NameNotFoundException e) {
-					e.printStackTrace();
-				}
-				alertDialog.setMessage(getResources().getString(R.string.version) + versionName);
-				alertDialog.show();
-				return;
-				
-				
-			case R.id.notification_settings_button:
-				Intent settingsIntent = new Intent(activity, PlaceNotificationSettings.class);
-				startActivity(settingsIntent);
-				return;
-				
-
-			default:
-				return;
-			}
-		}
-
-	}
-	
-	
 
 	}

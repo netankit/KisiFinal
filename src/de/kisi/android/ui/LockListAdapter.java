@@ -81,8 +81,14 @@ public class LockListAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Place place = KisiAPI.getInstance().getPlaceById(placeId);
-		LayoutInflater li = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		final Button button = (Button) li.inflate(R.layout.lock_button, parent, false);
+		Button button;
+		if(convertView == null) {
+			LayoutInflater li = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			 button = (Button) li.inflate(R.layout.lock_button, parent, false);
+		}
+		else {
+			 button = (Button) convertView;
+		}
 		button.setText(place.getLocks().get(position).getName());
 		//disable the clickability of the buttons so that the OnItemClickListner of the ListView handels the clicks 
 		button.setFocusable(false);

@@ -4,6 +4,7 @@ import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Place;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ public class DrawerListAdapter extends BaseAdapter {
 
 	private KisiAPI mKisiAPI;
 	private Context mContext;
+	private int selectedItem = 0;
 	
 	public DrawerListAdapter(Context context) {
 		mKisiAPI = KisiAPI.getInstance();
@@ -58,11 +60,16 @@ public class DrawerListAdapter extends BaseAdapter {
 		LayoutInflater li = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		TextView mView = (TextView) li.inflate(R.layout.drawer_list_item, null);
 		mView.setText(mKisiAPI.getPlaceAt(position).getName());
+		if(position == selectedItem)
+			mView.setTextColor(Color.WHITE);
 		return mView;
 	}
 
 	
-	
+	public void selectItem(int position) {
+		selectedItem = position;
+		this.notifyDataSetChanged();
+	}
 	
 
 }

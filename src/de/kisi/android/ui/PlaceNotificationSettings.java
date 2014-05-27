@@ -52,7 +52,6 @@ public class PlaceNotificationSettings extends Activity implements OnClickListen
 				TypedValue.COMPLEX_UNIT_SP, 50, r.getDisplayMetrics());
 
 		
-		LinearLayout.LayoutParams  layoutParams = new LinearLayout.LayoutParams(width, height);
 		Typeface font = Typeface.createFromAsset(this.getApplicationContext().getAssets(), "Roboto-Light.ttf");
 		LinearLayout linearLayout = (LinearLayout) findViewById(R.id.place_linear_layout);
 

@@ -18,6 +18,7 @@
             android:paddingTop="35dp"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
+            android:paddingBottom="25dp"
    			android:clipToPadding="false"
             android:scrollbars="none">
             	
@@ -38,8 +39,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
+        android:divider="#FFDDDDDD"
+        android:dividerHeight="1dp"
         android:background="@android:color/white"
         />
 
