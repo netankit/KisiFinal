@@ -13,29 +13,20 @@ import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 public class ConfirmToUnlockActor implements LockInVicinityActorInterface {
 
 	@Override
-	public void actOnEntry(int placeID, int lockId) {
-		if(lockId != 0)
-			LockInVicinityDisplayManager.getInstance().addLock(placeID,lockId);
-		else
-			LockInVicinityDisplayManager.getInstance().addPlace(placeID);
-	}
-
-	@Override
-	public void actOnExit(int placeID, int lockId) {
-		if(lockId != 0)
-			LockInVicinityDisplayManager.getInstance().removeLock(placeID,lockId);
-		else
-			LockInVicinityDisplayManager.getInstance().removePlace(placeID);
-	}
-
-	@Override
 	public void actOnEntry(Locator locator) {
-		LockInVicinityDisplayManager.getInstance().addLock(locator.getPlaceId(),locator.getLockId());
+		if(locator.getLockId() != 0)
+			LockInVicinityDisplayManager.getInstance().addLock(locator.getPlaceId(),locator.getLockId());
+		else
+			LockInVicinityDisplayManager.getInstance().addPlace(locator.getPlaceId());
 	}
 
 	@Override
 	public void actOnExit(Locator locator) {
-		LockInVicinityDisplayManager.getInstance().removeLock(locator.getPlaceId(),locator.getLockId());
+		if(locator.getLockId() != 0)
+			LockInVicinityDisplayManager.getInstance().removeLock(locator.getPlaceId(),locator.getLockId());
+		else
+			LockInVicinityDisplayManager.getInstance().removePlace(locator.getPlaceId());
+			
 	}
 
 }

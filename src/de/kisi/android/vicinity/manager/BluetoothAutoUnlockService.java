@@ -40,14 +40,14 @@ public class BluetoothAutoUnlockService extends Service {
 			public void onUnlockSuccess(String message) {
 				info.success = true;
 				info.message = message;
-				de.kisi.android.notifications.NotificationManager.getBLEAutoUnlockNotifictionResult(info);
+				de.kisi.android.notifications.NotificationManager.setBLEAutoUnlockNotifictionResult(info);
 			}
 
 			@Override
 			public void onUnlockFail(String message) {
 				info.success = false;
 				info.message = message;
-				de.kisi.android.notifications.NotificationManager.getBLEAutoUnlockNotifictionResult(info);
+				de.kisi.android.notifications.NotificationManager.setBLEAutoUnlockNotifictionResult(info);
 				}}
 		);
 
