@@ -13,6 +13,7 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Build;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -68,47 +69,40 @@ public class KisiAPI {
 			}
 		}
 		
-		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(login);
-		
-		JSONObject loginJSON = new JSONObject();
-		JSONObject userJSON = new JSONObject();
-		JSONObject deviceJSON = new JSONObject();
-		try {
-			//build user object
-			userJSON.put("email", login);
-			userJSON.put("password", password);
-			loginJSON.put("user", userJSON);
-			
-			//build device object
-			if (deviceUUID != null) {
-				deviceJSON.put("uuid", deviceUUID);				
-			}
-			deviceJSON.put("platform_name", "Android");
-			deviceJSON.put("platform_version", Build.VERSION.RELEASE);
-			deviceJSON.put("model", Build.MANUFACTURER + " " + Build.MODEL);
-			try {
-				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
-				return;
-			} catch (NullPointerException e) {
-				// This might happen if the user logout during a call
-			}
-		}
 		
 		synchronized(loginCallbacks){
 			if (oldAuthToken) {
-				JSONObject login_data = new JSONObject();
-				JSONObject login_user = new JSONObject();
+				String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(login);
+				
+				JSONObject loginJSON = new JSONObject();
+				JSONObject userJSON = new JSONObject();
+				JSONObject deviceJSON = new JSONObject();
 				try {
-					login_data.put("email", login);
-					login_data.put("password", password);
-					login_user.put("user", login_data);
+					//build user object
+					userJSON.put("email", login);
+					userJSON.put("password", password);
+					loginJSON.put("user", userJSON);
+					
+					//build device object
+					if (deviceUUID != null) {
+						deviceJSON.put("uuid", deviceUUID);				
+					}
+					deviceJSON.put("platform_name", "Android");
+					deviceJSON.put("platform_version", Build.VERSION.RELEASE);
+					deviceJSON.put("model", Build.MANUFACTURER + " " + Build.MODEL);
+					try {
+						callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
+						return;
+					} catch (NullPointerException e) {
+						// This might happen if the user logout during a call
+					}
 				} catch (JSONException e1) {
 					e1.printStackTrace();
 				}
 				/*for (StackTraceElement e : Thread.currentThread().getStackTrace())
 					Log.d("KisiAPI", " " + e.toString());*/
 				loginInProgress = true;
-				KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", login_user, new JsonHttpResponseHandler() {
+				KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", loginJSON, new JsonHttpResponseHandler() {
 
 					public void onSuccess(org.json.JSONObject response) {
 						oldAuthToken = false;

@@ -23,6 +23,9 @@ public class NFCReceiver extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		//Finish the activity at the start to avoid ugly animations
+        finish();
+
 		try{
 	        // Read the first record which contains the NFC data
 			Intent intent = getIntent();
@@ -54,14 +57,10 @@ public class NFCReceiver extends Activity{
 	
 	        if (!foundLock){
 	    		Intent i = new Intent(KisiApplication.getInstance(), KisiMain.class);
-	    		//i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 	    		i.putExtra("Type", "nfcNoLock");
 	    		startActivity(i);
 	        }
 	    }catch(Exception e){
-	    }finally{
-	        // Just finish the activity
-	        finish();
 	    }
 	}
 
