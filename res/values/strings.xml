@@ -66,8 +66,10 @@
 	<string name="bluetooth">Bluetooth</string>
 	<string name="bluetooth_on">Bluetooth detection on</string>
 	<string name="bluetooth_off">Bluetooth detection off</string>
-	<string name="update"> New version available.\n<u>Touch here to update</u></string>
-	
+	<string name="update">New version available.\n<u>Touch here to update</u></string>
+	<string name="restricted_access">Access restricted</string>
+	<string name="no_access_to_lock">Unfortunately, you do not have access to this lock.</string>
+		
 	
 	
 	

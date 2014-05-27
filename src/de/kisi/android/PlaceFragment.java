@@ -186,7 +186,9 @@ public class PlaceFragment extends Fragment {
 	private void unlockLock() {
 		if(lockToUnlock != null) {
 			if(buttonHashtable.containsKey(lockToUnlock.getId())) {
-				buttonHashtable.get(lockToUnlock.getId()).callOnClick();
+				Button button = buttonHashtable.get(lockToUnlock.getId());
+				layout.scrollTo(0, button.getTop());
+				button.callOnClick();
 			}
 			lockToUnlock = null;
 		}
@@ -266,6 +268,7 @@ public class PlaceFragment extends Fragment {
 		if(this.isVisible()){
 			if(buttonHashtable.containsKey(lockToUnlock.getId())) {
 				Button button = buttonHashtable.get(lockToUnlock.getId());
+				layout.scrollTo(0, button.getTop());
 				Drawable d = button.getBackground();
 				int w = button.getWidth();
 				int h = button.getHeight();

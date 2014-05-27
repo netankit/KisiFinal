@@ -205,7 +205,8 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 			return true;
 			
 		case R.id.about_version:
-			/*for(Place place2 : KisiAPI.getInstance().getPlaces()){
+			/*
+			for(Place place2 : KisiAPI.getInstance().getPlaces()){
 	        	for(Lock lock : place2.getLocks()){
 	        		for(Locator locator : lock.getLocators()){
 	        			if ("bla".equals(locator.getTag())){
@@ -213,10 +214,14 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	        				LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
 	        				// act
 	        				actor.actOnEntry(locator);
+	        				return true;
 	        			}
 	        		}
 	        	}
-	        }*/
+	        }
+    		Intent i = new Intent(KisiApplication.getInstance(), KisiMain.class);
+    		i.putExtra("Type", "nfcNoLock");
+    		startActivity(i);*/
 			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 			alertDialog.setTitle(R.string.kisi);
 			String versionName = null;
@@ -285,10 +290,20 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		// No extras, nothing to do
 		if (intent.getExtras() == null)
 			return;
-		if (intent.getStringExtra("Type").equals("unlock"))
+		String type = intent.getStringExtra("Type");
+		if (type.equals("unlock"))
 			handleUnlockIntent(intent);
-		if (intent.getStringExtra("Type").equals("highlight"))
+		if (type.equals("highlight"))
 			handleHighlightIntent(intent);
+		if (type.equals("nfcNoLock"))
+			handleNFCNoLockIntent();
+	}
+	
+	private void handleNFCNoLockIntent(){
+		AlertDialog alertDialog = new AlertDialog.Builder(this).setPositiveButton(getResources().getString(R.string.ok),null).create();
+		alertDialog.setTitle(R.string.restricted_access);
+		alertDialog.setMessage(getResources().getString(R.string.no_access_to_lock));
+		alertDialog.show();
 	}
 	
 	private void handleUnlockIntent(Intent intent){
@@ -323,7 +338,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	
 
 	private void handleHighlightIntent(Intent intent){
-		// Its not a unlock request, nothing to do
+		// Its not a highlight request, nothing to do
 		if (!intent.getStringExtra("Type").equals("highlight"))
 			return;
 		
@@ -345,7 +360,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 				}
 				else {
 					placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
-					placeFragment.setLockToUnlock(lockToUnlock);
+					placeFragment.setLockToHighlight(lockToUnlock);
 				}
 				break;
 			}
