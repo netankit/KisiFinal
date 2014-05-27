@@ -178,8 +178,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		// get all places
 		Place[] places = KisiAPI.getInstance().getPlaces();
 		Place place;
-		switch (item.getItemId()) {
-		case R.id.share:
+		if(item.getItemId() == R.id.share || item.getItemId() == R.id.share_actionbar_button) {
 			// check if user has a place
 			if (places.length == 0) {
 				Toast.makeText(this, R.string.share_empty_place_error, Toast.LENGTH_LONG).show();
@@ -197,8 +196,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 			intent.putExtra("place", place.getId());
 			startActivity(intent);
 			return true;
-
-		case R.id.showLog:
+		}
+		else if(item.getItemId() == R.id.showLog) {
 			// check if user has a place
 			if (places.length == 0) {
 				Toast.makeText(this, R.string.log_empty_place_error, Toast.LENGTH_LONG).show();
@@ -210,10 +209,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 			startActivity(logView);
 
 			return true;
-
-		default:
-			return super.onOptionsItemSelected(item);
 		}
+			return super.onOptionsItemSelected(item);
 	}
 	
 	public void refreshViews() {
