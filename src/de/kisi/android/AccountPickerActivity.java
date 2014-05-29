@@ -23,6 +23,7 @@ import android.widget.Toast;
 import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
+import de.kisi.android.api.LoginHandler;
 
 public class AccountPickerActivity extends Activity implements LoginCallback{
 
@@ -79,7 +80,9 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 			progressDialog.setMessage(getString(R.string.login_loading_message));
 			progressDialog.setCancelable(false);
 			progressDialog.show();
-			KisiAPI.getInstance().login(acc.name, password, mloginCallback);
+//			KisiAPI.getInstance().login(acc.name, password, mloginCallback);
+			LoginHandler loginHandler = new LoginHandler(activity);
+			loginHandler.login(acc.name, password, mloginCallback);
 			return;
 		}
 		//if there are more then one account let the user choose the right one
@@ -124,7 +127,9 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 							progressDialog.setMessage(getString(R.string.login_loading_message));
 							progressDialog.setCancelable(false);
 							progressDialog.show();
-							KisiAPI.getInstance().login(acc.name, password, mloginCallback);
+//							KisiAPI.getInstance().login(acc.name, password, mloginCallback);
+							LoginHandler loginHandler = new LoginHandler(activity);
+							loginHandler.login(acc.name, password, mloginCallback);
 						}
 					});
 				
