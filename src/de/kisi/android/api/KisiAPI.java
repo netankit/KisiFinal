@@ -59,8 +59,6 @@ public class KisiAPI {
 	
 	public void login(String login, String password, final LoginCallback callback){
 		
-		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(login);
-		
 		JSONObject loginJSON = new JSONObject();
 		JSONObject userJSON = new JSONObject();
 		JSONObject deviceJSON = new JSONObject();
@@ -68,9 +66,9 @@ public class KisiAPI {
 			//build user object
 			userJSON.put("email", login);
 			userJSON.put("password", password);
-			loginJSON.put("user", userJSON);
 			
 			//build device object
+			String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(login);
 			if (deviceUUID != null) {
 				deviceJSON.put("uuid", deviceUUID);				
 			}
@@ -82,6 +80,9 @@ public class KisiAPI {
 			} catch (NameNotFoundException e) {
 				//no app version for you then...
 			}
+			
+			//build login object
+			loginJSON.put("user", userJSON);
 			loginJSON.put("device", deviceJSON);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
@@ -119,18 +120,8 @@ public class KisiAPI {
 				callback.onLoginFail(errormessage);
 				return;
 			};
-			
 		});
-		
-		
-		
-
 	}
-	
-	public void clearCache() {		
-		DataManager.getInstance().deleteDB();
-	}
-	
 	
 	public void logout(){
 		KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
@@ -140,9 +131,14 @@ public class KisiAPI {
 		NotificationManager.removeAllNotification();
 		KisiRestClient.getInstance().delete("/users/sign_out",  new TextHttpResponseHandler() {
 			public void onSuccess(String msg) {
-	
+				
 			}
 		});
+	}
+	
+	
+	public void clearCache() {		
+		DataManager.getInstance().deleteDB();
 	}
 	
 	/**
@@ -169,20 +165,14 @@ public class KisiAPI {
 		return null;
 	}
 	
-	
 	public User getUser() {
 		return 	DataManager.getInstance().getUser();
 	}
 
-	/**
-	 * 
-	 * @param listener
-	 */
 	public void updatePlaces(final OnPlaceChangedListener listener) {
 		if(getUser() == null)
 			return;
 
-		
 		KisiRestClient.getInstance().get("places",  new JsonHttpResponseHandler() { 
 			
 			public void onSuccess(JSONArray response) {
@@ -219,12 +209,12 @@ public class KisiAPI {
 	
 	//helper method for updateLocators
 	public Lock getLockById(Place place, int lockId){ 
-		List<Lock> locks  = place.getLocks();
+		List<Lock> locks = place.getLocks();
 		if(locks == null)
 			return null;
-		for(Lock l: locks) {
-			if(l.getId() == lockId) {
-				return l;
+		for(Lock lock: locks) {
+			if(lock.getId() == lockId) {
+				return lock;
 			}
 		}
 		return null;
@@ -236,16 +226,15 @@ public class KisiAPI {
 		if(places == null)
 			return null;
 		
-		for(Place p: places){
-			for(Lock l: p.getLocks()) {
-				if(l.getId() == lockId){
-					return l;
+		for(Place place: places){
+			for(Lock lock: place.getLocks()) {
+				if(lock.getId() == lockId){
+					return lock;
 				}
 			}
 		}
 		return null;
 	}
-	
 	
 	public void updateLocators(final Place place) {
 		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locators", new JsonHttpResponseHandler() {
@@ -300,6 +289,7 @@ public class KisiAPI {
 		});	
 		return true;
 	}
+	
 	/**
 	 * Register for interest in any changes in the Places.
 	 * The listener is fired when a Place was added or deleted
@@ -313,6 +303,7 @@ public class KisiAPI {
 		if(listener != null)
 			newregisteredOnPlaceChangedListener.add(listener);
 	}
+	
 	/**
 	 * Unregister for the listener registered in registerOnPlaceChangedListener()
 	 * @param listener
@@ -417,7 +408,7 @@ public class KisiAPI {
 	
 	
 
-	public void createGateway(JSONObject blinkUpResponse) {	
+	public void createGateway(JSONObject blinkUpResponse) {
 		String agentUrl = null;
 		String impeeId = null;
 		String planId = null;
@@ -444,7 +435,6 @@ public class KisiAPI {
 			e.printStackTrace();
 		}
     	
-		
 		JSONObject data = new JSONObject();
 		
 		try {
@@ -455,8 +445,7 @@ public class KisiAPI {
 		}
 	
 		//TODO: Implement a proper handler
-		KisiRestClient.getInstance().post("gateways", data, new JsonHttpResponseHandler() {});	
-		
+		KisiRestClient.getInstance().post("gateways", data, new JsonHttpResponseHandler() {});
 	}
 
 	private JSONObject generateJSONLocation() {

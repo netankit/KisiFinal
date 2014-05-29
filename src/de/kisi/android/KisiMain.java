@@ -96,14 +96,11 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		}
 		
 		kisiAPI.updatePlaces(new OnPlaceChangedListener() {
-
 			@Override
 			public void onPlaceChanged(Place[] newPlaces) {
 				// build the UI again with fresh data from the server
 				setupView(newPlaces);
-
 			}
-			
 		});
 	}
 	

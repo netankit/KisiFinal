@@ -69,7 +69,6 @@ public class PlaceFragment extends Fragment {
 			setupButtons(place);
 		if(lockToUnlock == null)  {
 		KisiAPI.getInstance().updateLocks(place, new OnPlaceChangedListener() {
-
 				@Override
 				public void onPlaceChanged(Place[] newPlaces) {
 					setupButtons(place);
