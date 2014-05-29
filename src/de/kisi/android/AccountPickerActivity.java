@@ -80,16 +80,14 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 			progressDialog.setMessage(getString(R.string.login_loading_message));
 			progressDialog.setCancelable(false);
 			progressDialog.show();
-//			KisiAPI.getInstance().login(acc.name, password, mloginCallback);
-			LoginHandler loginHandler = new LoginHandler(activity);
-			loginHandler.login(acc.name, password, mloginCallback);
+			LoginHandler.getInstance().login(acc.name, password, mloginCallback);
 			return;
 		}
 		//if there are more then one account let the user choose the right one
 		else {
 			LinearLayout linearLayout = (LinearLayout)findViewById(R.id.placelinearLayout1);
 			//clear db and auth token before maybe login a different account
-			KisiAPI.getInstance().clearCache();
+			LoginHandler.getInstance().clearCache();
 			linearLayout.removeAllViews();
 			Typeface font = Typeface.createFromAsset(this.getApplicationContext().getAssets(), "Roboto-Light.ttf");
 			//Getting px form Scale-independent Pixels
@@ -127,9 +125,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 							progressDialog.setMessage(getString(R.string.login_loading_message));
 							progressDialog.setCancelable(false);
 							progressDialog.show();
-//							KisiAPI.getInstance().login(acc.name, password, mloginCallback);
-							LoginHandler loginHandler = new LoginHandler(activity);
-							loginHandler.login(acc.name, password, mloginCallback);
+							LoginHandler.getInstance().login(acc.name, password, mloginCallback);
 						}
 					});
 				

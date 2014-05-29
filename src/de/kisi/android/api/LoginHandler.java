@@ -24,8 +24,15 @@ import de.kisi.android.vicinity.manager.BluetoothLEManager;
 public class LoginHandler {
 	
 	private Context context;
+	private static LoginHandler instance;
 	
-	public LoginHandler(Context context) {
+	public static LoginHandler getInstance(){
+		if(instance == null)
+			instance = new LoginHandler(KisiApplication.getInstance());
+		return instance;
+	}
+
+	private LoginHandler(Context context){
 		this.context = context;
 	}
 
@@ -107,7 +114,7 @@ public class LoginHandler {
 		});
 	}
 	
-	private void clearCache() {		
+	public void clearCache() {		
 		DataManager.getInstance().deleteDB();
 	}
 }

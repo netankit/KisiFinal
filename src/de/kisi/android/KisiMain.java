@@ -21,6 +21,7 @@ import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.LoginHandler;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.model.Lock;
@@ -33,6 +34,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	private ViewPager pager;
 	private KisiAPI kisiAPI;
 	private PlacesHandler placesHandler;
+	private LoginHandler loginHandler;
 	private PlaceFragmentPagerAdapter pagerAdapter;
 
 	private int currentPage = 0;
@@ -49,6 +51,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		
 		kisiAPI = KisiAPI.getInstance();
 		placesHandler = PlacesHandler.getInstance();
+		loginHandler = LoginHandler.getInstance();
 
 		Intent login = new Intent(this, AccountPickerActivity.class);
 		startActivityForResult(login, LOGIN_REQUEST_CODE);
@@ -238,7 +241,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	}
 
 	private void logout() {
-		kisiAPI.logout();
+		loginHandler.logout();
 		finish();
 	}
 
