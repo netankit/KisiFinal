@@ -1,6 +1,7 @@
 package de.kisi.android.vicinity.manager;
 
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.LockHandler;
 import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Lock;
 import de.kisi.android.notifications.AutoUnlockNotificationInfo;
@@ -20,7 +21,7 @@ public class BluetoothAutoUnlockService extends Service {
 		int lockId = intent.getIntExtra("Lock", -1);
 		
 		if(lockId != -1 ) {
-			Lock lock = KisiAPI.getInstance().getLockById(lockId);
+			Lock lock = LockHandler.getInstance().getLockById(lockId);
 			unlockLock(lock);
 		}
 				
@@ -35,7 +36,7 @@ public class BluetoothAutoUnlockService extends Service {
 	
 	private void  unlockLock(final Lock lock) {
 		final AutoUnlockNotificationInfo info = de.kisi.android.notifications.NotificationManager.getBLEAutoUnlockNotifiction(lock);
-		KisiAPI.getInstance().unlock(lock, new  UnlockCallback(){
+		LockHandler.getInstance().unlock(lock, new  UnlockCallback(){
 			@Override
 			public void onUnlockSuccess(String message) {
 				info.success = true;

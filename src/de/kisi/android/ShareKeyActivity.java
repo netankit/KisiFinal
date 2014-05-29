@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.LockHandler;
 import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -135,7 +136,7 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 					Toast.makeText(getApplicationContext(), R.string.share_error_empty_email, Toast.LENGTH_LONG).show();
 					return;
 				}
-				KisiAPI.getInstance().createNewKey(place, email, sendlocks, activity);
+				LockHandler.getInstance().createNewKey(place, email, sendlocks, activity);
 				finish();
 			}
 		});

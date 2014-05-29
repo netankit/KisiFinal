@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Lock;
@@ -23,15 +24,20 @@ import de.kisi.android.vicinity.manager.GeofenceManager;
 
 public class LockHandler {
 	
-	private PlacesHandler placesHandler;
+	private static LockHandler instance;
 	private Context context;
 	
+	public static LockHandler getInstance(){
+		if(instance == null)
+			instance = new LockHandler(KisiApplication.getInstance());
+		return instance;
+	}
 	public LockHandler(Context context) {
 		this.context = context;
 	}
 	
-	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {	
-		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
+	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {
+		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
@@ -41,11 +47,11 @@ public class LockHandler {
 				}
 				DataManager.getInstance().saveLocks(locks);
 				listener.onPlaceChanged(PlacesHandler.getInstance().getPlaces());
-				getPlacesHandler().notifyAllOnPlaceChangedListener();
+				PlacesHandler.getInstance().notifyAllOnPlaceChangedListener();
 				//get also locators for this place
 				LocatorHandler.getInstance().updateLocators(place);
 			}
-		});		
+		});
 	}
 	
 	//helper method for updateLocators
@@ -76,14 +82,6 @@ public class LockHandler {
 		return null;
 	}
 
-	public PlacesHandler getPlacesHandler() {
-		return placesHandler;
-	}
-
-	public void setPlacesHandler(PlacesHandler placesHandler) {
-		this.placesHandler = placesHandler;
-	}
-	
 	public boolean createNewKey(Place p, String email, List<Lock> locks, final Activity activity) {
 
 		JSONArray lock_ids = new JSONArray();

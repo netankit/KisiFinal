@@ -63,14 +63,14 @@ public class PlacesHandler {
 				DataManager.getInstance().savePlaces(pl);
 				//update locks for places
 				for(Place p: pl) {
-					KisiAPI.getInstance().updateLocks(p, listener);
+					LockHandler.getInstance().updateLocks(p, listener);
 				}
 			}
 			
 		});
 	}
 	
-	private User getUser() {
+	private User getUser() { //TODO: doesn't belong here
 		return 	DataManager.getInstance().getUser();
 	}
 	

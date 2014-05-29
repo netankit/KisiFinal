@@ -21,6 +21,7 @@ import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.LockHandler;
 import de.kisi.android.api.LoginHandler;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.api.PlacesHandler;
@@ -283,7 +284,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		for (int j = 0; j < placesHandler.getPlaces().length; j++) {
 			if (placesHandler.getPlaces()[j].getId() == placeId) {
 				int lockId = intent.getIntExtra("Lock", -1);
-				Lock lockToUnlock = kisiAPI.getLockById(placesHandler.getPlaceById(placeId), lockId);
+				Lock lockToUnlock = LockHandler.getInstance().getLockById(placesHandler.getPlaceById(placeId), lockId);
 				pager.setCurrentItem(j, false);
 				int id  = pager.getCurrentItem();
 				// http://tofu0913.blogspot.de/2013/06/adnroid-get-current-fragment-when-using.html
