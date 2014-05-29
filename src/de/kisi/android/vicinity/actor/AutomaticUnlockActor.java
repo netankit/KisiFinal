@@ -2,7 +2,7 @@ package de.kisi.android.vicinity.actor;
 
 import android.content.Intent;
 import de.kisi.android.KisiApplication;
-import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -14,7 +14,7 @@ public class AutomaticUnlockActor implements LockInVicinityActorInterface {
 	// directly send a unlock process to the server
 	@Override
 	public void actOnEntry(int placeID, int lockId) {
-		Place place = KisiAPI.getInstance().getPlaceById(placeID);
+		Place place = PlacesHandler.getInstance().getPlaceById(placeID);
 		for(Lock lock : place.getLocks())
 			if(lock.getId()==lockId) {
 				Intent intent = new Intent(KisiApplication.getInstance(), BluetoothAutoUnlockService.class);

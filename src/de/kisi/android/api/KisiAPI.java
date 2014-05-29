@@ -1,7 +1,6 @@
 package de.kisi.android.api;
 
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -15,6 +14,7 @@ import android.location.Location;
 import android.os.Build;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
@@ -32,18 +32,13 @@ import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 import de.kisi.android.vicinity.manager.BluetoothLEManager;
 import de.kisi.android.vicinity.manager.GeofenceManager;
 
-import com.google.gson.Gson;
-
 
 public class KisiAPI {
 
 	private static KisiAPI instance;  
 	
 	
-	private List<OnPlaceChangedListener> registeredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
-	private List<OnPlaceChangedListener> unregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
-	private List<OnPlaceChangedListener> newregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
-
+	
 	private Context context;
 	
 	public static KisiAPI getInstance(){
@@ -141,53 +136,11 @@ public class KisiAPI {
 		DataManager.getInstance().deleteDB();
 	}
 	
-	/**
-	 * Get all available Places for the User
-	 * 
-	 * @return Array of all Places the user has access to
-	 */
-	public Place[] getPlaces(){
-		return DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-	}
-	
-	public Place getPlaceAt(int index){
-		Place[] places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-		if(places != null && index>=0 && index<places.length)
-			return places[index];
-		return null;
-	}
-	
-	public Place getPlaceById(int num){
-		Place[]  places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
-		for(Place p : places)
-			if(p.getId() == num)
-				return p;
-		return null;
-	}
 	
 	public User getUser() {
 		return 	DataManager.getInstance().getUser();
 	}
 
-	public void updatePlaces(final OnPlaceChangedListener listener) {
-		if(getUser() == null)
-			return;
-
-		KisiRestClient.getInstance().get("places",  new JsonHttpResponseHandler() { 
-			
-			public void onSuccess(JSONArray response) {
-				Gson gson = new Gson();
-				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
-				DataManager.getInstance().savePlaces(pl);
-				//update locks for places
-				for(Place p: pl) {
-					KisiAPI.getInstance().updateLocks(p, listener);
-				}
-			}
-			
-		});
-	}
-	
 	
 	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {	
 		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() { 
@@ -196,11 +149,11 @@ public class KisiAPI {
 				Gson gson = new Gson();
 				Lock[] locks = gson.fromJson(response.toString(), Lock[].class);
 				for(Lock l: locks) {
-					l.setPlace(instance.getPlaceById(l.getPlaceId()));
+					l.setPlace(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocks(locks);
-				listener.onPlaceChanged(getPlaces());
-				notifyAllOnPlaceChangedListener();
+				listener.onPlaceChanged(PlacesHandler.getInstance().getPlaces());
+				PlacesHandler.getInstance().notifyAllOnPlaceChangedListener();
 				//get also locators for this place
 				KisiAPI.getInstance().updateLocators(place);
 			}
@@ -222,7 +175,7 @@ public class KisiAPI {
 	
 	
 	public Lock getLockById(int lockId) {
-		Place[] places = this.getPlaces();
+		Place[] places = PlacesHandler.getInstance().getPlaces();
 		if(places == null)
 			return null;
 		
@@ -243,11 +196,11 @@ public class KisiAPI {
 				Gson gson = new Gson();
 				Locator[] locators = gson.fromJson(response.toString(), Locator[].class);
 				for(Locator l: locators) {
-					l.setLock(KisiAPI.getInstance().getLockById(KisiAPI.getInstance().getPlaceById(l.getPlaceId()), l.getLockId()));
-					l.setPlace(KisiAPI.getInstance().getPlaceById(l.getPlaceId()));
+					l.setLock(KisiAPI.getInstance().getLockById(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()), l.getLockId()));
+					l.setPlace(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocators(locators);
-				notifyAllOnPlaceChangedListener();
+				PlacesHandler.getInstance().notifyAllOnPlaceChangedListener();
 			}
 			
 		});
@@ -288,54 +241,6 @@ public class KisiAPI {
 			
 		});	
 		return true;
-	}
-	
-	/**
-	 * Register for interest in any changes in the Places.
-	 * The listener is fired when a Place was added or deleted
-	 * or any change occur within the Place like a Lock or Locator has been added. 
-	 * 
-	 * Sometimes on a total refresh there can be a lot of PlaceChanges in a short
-	 * period of time, so make sure that the client can handle this.
-	 * @param listener
-	 */
-	public void registerOnPlaceChangedListener(OnPlaceChangedListener listener){
-		if(listener != null)
-			newregisteredOnPlaceChangedListener.add(listener);
-	}
-	
-	/**
-	 * Unregister for the listener registered in registerOnPlaceChangedListener()
-	 * @param listener
-	 */
-	public void unregisterOnPlaceChangedListener(OnPlaceChangedListener listener){
-		if(listener != null)
-			unregisteredOnPlaceChangedListener.add(listener);
-	}
-	
-	/**
-	 * Notifies all the registered OnPlaceChangedListener that some Data regarding
-	 * the Places has changed.
-	 */
-	private void notifyAllOnPlaceChangedListener(){
-		// This have to be done this way, lists are not allowed to be modified 
-		// during a foreach loop
-		for(OnPlaceChangedListener listener : unregisteredOnPlaceChangedListener)
-			registeredOnPlaceChangedListener.remove(listener);
-		registeredOnPlaceChangedListener.addAll(newregisteredOnPlaceChangedListener);
-		newregisteredOnPlaceChangedListener.clear();
-		for(OnPlaceChangedListener listener : registeredOnPlaceChangedListener)
-			listener.onPlaceChanged(getPlaces());
-	}
-	
-	/**
-	 * Checks if the place is owned by the user or just shared
-	 * 
-	 * @param place Place to be checked
-	 * @return true if user is owner, false if someone else shares this place with the user
-	 */
-	public boolean userIsOwner(Place place){
-		return place.getOwnerId()==this.getUser().getId();
 	}
 	
 	/**
@@ -399,13 +304,6 @@ public class KisiAPI {
 			}	
 		});
 	}
-	
-	
-	public void refresh(OnPlaceChangedListener listener) {
-		DataManager.getInstance().deletePlaceLockLocatorFromDB();
-		this.updatePlaces(listener);
-	}
-	
 	
 
 	public void createGateway(JSONObject blinkUpResponse) {

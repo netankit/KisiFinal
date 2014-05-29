@@ -20,8 +20,8 @@ public class LocatorHandler {
 				Gson gson = new Gson();
 				Locator[] locators = gson.fromJson(response.toString(), Locator[].class);
 				for(Locator l: locators) {
-					l.setLock(KisiAPI.getInstance().getLockById(KisiAPI.getInstance().getPlaceById(l.getPlaceId()), l.getLockId()));
-					l.setPlace(KisiAPI.getInstance().getPlaceById(l.getPlaceId()));
+					l.setLock(KisiAPI.getInstance().getLockById(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()), l.getLockId()));
+					l.setPlace(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocators(locators);
 				getPlacesHandler().notifyAllOnPlaceChangedListener();

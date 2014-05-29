@@ -4,10 +4,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-
-
-
-
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
@@ -21,7 +17,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.notifications.NotificationInformation.Type;
@@ -56,7 +52,7 @@ public class NotificationManager extends BroadcastReceiver {
 	private void updateNotifications(){
 		Context context = getDefaultContext();
 		android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		Place[] places = KisiAPI.getInstance().getPlaces();
+		Place[] places = PlacesHandler.getInstance().getPlaces();
 		// This is a test for removed notifications
 		for(NotificationInformation info:notifications) {
 			info.valid = false;

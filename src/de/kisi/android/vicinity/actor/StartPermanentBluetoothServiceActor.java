@@ -2,7 +2,7 @@ package de.kisi.android.vicinity.actor;
 
 import android.content.pm.PackageManager;
 import de.kisi.android.KisiApplication;
-import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -18,7 +18,7 @@ public class StartPermanentBluetoothServiceActor implements LockInVicinityActorI
 	@Override
 	public void actOnEntry(int placeID, int lockId) {
 		// Start BLE and make sure it runs in foreground mode
-		Place place = KisiAPI.getInstance().getPlaceById(placeID);
+		Place place = PlacesHandler.getInstance().getPlaceById(placeID);
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
 				KisiApplication.getInstance().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
 			for(Lock lock:place.getLocks()) {

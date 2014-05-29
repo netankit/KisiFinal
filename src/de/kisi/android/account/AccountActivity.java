@@ -1,9 +1,5 @@
 package de.kisi.android.account;
 
-import de.kisi.android.KisiApplication;
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.LoginCallback;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountAuthenticatorResponse;
@@ -19,6 +15,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.LoginCallback;
 
 // see https://github.com/Udinic/AccountAuthenticator/blob/master/src/com/udinic/accounts_authenticator_example/authentication/AuthenticatorActivity.java
 

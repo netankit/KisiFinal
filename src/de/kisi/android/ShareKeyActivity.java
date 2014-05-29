@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import android.app.Activity;
@@ -43,7 +44,7 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 		backButton.setOnClickListener(this);
 
 		int place = getIntent().getExtras().getInt("place");
-		buildShareDialog(KisiAPI.getInstance().getPlaces()[place]);
+		buildShareDialog(PlacesHandler.getInstance().getPlaces()[place]);
 
 	}	
 	

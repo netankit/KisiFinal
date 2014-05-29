@@ -37,10 +37,10 @@ public class LockHandler {
 				Gson gson = new Gson();
 				Lock[] locks = gson.fromJson(response.toString(), Lock[].class);
 				for(Lock l: locks) {
-					l.setPlace(PlacesHandler.getPlaceById(l.getPlaceId()));
+					l.setPlace(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocks(locks);
-				listener.onPlaceChanged(PlacesHandler.getPlaces());
+				listener.onPlaceChanged(PlacesHandler.getInstance().getPlaces());
 				getPlacesHandler().notifyAllOnPlaceChangedListener();
 				//get also locators for this place
 				KisiAPI.getInstance().updateLocators(place);
@@ -62,7 +62,7 @@ public class LockHandler {
 	}
 	
 	public Lock getLockById(int lockId) {
-		Place[] places = PlacesHandler.getPlaces();
+		Place[] places = PlacesHandler.getInstance().getPlaces();
 		if(places == null)
 			return null;
 		

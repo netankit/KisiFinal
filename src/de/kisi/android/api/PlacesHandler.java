@@ -15,11 +15,32 @@ import de.kisi.android.rest.KisiRestClient;
 
 public class PlacesHandler {
 	
+	
+	
+	
+	private static PlacesHandler instance;  
+	
+	public static PlacesHandler getInstance(){
+		if(instance == null)
+			instance = new PlacesHandler();
+		return instance;
+	}
+
+	private PlacesHandler(){
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 	private List<OnPlaceChangedListener> registeredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> unregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> newregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	
-	public static Place[] getPlaces(){
+	public Place[] getPlaces(){
 		return DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 	}
 	
@@ -30,7 +51,7 @@ public class PlacesHandler {
 		return null;
 	}
 	
-	public static Place getPlaceById(int num){
+	public Place getPlaceById(int num){
 		Place[]  places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
 		for(Place p : places)
 			if(p.getId() == num)

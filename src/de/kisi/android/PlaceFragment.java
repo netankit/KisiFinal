@@ -2,12 +2,6 @@ package de.kisi.android;
 
 import java.util.Hashtable;
 
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.api.UnlockCallback;
-import de.kisi.android.model.Lock;
-import de.kisi.android.model.Place;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.Resources;
@@ -21,13 +15,19 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.api.PlacesHandler;
+import de.kisi.android.api.UnlockCallback;
+import de.kisi.android.model.Lock;
+import de.kisi.android.model.Place;
 
 public class PlaceFragment extends Fragment {
 
@@ -64,7 +64,7 @@ public class PlaceFragment extends Fragment {
 		
 		index = getArguments().getInt("index");
 		
-		final Place place = KisiAPI.getInstance().getPlaceAt(index);
+		final Place place = PlacesHandler.getInstance().getPlaceAt(index);
 		if(place != null)
 			setupButtons(place);
 		if(lockToUnlock == null)  {

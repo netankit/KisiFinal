@@ -1,8 +1,6 @@
 package de.kisi.android;
 
 
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.model.Place;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -11,14 +9,16 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import de.kisi.android.api.PlacesHandler;
+import de.kisi.android.model.Place;
 
 
 public class PlaceNotificationSettings extends Activity implements OnClickListener {
@@ -42,7 +42,7 @@ public class PlaceNotificationSettings extends Activity implements OnClickListen
 	}
 
 	private void buildShareDialog() {
-		final Place[] places = KisiAPI.getInstance().getPlaces();
+		final Place[] places = PlacesHandler.getInstance().getPlaces();
 
 		// Getting px form Scale-independent Pixels
 		Resources r = getResources();

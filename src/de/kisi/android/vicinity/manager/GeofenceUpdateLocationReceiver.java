@@ -2,22 +2,19 @@ package de.kisi.android.vicinity.manager;
 
 import java.util.List;
 
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.LocationClient;
-
-import de.kisi.android.KisiApplication;
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.model.Place;
-import de.kisi.android.vicinity.LockInVicinityActorFactory;
-import de.kisi.android.vicinity.LockInVicinityActorInterface;
-import de.kisi.android.vicinity.VicinityTypeEnum;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.support.v4.app.NotificationCompat;
+
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.LocationClient;
+
+import de.kisi.android.api.PlacesHandler;
+import de.kisi.android.model.Place;
+import de.kisi.android.vicinity.LockInVicinityActorFactory;
+import de.kisi.android.vicinity.LockInVicinityActorInterface;
+import de.kisi.android.vicinity.VicinityTypeEnum;
 
 /**
  * This BroadcastReceiver receives Geofence Transitions defined by the 
@@ -42,7 +39,7 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
             for(Geofence fence : fences){
             	String p[] = fence.getRequestId().split(": ");
             	int placeID = Integer.parseInt(p[1]);
-            	if(checkLocation(KisiAPI.getInstance().getPlaceById(placeID))){
+            	if(checkLocation(PlacesHandler.getInstance().getPlaceById(placeID))){
             		actor.actOnEntry(placeID,0);
             	}
             }
