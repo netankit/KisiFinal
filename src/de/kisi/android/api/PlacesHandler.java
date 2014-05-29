@@ -15,9 +15,6 @@ import de.kisi.android.rest.KisiRestClient;
 
 public class PlacesHandler {
 	
-	
-	
-	
 	private static PlacesHandler instance;  
 	
 	public static PlacesHandler getInstance(){
@@ -29,12 +26,6 @@ public class PlacesHandler {
 	private PlacesHandler(){
 		
 	}
-	
-	
-	
-	
-	
-	
 	
 	private List<OnPlaceChangedListener> registeredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();
 	private List<OnPlaceChangedListener> unregisteredOnPlaceChangedListener = new LinkedList<OnPlaceChangedListener>();

@@ -43,7 +43,7 @@ public class LockHandler {
 				listener.onPlaceChanged(PlacesHandler.getInstance().getPlaces());
 				getPlacesHandler().notifyAllOnPlaceChangedListener();
 				//get also locators for this place
-				KisiAPI.getInstance().updateLocators(place);
+				LocatorHandler.getInstance().updateLocators(place);
 			}
 		});		
 	}

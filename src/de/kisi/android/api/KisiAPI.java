@@ -155,7 +155,7 @@ public class KisiAPI {
 				listener.onPlaceChanged(PlacesHandler.getInstance().getPlaces());
 				PlacesHandler.getInstance().notifyAllOnPlaceChangedListener();
 				//get also locators for this place
-				KisiAPI.getInstance().updateLocators(place);
+				LocatorHandler.getInstance().updateLocators(place);
 			}
 		});		
 	}
@@ -189,24 +189,6 @@ public class KisiAPI {
 		return null;
 	}
 	
-	public void updateLocators(final Place place) {
-		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locators", new JsonHttpResponseHandler() {
-			
-			public void onSuccess(JSONArray response) {
-				Gson gson = new Gson();
-				Locator[] locators = gson.fromJson(response.toString(), Locator[].class);
-				for(Locator l: locators) {
-					l.setLock(KisiAPI.getInstance().getLockById(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()), l.getLockId()));
-					l.setPlace(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()));
-				}
-				DataManager.getInstance().saveLocators(locators);
-				PlacesHandler.getInstance().notifyAllOnPlaceChangedListener();
-			}
-			
-		});
-	}
-	
-
 	public boolean createNewKey(Place p, String email, List<Lock> locks, final Activity activity) {
 
 		JSONArray lock_ids = new JSONArray();

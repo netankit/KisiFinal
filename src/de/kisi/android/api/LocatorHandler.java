@@ -11,7 +11,17 @@ import de.kisi.android.model.Place;
 import de.kisi.android.rest.KisiRestClient;
 
 public class LocatorHandler {
-	private PlacesHandler placesHandler;
+	
+	private static LocatorHandler instance;
+	private LocatorHandler(){
+		
+	}
+	public static LocatorHandler getInstance(){
+		if(instance == null)
+			instance = new LocatorHandler();
+		return instance;
+	}
+	
 	
 	public void updateLocators(final Place place) {
 		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locators", new JsonHttpResponseHandler() {
@@ -24,17 +34,10 @@ public class LocatorHandler {
 					l.setPlace(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocators(locators);
-				getPlacesHandler().notifyAllOnPlaceChangedListener();
+				PlacesHandler.getInstance().notifyAllOnPlaceChangedListener();
 			}
 			
 		});
 	}
 
-	public PlacesHandler getPlacesHandler() {
-		return placesHandler;
-	}
-
-	public void setPlacesHandler(PlacesHandler placesHandler) {
-		this.placesHandler = placesHandler;
-	}
 }
