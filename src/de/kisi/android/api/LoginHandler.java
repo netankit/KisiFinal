@@ -66,7 +66,7 @@ public class LoginHandler {
 			e1.printStackTrace();
 		}
 
-		KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", loginJSON,  new JsonHttpResponseHandler() {
+		KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", loginJSON,  new GenericResponceHandler(callback) {
 			
 			 public void onSuccess(org.json.JSONObject response) {
 				Gson gson = new Gson();
@@ -75,30 +75,6 @@ public class LoginHandler {
 				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
 				return;
 			}
-			
-			 public void onFailure(int statusCode, Throwable e, JSONObject response) {
-				 String errormessage = null;
-				 //no network connectivity
-				 if(statusCode == 0) {
-					 errormessage = context.getResources().getString(R.string.no_network);
-					 callback.onLoginFail(errormessage);
-					 return;
-				 }
-	
-				 if(response != null) {
-					try {
-						errormessage = response.getString("error");
-					} catch (JSONException ej) {
-						ej.printStackTrace();
-					}
-				}
-				else {
-					errormessage = "Error!";
-				}
-				callback.onLoginFail(errormessage);
-				return;
-			};
-			
 		});
 	}
 	public void logout(){
