@@ -80,7 +80,8 @@
             android:id="@+id/termsCondition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/AgreeTermsConditions" />
+            android:text="@string/AgreeTermsConditions" 
+            android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/registerButton"
