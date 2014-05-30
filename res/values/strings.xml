@@ -6,6 +6,7 @@
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="PasswordConfirm">Confirm password</string>
+    <string name="AgreeTermsConditions">I agree to KISI\'s Terms &amp; Conditions</string>
     <string name="RememberMe">Remember password</string>
     <string name="Login">Login</string>
     <string name="Register">Register</string>
@@ -70,8 +71,10 @@
 	<string name="bluetooth_off">Bluetooth detection off</string>
 	<string name="update"> New version available.\n<u>Touch here to update</u></string>
 	
+	<string name="registration_successful"> Registration is successful. You need to confirm your email.</string>
 	<string name="passwords_not_match"> Passwords do not match!</string>
 	<string name="fields_cannot_be_empty"> Fields cannot be empty!</string>
+	<string name="terms_and_conditions_not_agreed"> You need to agree to KISI\'s Terms &amp; Conditions.</string>
 	
 	
 	

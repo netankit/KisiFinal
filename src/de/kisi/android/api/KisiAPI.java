@@ -1,6 +1,7 @@
 package de.kisi.android.api;
 
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.location.Location;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -57,9 +59,9 @@ public class KisiAPI {
 	}
 	
 	// Registration: Registers user by sending in a JSON object with user information.
-		public void register(String user_email, String password, String password_confirmation, Boolean terms_and_conditions,  final RegisterCallback callback){
+	public void register(String user_email, String password, String password_confirmation, Boolean terms_and_conditions,  final RegisterCallback callback){
 		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(user_email);
-		
+
 		JSONObject registerJSON = new JSONObject();
 		JSONObject userJSON = new JSONObject();
 		JSONObject deviceJSON = new JSONObject();
@@ -67,10 +69,9 @@ public class KisiAPI {
 			//build user object
 			userJSON.put("email", user_email);
 			userJSON.put("password", password);
-			userJSON.put("password_confirmation", password_confirmation);
-			userJSON.put("terms_and_conditions", terms_and_conditions);
+			userJSON.put("terms_and_conditions", terms_and_conditions == true?"1":"0");
 			registerJSON.put("user", userJSON);
-			
+
 			//build device object
 			if (deviceUUID != null) {
 				deviceJSON.put("uuid", deviceUUID);				
@@ -86,30 +87,45 @@ public class KisiAPI {
 			registerJSON.put("device", deviceJSON);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
-	}
-	KisiRestClient.getInstance().postWithoutAuthToken("users/sign_up", registerJSON,  new JsonHttpResponseHandler() {
-			
-			 public void onSuccess(org.json.JSONObject response) {
-				Gson gson = new Gson();
-				User user = gson.fromJson(response.toString(), User.class);
-				callback.onRegisterSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
+		}
+		KisiRestClient.getInstance().postWithoutAuthToken("users", registerJSON,  new JsonHttpResponseHandler() {
+
+			public void onSuccess(JSONObject response) {
+				try{
+					String id = response.getString("id");	
+					if(id != null && (!id.isEmpty())){
+						callback.onRegisterSuccess();
+						return;
+					}	
+				} catch (JSONException ej) {
+					ej.printStackTrace();
+				}
+				callback.onRegisterFail("Error!");
 				return;
 			}
-			
-			 public void onFailure(int statusCode, Throwable e, JSONObject response) {
-				 String errormessage = null;
-				 //no network connectivity
-				 if(statusCode == 0) {
-					 errormessage = context.getResources().getString(R.string.no_network);
-					 callback.onRegisterFail(errormessage);
-					 return;
-				 }
-	
-				 if(response != null) {
-					try {
-						errormessage = response.getString("error");
-					} catch (JSONException ej) {
+
+			public void onFailure(int statusCode, Throwable e, JSONObject response) {
+				String errormessage = "";
+				//no network connectivity
+				if(statusCode == 0) {
+					errormessage = context.getResources().getString(R.string.no_network);
+					callback.onRegisterFail(errormessage);
+					return;
+				}
+
+				if(response != null) {
+					try{
+						JSONObject errors = response.getJSONObject("errors");
+						Iterator it = errors.keys();
+						
+						while(it.hasNext()){
+							String key = (String) it.next();
+							String value = errors.getString(key);
+							errormessage = errormessage + key + value + '\n';
+						};
+					}catch (JSONException ej) {
 						ej.printStackTrace();
+						errormessage = "Error!";
 					}
 				}
 				else {
@@ -118,10 +134,10 @@ public class KisiAPI {
 				callback.onRegisterFail(errormessage);
 				return;
 			};
-			
+
 		});
-		
-}
+
+	}
 	
 	
 	public void login(String login, String password, final LoginCallback callback){

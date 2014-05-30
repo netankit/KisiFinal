@@ -76,6 +76,12 @@
             android:textColor="#ffffff"
             android:textColorHint="#ffffff" />
 
+        <CheckBox
+            android:id="@+id/termsCondition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/AgreeTermsConditions" />
+
         <Button
             android:id="@+id/registerButton"
             android:layout_width="300dp"

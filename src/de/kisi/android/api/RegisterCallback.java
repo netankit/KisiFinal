@@ -4,6 +4,6 @@ package de.kisi.android.api;
  * procedure was successful or not. 
  */
 public interface RegisterCallback {
-	public void onRegisterSuccess(String successmessage);
+	public void onRegisterSuccess();
 	public void onRegisterFail(String errormessage);
 }

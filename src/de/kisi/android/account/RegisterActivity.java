@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -16,6 +17,7 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 	private EditText userNameField;
 	private EditText passwordField;
 	private EditText passwordConfirmField;
+	private CheckBox agreedTermsField;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -24,6 +26,7 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		userNameField = (EditText) findViewById(R.id.email);
 		passwordField = (EditText) findViewById(R.id.password);
 		passwordConfirmField = (EditText) findViewById(R.id.passwordConfirm);
+		agreedTermsField = (CheckBox) findViewById(R.id.termsCondition);
 		
 		Button registerButton = (Button) findViewById(R.id.registerButton);
 		registerButton.setOnClickListener(this);
@@ -37,16 +40,21 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 			String username = userNameField.getText().toString();
 			String password = passwordField.getText().toString();
 			String passwordConfirm = passwordConfirmField.getText().toString();
+			boolean termsAgreed = agreedTermsField.isChecked();
+			
+			if(!termsAgreed){
+				Toast.makeText(getApplicationContext(), R.string.terms_and_conditions_not_agreed, Toast.LENGTH_SHORT).show();
+				return;
+			}
 			if(username.isEmpty() || password.isEmpty() || passwordConfirm.isEmpty()){
 				Toast.makeText(getApplicationContext(), R.string.fields_cannot_be_empty, Toast.LENGTH_SHORT).show();
-				break;
+				return;
 			}
 			if(!password.equals(passwordConfirm)){
 				Toast.makeText(getApplicationContext(), R.string.passwords_not_match, Toast.LENGTH_SHORT).show();
-				break;
+				return;
 			}
-			// TODO Change true to the value from user interface
-			KisiAPI.getInstance().register(username, password, passwordConfirm, true, this);
+			KisiAPI.getInstance().register(username, password, passwordConfirm, termsAgreed, this);
 			
 			break;
 		default:
@@ -56,9 +64,8 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 	}
 
 	@Override
-	public void onRegisterSuccess(String successmessage) {
-		// TODO Show the success message and return the previous activity.
-		Toast.makeText(getBaseContext(), successmessage, Toast.LENGTH_SHORT).show();
+	public void onRegisterSuccess() {
+		Toast.makeText(getBaseContext(), R.string.registration_successful, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
