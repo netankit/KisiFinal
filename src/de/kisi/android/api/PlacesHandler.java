@@ -3,15 +3,10 @@ package de.kisi.android.api;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.json.JSONArray;
-
-import com.google.gson.Gson;
-import com.loopj.android.http.JsonHttpResponseHandler;
-
+import de.kisi.android.api.calls.UpdatePlacesCall;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
-import de.kisi.android.rest.KisiRestClient;
 
 public class PlacesHandler {
 	
@@ -54,20 +49,8 @@ public class PlacesHandler {
 		if(getUser() == null)
 			return;
 
+		new UpdatePlacesCall(listener).send();
 		
-		KisiRestClient.getInstance().get("places",  new JsonHttpResponseHandler() { 
-			
-			public void onSuccess(JSONArray response) {
-				Gson gson = new Gson();
-				Place[]  pl = gson.fromJson(response.toString(), Place[].class);
-				DataManager.getInstance().savePlaces(pl);
-				//update locks for places
-				for(Place p: pl) {
-					LockHandler.getInstance().updateLocks(p, listener);
-				}
-			}
-			
-		});
 	}
 	
 	private User getUser() { //TODO: doesn't belong here

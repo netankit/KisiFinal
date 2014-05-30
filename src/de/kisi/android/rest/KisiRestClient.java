@@ -119,6 +119,7 @@ public class KisiRestClient {
 		} catch (UnsupportedEncodingException e2) {
 			e2.printStackTrace();
 		}
+        //TODO: entity can still be null! Fix that.
         entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         return entity;
 	}

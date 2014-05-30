@@ -16,6 +16,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
+import de.kisi.android.api.calls.UpdateLocksCall;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -37,21 +38,8 @@ public class LockHandler {
 	}
 	
 	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {
-		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locks",  new JsonHttpResponseHandler() {
-			
-			public void onSuccess(JSONArray response) {
-				Gson gson = new Gson();
-				Lock[] locks = gson.fromJson(response.toString(), Lock[].class);
-				for(Lock l: locks) {
-					l.setPlace(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()));
-				}
-				DataManager.getInstance().saveLocks(locks);
-				listener.onPlaceChanged(PlacesHandler.getInstance().getPlaces());
-				PlacesHandler.getInstance().notifyAllOnPlaceChangedListener();
-				//get also locators for this place
-				LocatorHandler.getInstance().updateLocators(place);
-			}
-		});
+		
+		new UpdateLocksCall(place, listener).send();
 	}
 	
 	//helper method for updateLocators
