@@ -13,6 +13,7 @@ import de.kisi.android.api.calls.CreateGatewayCall;
 import de.kisi.android.api.calls.CreateNewKeyCall;
 import de.kisi.android.api.calls.LoginCall;
 import de.kisi.android.api.calls.LogoutCall;
+import de.kisi.android.api.calls.RegisterCall;
 import de.kisi.android.api.calls.UnlockCall;
 import de.kisi.android.api.calls.UpdateLocatorsCall;
 import de.kisi.android.api.calls.UpdateLocksCall;
@@ -93,6 +94,17 @@ public class KisiAPI {
 	 */
 	public void unlock(Lock lock, final UnlockCallback callback){
 		new UnlockCall(lock, callback).send();
+	}
+	
+	// Registration: Registers user by sending in a JSON object with user information.
+	public void register(
+			String user_email, 
+			String password,
+			String password_confirmation, 
+			Boolean terms_and_conditions,
+			final RegisterCallback callback) {
+		
+		new RegisterCall(user_email, password, password_confirmation, terms_and_conditions, callback).send();
 	}
 	
 	
