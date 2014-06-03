@@ -20,6 +20,7 @@ import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.OnPlaceChangedEventHandler;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
@@ -278,7 +279,7 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 			}
 			
 		});
-		KisiAPI.getInstance().registerOnPlaceChangedListener(new OnPlaceChangedListener(){
+		OnPlaceChangedEventHandler.getInstance().registerOnPlaceChangedListener(new OnPlaceChangedListener(){
 
 			@Override
 			public void onPlaceChanged(Place[] newPlaces) {

@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.OnPlaceChangedEventHandler;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
@@ -25,7 +26,7 @@ public class UpdateLocatorsCall extends GenericCall {
 					locator.setPlace(KisiAPI.getInstance().getPlaceById(locator.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocators(locators);
-				KisiAPI.getInstance().notifyAllOnPlaceChangedListener();
+				OnPlaceChangedEventHandler.getInstance().notifyAllOnPlaceChangedListener();
 			}
 			
 		};
