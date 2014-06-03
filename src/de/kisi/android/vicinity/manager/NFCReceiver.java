@@ -8,7 +8,7 @@ import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.widget.Toast;
-import de.kisi.android.api.PlacesHandler;
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -38,7 +38,7 @@ public class NFCReceiver extends Activity{
 			LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.NFC);
 	        
 	        // Test all locators for equality to the data string 
-	        for(Place place : PlacesHandler.getInstance().getPlaces()){
+	        for(Place place : KisiAPI.getInstance().getPlaces()){
 	        	for(Lock lock : place.getLocks()){
 	        		for(Locator locator : lock.getLocators()){
 	        			if (nfcData.equals(locator.getTag())){

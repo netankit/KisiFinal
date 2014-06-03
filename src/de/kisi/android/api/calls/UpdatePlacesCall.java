@@ -5,11 +5,10 @@ import org.json.JSONArray;
 import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-import de.kisi.android.api.LockHandler;
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Place;
-import de.kisi.android.rest.KisiRestClient;
 
 public class UpdatePlacesCall extends GenericCall {
 
@@ -22,7 +21,7 @@ public class UpdatePlacesCall extends GenericCall {
 				DataManager.getInstance().savePlaces(pl);
 				//update locks for places
 				for(Place p: pl) {
-					LockHandler.getInstance().updateLocks(p, listener);
+					KisiAPI.getInstance().updateLocks(p, listener);
 				}
 			}
 		};

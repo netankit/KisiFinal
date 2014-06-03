@@ -16,8 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
-import de.kisi.android.api.LoginHandler;
 
 // see https://github.com/Udinic/AccountAuthenticator/blob/master/src/com/udinic/accounts_authenticator_example/authentication/AuthenticatorActivity.java
 
@@ -115,7 +115,7 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		username = userNameField.getText().toString();
 		password = passwordField.getText().toString();
 
-        LoginHandler.getInstance().login(username, password, this);
+		KisiAPI.getInstance().login(username, password, this);
 	}
 
     private void finishLogin(Intent intent) {

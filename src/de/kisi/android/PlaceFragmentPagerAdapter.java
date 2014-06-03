@@ -5,7 +5,7 @@ import java.util.List;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import de.kisi.android.api.PlacesHandler;
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Place;
 
 
@@ -47,7 +47,7 @@ public class PlaceFragmentPagerAdapter extends FragmentPagerAdapter {
 	
 	@Override
 	public CharSequence getPageTitle(int num) {
-		Place l = PlacesHandler.getInstance().getPlaceAt(num);
+		Place l = KisiAPI.getInstance().getPlaceAt(num);
 		if(l!=null)
 			return l.getName();
 		else

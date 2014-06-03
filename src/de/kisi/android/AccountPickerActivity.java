@@ -23,7 +23,6 @@ import android.widget.Toast;
 import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
-import de.kisi.android.api.LoginHandler;
 
 public class AccountPickerActivity extends Activity implements LoginCallback{
 
@@ -80,14 +79,14 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 			progressDialog.setMessage(getString(R.string.login_loading_message));
 			progressDialog.setCancelable(false);
 			progressDialog.show();
-			LoginHandler.getInstance().login(acc.name, password, mloginCallback);
+			KisiAPI.getInstance().login(acc.name, password, mloginCallback);
 			return;
 		}
 		//if there are more then one account let the user choose the right one
 		else {
 			LinearLayout linearLayout = (LinearLayout)findViewById(R.id.placelinearLayout1);
 			//clear db and auth token before maybe login a different account
-			LoginHandler.getInstance().clearCache();
+			KisiAPI.getInstance().clearCache();
 			linearLayout.removeAllViews();
 			Typeface font = Typeface.createFromAsset(this.getApplicationContext().getAssets(), "Roboto-Light.ttf");
 			//Getting px form Scale-independent Pixels
@@ -125,7 +124,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 							progressDialog.setMessage(getString(R.string.login_loading_message));
 							progressDialog.setCancelable(false);
 							progressDialog.show();
-							LoginHandler.getInstance().login(acc.name, password, mloginCallback);
+							KisiAPI.getInstance().login(acc.name, password, mloginCallback);
 						}
 					});
 				

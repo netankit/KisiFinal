@@ -21,8 +21,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationStatusCodes;
 
 import de.kisi.android.KisiApplication;
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.model.Place;
 
 /**
@@ -101,9 +101,9 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 		reconnectTries = 0;
 		startLocationUpdate();
         // Show interest on any change of the Places
-		PlacesHandler.getInstance().registerOnPlaceChangedListener(this);
+		KisiAPI.getInstance().registerOnPlaceChangedListener(this);
         // Register Places as Geofences
-        registerGeofences(PlacesHandler.getInstance().getPlaces());
+        registerGeofences(KisiAPI.getInstance().getPlaces());
 	}
 
 	@Override

@@ -1,8 +1,8 @@
 package de.kisi.android.api.calls;
 
-import org.apache.http.protocol.HTTP;
-import org.json.JSONArray;
 import org.json.JSONObject;
+
+import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -10,17 +10,13 @@ import de.kisi.android.rest.KisiRestClient;
 
 public abstract class GenericCall {
 
-	protected enum HTTPMethod {
-		GET, POST
-	}
-	
 	protected JsonHttpResponseHandler handler;
-	protected String endpoint;
+	protected String path;
 	protected JSONObject json;
 	protected HTTPMethod method;
 	
-	protected GenericCall(String endpoint, HTTPMethod method) {
-		this.endpoint = endpoint;
+	protected GenericCall(String path, HTTPMethod method) {
+		this.path = path;
 		this.method = method;
 	}
 	
@@ -30,12 +26,12 @@ public abstract class GenericCall {
 	
 	public void send() {
 		final GenericCall call = this;
-		this.createJson();
+		createJson();
 		JsonHttpResponseHandler realHandler = new JsonHttpResponseHandler() {
-			//call = this
 			
 			@Override
-			public void onSuccess(JSONArray response) {
+			public void onSuccess(JSONObject response) {
+				Log.d("GenericCall", "call success");
 				if (call.handler != null) {
 					call.handler.onSuccess(response);
 				}
@@ -50,16 +46,16 @@ public abstract class GenericCall {
 		
 		switch (this.method) {
 		case GET:
-			KisiRestClient.getInstance().get(this.endpoint, realHandler);
+			KisiRestClient.getInstance().get(path, realHandler);
 			break;
 		case POST:
-			KisiRestClient.getInstance().post(this.endpoint, this.json, realHandler);
+			KisiRestClient.getInstance().post(path, json, realHandler);
+			break;
+		case DELETE:
+			KisiRestClient.getInstance().delete(path,  realHandler);
 			break;
 		default:
-			//TODO: do some error handling
-			break;
+			throw new RuntimeException("Unsupported HttpMethod");
 		}
-		
 	}
-	
 }

@@ -3,12 +3,6 @@ package de.kisi.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.LockHandler;
-import de.kisi.android.api.PlacesHandler;
-import de.kisi.android.model.Lock;
-import de.kisi.android.model.Place;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -19,14 +13,17 @@ import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.model.Lock;
+import de.kisi.android.model.Place;
 
 public class ShareKeyActivity extends Activity implements OnClickListener {
 
@@ -45,7 +42,7 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 		backButton.setOnClickListener(this);
 
 		int place = getIntent().getExtras().getInt("place");
-		buildShareDialog(PlacesHandler.getInstance().getPlaces()[place]);
+		buildShareDialog(KisiAPI.getInstance().getPlaces()[place]);
 
 	}	
 	
@@ -136,7 +133,7 @@ public class ShareKeyActivity extends Activity implements OnClickListener {
 					Toast.makeText(getApplicationContext(), R.string.share_error_empty_email, Toast.LENGTH_LONG).show();
 					return;
 				}
-				LockHandler.getInstance().createNewKey(place, email, sendlocks, activity);
+				KisiAPI.getInstance().createNewKey(place, email, sendlocks, activity);
 				finish();
 			}
 		});

@@ -17,7 +17,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-import de.kisi.android.api.PlacesHandler;
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Place;
 
 
@@ -42,7 +42,7 @@ public class PlaceNotificationSettings extends Activity implements OnClickListen
 	}
 
 	private void buildShareDialog() {
-		final Place[] places = PlacesHandler.getInstance().getPlaces();
+		final Place[] places = KisiAPI.getInstance().getPlaces();
 
 		// Getting px form Scale-independent Pixels
 		Resources r = getResources();

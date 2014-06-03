@@ -5,9 +5,8 @@ import org.json.JSONArray;
 import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-import de.kisi.android.api.LocatorHandler;
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -23,13 +22,13 @@ public class UpdateLocksCall extends GenericCall{
 				Gson gson = new Gson();
 				Lock[] locks = gson.fromJson(response.toString(), Lock[].class);
 				for(Lock l: locks) {
-					l.setPlace(PlacesHandler.getInstance().getPlaceById(l.getPlaceId()));
+					l.setPlace(KisiAPI.getInstance().getPlaceById(l.getPlaceId()));
 				}
 				DataManager.getInstance().saveLocks(locks);
-				listener.onPlaceChanged(PlacesHandler.getInstance().getPlaces());
-				PlacesHandler.getInstance().notifyAllOnPlaceChangedListener();
+				listener.onPlaceChanged(KisiAPI.getInstance().getPlaces());
+				KisiAPI.getInstance().notifyAllOnPlaceChangedListener();
 				//get also locators for this place
-				LocatorHandler.getInstance().updateLocators(place);
+				KisiAPI.getInstance().updateLocators(place);
 			}
 		};
 	}	

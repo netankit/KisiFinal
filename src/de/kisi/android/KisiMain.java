@@ -21,10 +21,7 @@ import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.LockHandler;
-import de.kisi.android.api.LoginHandler;
 import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 
@@ -34,8 +31,6 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 
 	private ViewPager pager;
 	private KisiAPI kisiAPI;
-	private PlacesHandler placesHandler;
-	private LoginHandler loginHandler;
 	private PlaceFragmentPagerAdapter pagerAdapter;
 
 	private int currentPage = 0;
@@ -51,8 +46,6 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		NewRelic.withApplicationToken("AAe80044cf73854b68f6e83881c9e61c0df9d92e56").start(this.getApplication());
 		
 		kisiAPI = KisiAPI.getInstance();
-		placesHandler = PlacesHandler.getInstance();
-		loginHandler = LoginHandler.getInstance();
 
 		Intent login = new Intent(this, AccountPickerActivity.class);
 		startActivityForResult(login, LOGIN_REQUEST_CODE);
@@ -97,12 +90,12 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	
 	private void buildUI() { 
 		Place[] places;
-		if((places = placesHandler.getPlaces()) != null) {
+		if((places = kisiAPI.getPlaces()) != null) {
 			// build the UI now with persistent data
 			setupView(places);
 		}
 		
-		placesHandler.updatePlaces(new OnPlaceChangedListener() {
+		kisiAPI.updatePlaces(new OnPlaceChangedListener() {
 			@Override
 			public void onPlaceChanged(Place[] newPlaces) {
 				// build the UI again with fresh data from the server
@@ -131,12 +124,12 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	@Override
 	public boolean onMenuItemClick(MenuItem item) {
 		// get all places
-		Place[] places = placesHandler.getPlaces();
+		Place[] places = kisiAPI.getPlaces();
 
 		switch (item.getItemId()) {
 		case R.id.refresh:
 			// Trigger a refresh of the data
-			placesHandler.refresh(new OnPlaceChangedListener() {
+			kisiAPI.refresh(new OnPlaceChangedListener() {
 
 				@Override
 				public void onPlaceChanged(Place[] newPlaces) {
@@ -156,7 +149,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 
 			Place p = places[pager.getCurrentItem()];
 			// check if user is owner
-			if (!placesHandler.userIsOwner(p)) {
+			if ( ! p.userIsOwner() ) {
 				Toast.makeText(this, R.string.share_owner_only, Toast.LENGTH_LONG).show();
 				return false;
 			}
@@ -242,7 +235,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	}
 
 	private void logout() {
-		loginHandler.logout();
+		kisiAPI.logout();
 		finish();
 	}
 
@@ -281,10 +274,10 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		
 		
 		int placeId = intent.getIntExtra("Place", -1);
-		for (int j = 0; j < placesHandler.getPlaces().length; j++) {
-			if (placesHandler.getPlaces()[j].getId() == placeId) {
+		for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
+			if (kisiAPI.getPlaces()[j].getId() == placeId) {
 				int lockId = intent.getIntExtra("Lock", -1);
-				Lock lockToUnlock = LockHandler.getInstance().getLockById(placesHandler.getPlaceById(placeId), lockId);
+				Lock lockToUnlock = KisiAPI.getInstance().getLockById(kisiAPI.getPlaceById(placeId), lockId);
 				pager.setCurrentItem(j, false);
 				int id  = pager.getCurrentItem();
 				// http://tofu0913.blogspot.de/2013/06/adnroid-get-current-fragment-when-using.html

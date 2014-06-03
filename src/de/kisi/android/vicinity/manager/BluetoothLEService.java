@@ -19,8 +19,8 @@ import com.radiusnetworks.ibeacon.MonitorNotifier;
 import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
 import de.kisi.android.notifications.NotificationInformation;
@@ -185,7 +185,7 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 				Locator locator;
 				
 				try{
-					locator = PlacesHandler.getInstance().getPlaceById(placeId).getLockById(lockId).getLocatorById(locatorId);
+					locator = KisiAPI.getInstance().getPlaceById(placeId).getLockById(lockId).getLocatorById(locatorId);
 					if(locator.isSuggestUnlockEnabled()){
 						LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLE);
 						if(unlockSuggest.contains(locatorId) && locator.getSuggestUnlockTreshold()<maxRssi){
@@ -245,7 +245,7 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 				int locatorId = Integer.parseInt(beaconId[5]);
 				
 				try{
-					Locator locator = PlacesHandler.getInstance().getPlaceById(placeId).getLockById(lockId).getLocatorById(locatorId);
+					Locator locator = KisiAPI.getInstance().getPlaceById(placeId).getLockById(lockId).getLocatorById(locatorId);
 					// Check BLE Type
 					if(locator.isAutoUnlockEnabled())
 						actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLEAutoUnlock);
@@ -278,7 +278,7 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 			}
 			
 		});
-		PlacesHandler.getInstance().registerOnPlaceChangedListener(new OnPlaceChangedListener(){
+		KisiAPI.getInstance().registerOnPlaceChangedListener(new OnPlaceChangedListener(){
 
 			@Override
 			public void onPlaceChanged(Place[] newPlaces) {
@@ -286,7 +286,7 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 				
 			}
 		});
-		registerPlaces(PlacesHandler.getInstance().getPlaces());
+		registerPlaces(KisiAPI.getInstance().getPlaces());
 	}
 	
 	private void registerPlaces(Place[] places){

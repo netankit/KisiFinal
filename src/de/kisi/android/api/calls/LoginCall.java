@@ -5,17 +5,18 @@ import org.json.JSONObject;
 
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
+import android.util.Log;
 
 import com.google.gson.Gson;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import de.kisi.android.KisiApplication;
+import de.kisi.android.R;
 import de.kisi.android.account.KisiAccountManager;
-import de.kisi.android.api.GenericResponceHandler;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
 import de.kisi.android.db.DataManager;
 import de.kisi.android.model.User;
-import de.kisi.android.rest.KisiRestClient;
 
 public class LoginCall extends GenericCall {
 
@@ -24,16 +25,40 @@ public class LoginCall extends GenericCall {
 	
 	public LoginCall(String email, String password, final LoginCallback callback) {
 		super("users/sign_in", HTTPMethod.POST);
-		
+
 		this.email = email;
 		this.password = password;
-		this.handler = new GenericResponceHandler(callback) {
-			
-			 public void onSuccess(org.json.JSONObject response) {
+		this.handler = new JsonHttpResponseHandler() {
+
+			public void onSuccess(org.json.JSONObject response) {
+				Log.d("LoginCall", "Login success");
 				Gson gson = new Gson();
 				User user = gson.fromJson(response.toString(), User.class);
 				DataManager.getInstance().saveUser(user);
 				callback.onLoginSuccess(KisiAPI.getInstance().getUser().getAuthentication_token());
+				return;
+			}
+
+			public void onFailure(int statusCode, Throwable e, JSONObject response) {
+				Log.d("LoginCall", "Login failure");
+				String errormessage = null;
+				// no network connectivity
+				if (statusCode == 0) {
+					errormessage = KisiApplication.getInstance().getResources().getString(R.string.no_network);
+					callback.onLoginFail(errormessage);
+					return;
+				}
+
+				if (response != null) {
+					try {
+						errormessage = response.getString("error");
+					} catch (JSONException ej) {
+						ej.printStackTrace();
+					}
+				} else {
+					errormessage = "Error!";
+				}
+				callback.onLoginFail(errormessage);
 				return;
 			}
 		};

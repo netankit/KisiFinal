@@ -10,7 +10,7 @@ import android.location.Location;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 
-import de.kisi.android.api.PlacesHandler;
+import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Place;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
@@ -39,7 +39,7 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
             for(Geofence fence : fences){
             	String p[] = fence.getRequestId().split(": ");
             	int placeID = Integer.parseInt(p[1]);
-            	if(checkLocation(PlacesHandler.getInstance().getPlaceById(placeID))){
+            	if(checkLocation(KisiAPI.getInstance().getPlaceById(placeID))){
             		actor.actOnEntry(placeID,0);
             	}
             }

@@ -23,9 +23,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.LockHandler;
 import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.api.PlacesHandler;
 import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -65,11 +63,11 @@ public class PlaceFragment extends Fragment {
 		
 		index = getArguments().getInt("index");
 		
-		final Place place = PlacesHandler.getInstance().getPlaceAt(index);
+		final Place place = KisiAPI.getInstance().getPlaceAt(index);
 		if(place != null)
 			setupButtons(place);
 		if(lockToUnlock == null)  {
-			LockHandler.getInstance().updateLocks(place, new OnPlaceChangedListener() {
+			KisiAPI.getInstance().updateLocks(place, new OnPlaceChangedListener() {
 				@Override
 				public void onPlaceChanged(Place[] newPlaces) {
 					setupButtons(place);
@@ -154,7 +152,7 @@ public class PlaceFragment extends Fragment {
 						progressDialog.setMessage(fragment.getString(R.string.opening));
 						progressDialog.show();
 
-						LockHandler.getInstance().unlock(lock, new UnlockCallback(){
+						KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
 							
 							
 							@Override

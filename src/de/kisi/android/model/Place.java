@@ -174,4 +174,14 @@ public class Place {
 		}
 	}
 
+	/**
+	 * Checks if the place is owned by the user or just shared
+	 * 
+	 * @param place Place to be checked
+	 * @return true if user is owner, false if someone else shares this place with the user
+	 */
+	public boolean userIsOwner(){
+		return getOwnerId() == KisiAPI.getInstance().getUser().getId();
+	}
+	
 }

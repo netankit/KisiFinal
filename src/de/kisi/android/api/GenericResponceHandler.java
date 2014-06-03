@@ -9,11 +9,10 @@ import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 
 public abstract class GenericResponceHandler extends JsonHttpResponseHandler {
-	private LoginCallback callback;
 	
-	public GenericResponceHandler(LoginCallback callback) {
+	
+	public GenericResponceHandler() {
 		super();
-		this.callback = callback;
 	}
 	
 	
@@ -22,7 +21,7 @@ public abstract class GenericResponceHandler extends JsonHttpResponseHandler {
 		 //no network connectivity
 		 if(statusCode == 0) {
 			 errormessage = KisiApplication.getInstance().getResources().getString(R.string.no_network);
-			 callback.onLoginFail(errormessage);
+			 
 			 return;
 		 }
 
@@ -36,7 +35,7 @@ public abstract class GenericResponceHandler extends JsonHttpResponseHandler {
 		else {
 			errormessage = "Error!";
 		}
-		callback.onLoginFail(errormessage);
+		
 		return;
 	}
 
