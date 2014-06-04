@@ -15,7 +15,6 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.widget.Toast;
 
 public class NFCReceiver extends Activity{
 

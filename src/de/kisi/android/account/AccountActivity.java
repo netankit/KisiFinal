@@ -31,8 +31,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	private String password;
 	private Button loginButton;
 	
-	private AccountAuthenticatorResponse response;
-	
 	private ProgressDialog progressDialog;
 
 	// TODO:clean this up later. copy and paste code

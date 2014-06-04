@@ -5,19 +5,15 @@ import java.util.List;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 
-import de.kisi.android.KisiApplication;
-import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Place;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.VicinityTypeEnum;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.support.v4.app.NotificationCompat;
 
 /**
  * This BroadcastReceiver receives Geofence Transitions defined by the 

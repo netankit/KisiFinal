@@ -24,11 +24,8 @@ import com.newrelic.agent.android.NewRelic;
 import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
-import de.kisi.android.vicinity.LockInVicinityActorFactory;
-import de.kisi.android.vicinity.LockInVicinityActorInterface;
 
 public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickListener,OnPlaceChangedListener {
 

@@ -71,6 +71,7 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 		}
 		GeofencingEnabler geofencingEnabler = new GeofencingEnabler();
 		geofencingEnabler.enableGeofencing(getContentResolver(),this);
+		@SuppressWarnings("deprecation")
 		String locationProviders = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 		if(!locationProviders.contains("gps") && !locationProviders.contains("network")) {
 			locationEnabled = false;
@@ -166,16 +167,8 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 	
 	@Override
 	protected void onStop() {
-		if(KisiAPI.getInstance().getUser() != null) {
-			GeofenceManager.getInstance().stopLocationUpdate();
-		}
-		super.onStop();
-	}
-	
-	@Override
-	protected void onDestroy(){
 		GeofenceManager.getInstance().stopLocationUpdate();
-		super.onDestroy();
+		super.onStop();
 	}
 	
 	private void updateButton() {
