@@ -7,6 +7,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -21,13 +23,16 @@ import de.kisi.android.api.LoginCallback;
 
 // see https://github.com/Udinic/AccountAuthenticator/blob/master/src/com/udinic/accounts_authenticator_example/authentication/AuthenticatorActivity.java
 
-public class AccountActivity extends AccountAuthenticatorActivity implements OnClickListener, LoginCallback {
+public class AccountActivity extends AccountAuthenticatorActivity implements OnClickListener, TextWatcher, LoginCallback{
 
 	private EditText userNameField;
 	private EditText passwordField;
 	private String username;
 	private String password;
-
+	private Button loginButton;
+	
+	private AccountAuthenticatorResponse response;
+	
 	private ProgressDialog progressDialog;
 
 	// TODO:clean this up later. copy and paste code
@@ -58,13 +63,17 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 			mAuthTokenType = KisiAuthenticator.AUTHTOKEN_TYPE_DEFAULT;
 		}
 
-		Button loginButton = (Button) findViewById(R.id.loginButton);
+		loginButton = (Button) findViewById(R.id.loginButton);
 		loginButton.setOnClickListener(this);
-
+		loginButton.setEnabled(false);
+		
 		userNameField = (EditText) findViewById(R.id.email);
 		passwordField = (EditText) findViewById(R.id.password);
 		passwordField.setTypeface(Typeface.DEFAULT);
 
+		userNameField.addTextChangedListener(this);
+		passwordField.addTextChangedListener(this);
+		
 		TextView slogan = (TextView) findViewById(R.id.Slogan);
 		Typeface font = Typeface.createFromAsset(getAssets(), "Roboto-Light.ttf");
 		slogan.setTypeface(font);
@@ -148,4 +157,24 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		Toast.makeText(getBaseContext(), errormessage, Toast.LENGTH_SHORT).show();
 	}
 
+	@Override
+	public void afterTextChanged(Editable s) {
+		username = userNameField.getText().toString();
+		password = passwordField.getText().toString();
+		
+		if(!username.isEmpty() && !password.isEmpty())
+			loginButton.setEnabled(true);
+		else
+			loginButton.setEnabled(false);
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		
+	}
 }
