@@ -67,8 +67,8 @@ public class KisiAPI {
 		new UpdateLocksCall(place, listener).send();
 	}
 	
-	public boolean createNewKey(Place place, String email, List<Lock> locks, final Activity activity) {
-		new CreateNewKeyCall(place, email, locks, activity).send();
+	public boolean createNewKey(Place place, String email, List<Lock> locks) {
+		new CreateNewKeyCall(place, email, locks).send();
 		return true;
 	}
 	

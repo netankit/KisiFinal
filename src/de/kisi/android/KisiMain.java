@@ -18,6 +18,8 @@ import android.view.Window;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.electricimp.blinkup.BlinkupController;
+import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.account.KisiAuthenticator;

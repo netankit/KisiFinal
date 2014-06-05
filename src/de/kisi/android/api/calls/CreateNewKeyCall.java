@@ -21,7 +21,7 @@ public class CreateNewKeyCall extends GenericCall {
 	private String email;
 	private List<Lock> locks;
 
-	public CreateNewKeyCall(Place place, String email, List<Lock> locks, final Activity activity) {
+	public CreateNewKeyCall(Place place, String email, List<Lock> locks) {
 		super("places/" + place.getId() + "/keys", HTTPMethod.POST);
 		
 		this.email = email;
