@@ -2,7 +2,6 @@ package de.kisi.android;
 
 import java.util.Hashtable;
 
-import android.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.Resources;

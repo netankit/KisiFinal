@@ -1,6 +1,5 @@
 package de.kisi.android.account;
 
-import android.R;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -16,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
 

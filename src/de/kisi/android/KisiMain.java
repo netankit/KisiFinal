@@ -3,7 +3,6 @@ package de.kisi.android;
 import java.util.List;
 import java.util.Vector;
 
-import android.R;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.Intent;
