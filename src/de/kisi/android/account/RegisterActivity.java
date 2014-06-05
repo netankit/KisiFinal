@@ -7,9 +7,12 @@ import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.RegisterCallback;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -22,6 +25,8 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 	private EditText passwordField;
 	private EditText passwordConfirmField;
 	private CheckBox agreedTermsField;
+	
+	private ProgressDialog progressDialog;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,28 +41,6 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		registerButton.setOnClickListener(this);
 		
 	}
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.registerButton:
-			register();
-			break;
-		default:
-			break;
-		}
-		
-	}
-
-	@Override
-	public void onRegisterSuccess() {
-		Toast.makeText(getBaseContext(), R.string.registration_successful, Toast.LENGTH_LONG).show();
-	}
-
-	@Override
-	public void onRegisterFail(String errormessage) {
-		Toast.makeText(getBaseContext(), errormessage, Toast.LENGTH_SHORT).show();
-	}
-
 	private void focusOnField(TextView field, String error){
 		field.setError(error);			
 	}
@@ -101,7 +84,51 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 			errorFlag = true;
 		}
 		if(!errorFlag){
+			progressDialog = new ProgressDialog(this);
+			progressDialog.setMessage(getString(R.string.loading_message));
+			progressDialog.setCancelable(false);
+			progressDialog.show();
 			KisiAPI.getInstance().register(email, password, termsAgreed, this);
 		}
+	}
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.registerButton:
+			register();
+			break;
+		default:
+			break;
+		}
+		
+	}
+	@Override
+	public void onRegisterSuccess() {
+		progressDialog.dismiss();
+		emailField.setText("");
+		passwordField.setText("");
+		passwordConfirmField.setText("");
+		agreedTermsField.setChecked(false);
+		
+		TextView errorText = (TextView) findViewById(R.id.ErrorMessage);
+		errorText.setText("");
+		errorText.setVisibility(View.GONE);
+		
+		Toast.makeText(getBaseContext(), R.string.registration_successful, Toast.LENGTH_LONG).show();
+	}
+
+	@Override
+	public void onRegisterFail(String errormessage) {
+		progressDialog.dismiss();
+		TextView errorText = (TextView) findViewById(R.id.ErrorMessage);
+		errorText.setText(errormessage);
+		errorText.setVisibility(View.VISIBLE);
+		
+		Animation anim = new AlphaAnimation(0.0f, 1.0f);
+		anim.setDuration(50);
+		anim.setStartOffset(90);
+		anim.setRepeatMode(Animation.REVERSE);
+		anim.setRepeatCount(5);
+		errorText.startAnimation(anim);
 	}
 }

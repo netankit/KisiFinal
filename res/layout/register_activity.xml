@@ -80,9 +80,17 @@
             android:id="@+id/termsCondition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/AgreeTermsConditions" 
+            android:text="@string/AgreeTermsConditions"
             android:textColor="#ffffff" />
 
+		<TextView
+            android:id="@+id/ErrorMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#cf304b"
+            android:visibility="gone"
+            />
         <Button
             android:id="@+id/registerButton"
             android:layout_width="300dp"

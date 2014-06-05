@@ -108,8 +108,11 @@ public class KisiAPI {
 						
 						while(it.hasNext()){
 							String key = (String) it.next();
-							String value = errors.getString(key);
-							errormessage = errormessage + key + " " + value + '\n';
+							Gson gson = new Gson();
+							String[] errorMessages = gson.fromJson(errors.getJSONArray(key).toString(), String[].class);
+							for(String msg : errorMessages) {
+								errormessage = errormessage + key + " " + msg + '\n';
+							}							
 						};
 					}catch (JSONException ej) {
 						ej.printStackTrace();
