@@ -82,7 +82,9 @@ public class KisiRestClient {
 		}
 		
 		Log.d("post", "post url: " + url); //TODO: remove this in release versions!
-		Log.d("post", "post data: " + data.toString()); //TODO: remove this in release versions!
+		if(data!=null){
+			Log.d("post", "post data: " + data.toString()); //TODO: remove this in release versions!
+		}
 		client.post(KisiApplication.getInstance(), url, JSONtoStringEntity(data), "application/json", responseHandler);
 	}
 	
