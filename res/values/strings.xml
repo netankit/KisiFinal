@@ -2,7 +2,8 @@
 <resources>
 
     <string name="app_name">KISI</string>
-
+    <string name="app_name_empty"></string>
+    
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="RememberMe">Remember password</string>
@@ -41,6 +42,7 @@
     <string name="share_empty_place_error">You can not share an empty place!</string>
     <string name="log_empty_place_error">You can not see the log of an empty place</string>
 	<string name="share_error_empty_email">You have to enter an email address to share a lock!</string>
+	<string name="automatic_relogin_failed">Automatic login failed. For your security, please sign in again.</string>
 
 	<string name="new_user_html">New? <a href="https://www.kisi.de/users/sign_up">Get started on our website</a></string>
 	<string name="forgot_html"><a href="https://www.kisi.de/users/password/new">Forgot your password?</a></string>
@@ -66,8 +68,10 @@
 	<string name="bluetooth">Bluetooth</string>
 	<string name="bluetooth_on">Bluetooth detection on</string>
 	<string name="bluetooth_off">Bluetooth detection off</string>
-	<string name="update"> New version available.\n<u>Touch here to update</u></string>
-	
+	<string name="update">New version available.\n<u>Touch here to update</u></string>
+	<string name="restricted_access">Access restricted</string>
+	<string name="no_access_to_lock">Unfortunately, you do not have access to this lock.</string>
+		
 	
 	
 	

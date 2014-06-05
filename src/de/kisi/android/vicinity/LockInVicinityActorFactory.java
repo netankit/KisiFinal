@@ -1,5 +1,6 @@
 package de.kisi.android.vicinity;
 
+import de.kisi.android.model.Locator;
 import de.kisi.android.vicinity.actor.*;
 
 /**
@@ -23,9 +24,22 @@ public class LockInVicinityActorFactory {
 			actors[1] = delayedBluetoothActor;
 			return new CompositActor(actors);
 		case NFC: // NFC Tag with Lock information detected
-			return new AutomaticUnlockActor();
+			return new ConfirmToUnlockActor();
 		default: // default state for future vicinity manager
 			return new ConfirmToUnlockActor();
 		}
+	}
+	
+	public static LockInVicinityActorInterface getActor(Locator locator){
+		if(locator==null)
+			return new ConfirmToUnlockActor();
+		
+		if("NFC".equals(locator.getType())){
+			if(locator.isAutoUnlockEnabled())
+				return new NFCAutomaticUnlockActor();
+			if(locator.isSuggestUnlockEnabled())
+				return new HighlightLockActor();
+		}
+		return new ConfirmToUnlockActor();
 	}
 }
