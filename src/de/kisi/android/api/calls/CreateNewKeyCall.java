@@ -61,6 +61,7 @@ public class CreateNewKeyCall extends GenericCall {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		this.json=data;
 	}
 
 }
