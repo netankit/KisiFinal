@@ -50,7 +50,7 @@
             android:inputType="textEmailAddress"
             android:textColor="#FFFFFF"
             android:textColorHint="#ffffff" >
-
+            
             <requestFocus />
         </EditText>
 

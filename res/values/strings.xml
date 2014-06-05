@@ -73,7 +73,8 @@
 	
 	<string name="registration_successful"> Registration is successful. You need to confirm your email.</string>
 	<string name="passwords_not_match"> Passwords do not match!</string>
-	<string name="fields_cannot_be_empty"> Fields cannot be empty!</string>
+	<string name="password_length_error"> Password has to be at least 8 characters</string>
+	<string name="email_not_valid"> E-Mail is not valid!</string>
 	<string name="terms_and_conditions_not_agreed"> You need to agree to KISI\'s Terms &amp; Conditions.</string>
 	<string name="unknown_error"> Unknown Error!</string>
 	
