@@ -1,5 +1,6 @@
 package de.kisi.android.api.calls;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.util.Log;
@@ -31,13 +32,28 @@ public abstract class GenericCall {
 			
 			@Override
 			public void onSuccess(JSONObject response) {
-				Log.d("GenericCall", "call success");
+				Log.d("GenericCall", "call success: " + response.toString());
 				if (call.handler != null) {
 					call.handler.onSuccess(response);
 				}
 			}	
 			
 			public void onFailure(int statusCode, Throwable e, JSONObject response) {
+				Log.d("GenericCall", "call failed: "+response.toString());
+				if (call.handler != null) {
+					call.handler.onFailure(statusCode, e, response);
+				}
+			}
+			@Override
+			public void onSuccess(JSONArray response) {
+				Log.d("GenericCall", "call success: " + response.toString());
+				if (call.handler != null) {
+					call.handler.onSuccess(response);
+				}
+			}	
+			
+			public void onFailure(int statusCode, Throwable e, JSONArray response) {
+				Log.d("GenericCall", "call failed: "+response.toString());
 				if (call.handler != null) {
 					call.handler.onFailure(statusCode, e, response);
 				}
