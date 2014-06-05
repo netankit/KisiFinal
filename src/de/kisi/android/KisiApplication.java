@@ -1,7 +1,9 @@
 package de.kisi.android;
 
 import android.app.Application;
+import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.widget.Toast;
 import de.kisi.android.vicinity.manager.GeofenceManager;
 
 
@@ -19,6 +21,12 @@ public class KisiApplication extends Application {
 	public String getVersion() throws NameNotFoundException {
 		String versionName = (this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);
 		return versionName;
+	}
+	
+	public void showLoginScreen() {
+		Intent login = new Intent(KisiApplication.getInstance(), KisiMain.class);
+		login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(login);
 	}
 
 	/**

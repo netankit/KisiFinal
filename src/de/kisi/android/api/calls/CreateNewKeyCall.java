@@ -31,7 +31,7 @@ public class CreateNewKeyCall extends GenericCall {
 			public void onSuccess(JSONObject data) {
 				try {
 					Toast.makeText(
-							activity,
+							KisiApplication.getInstance(),
 							String.format(KisiApplication.getInstance().getResources().getString(R.string.share_success),
 								data.getString("issued_to_email")),
 							Toast.LENGTH_LONG).show();

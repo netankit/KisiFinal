@@ -21,12 +21,17 @@ public class UpdateLocatorsCall extends GenericCall {
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
 				Locator[] locators = gson.fromJson(response.toString(), Locator[].class);
-				for(Locator locator: locators) {
-					locator.setLock(KisiAPI.getInstance().getLockById(KisiAPI.getInstance().getPlaceById(locator.getPlaceId()), locator.getLockId()));
-					locator.setPlace(KisiAPI.getInstance().getPlaceById(locator.getPlaceId()));
+				try {// Prevent App from crashing when closing during a
+						// refresh
+					for (Locator l : locators) {
+						l.setLock(KisiAPI.getInstance().getLockById(KisiAPI.getInstance().getPlaceById(l.getPlaceId()), l.getLockId()));
+						l.setPlace(KisiAPI.getInstance().getPlaceById(l.getPlaceId()));
+					}
+					DataManager.getInstance().saveLocators(locators);
+					OnPlaceChangedEventHandler.getInstance().notifyAllOnPlaceChangedListener();
+				} catch (NullPointerException e) {
 				}
-				DataManager.getInstance().saveLocators(locators);
-				OnPlaceChangedEventHandler.getInstance().notifyAllOnPlaceChangedListener();
+				
 			}
 			
 		};

@@ -1,6 +1,7 @@
 package de.kisi.android.api;
 
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.json.JSONException;
@@ -11,6 +12,7 @@ import android.location.Location;
 import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.api.calls.CreateGatewayCall;
 import de.kisi.android.api.calls.CreateNewKeyCall;
+import de.kisi.android.api.calls.GenericCall;
 import de.kisi.android.api.calls.LoginCall;
 import de.kisi.android.api.calls.LogoutCall;
 import de.kisi.android.api.calls.RegisterCall;
@@ -30,15 +32,21 @@ import de.kisi.android.vicinity.manager.GeofenceManager;
 
 
 public class KisiAPI {
-
+	
+	private boolean oldAuthToken = true;
+	private boolean reloginSuccess = false;
+	private boolean loginInProgress = false; 
+	private final LinkedList<GenericCall> callQueue = new LinkedList<GenericCall>();
+	
 	// -------------------- Singleton Stuff: --------------------
 	private static KisiAPI instance;
-	public static KisiAPI getInstance(){
+	
+	public static KisiAPI getInstance() {
 		if(instance == null)
 			instance = new KisiAPI();
 		return instance;
 	}
-	private KisiAPI(){
+	private KisiAPI() {
 	}
 	
 	
@@ -64,18 +72,61 @@ public class KisiAPI {
 		return true;
 	}
 	
-	public void login(String email, String password, final LoginCallback callback){
-		new LoginCall(email, password, callback).send();
+	private void sendCall(GenericCall call) {
+		if (!loginInProgress || (call instanceof LoginCall)
+				|| (call instanceof RegisterCall)
+				|| (call instanceof LogoutCall)) {
+			call.send();
+		} else if (loginInProgress){
+			synchronized (callQueue) {
+				callQueue.add(call);
+			}
+		}
+		
+	}
+	
+	private void processCallQueue() {
+		synchronized (callQueue) {
+			for (GenericCall call : callQueue) {
+				call.send();
+			}
+			callQueue.clear();
+		}
+	}
+	
+	public synchronized void login(String email, String password, final LoginCallback callback){
+		loginInProgress = true;
+		LoginCall loginCall = new LoginCall(email, password, new LoginCallback() {
+			
+			@Override
+			public void onLoginSuccess(String authtoken) {
+				loginInProgress = false;
+				if (callback != null) {
+					callback.onLoginSuccess(authtoken);
+				}
+				processCallQueue();
+			}
+			
+			@Override
+			public void onLoginFail(String errormessage) {
+				loginInProgress = false;
+				if (callback != null) {
+					callback.onLoginFail(errormessage);
+				}
+				callQueue.clear();
+			}
+		});
+		sendCall(loginCall);
 	}
 	
 	public void logout(){
+		new LogoutCall().send();
 		KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
 		clearCache();
 		BluetoothLEManager.getInstance().stopService();
 		LockInVicinityDisplayManager.getInstance().update();
 		NotificationManager.removeAllNotification();
 		
-		new LogoutCall().send();
 	}
 	
 	public void updatePlaces(final OnPlaceChangedListener listener) {
@@ -165,7 +216,7 @@ public class KisiAPI {
 	
 	
 	// -------------------- OTHER: --------------------
-	public JSONObject generateJSONLocation() { // TODO: this should maybe be moved to GeofenceManager.
+	public JSONObject generateJSONLocation() { // TODO: put it in a superclass to CreateGatewaycall and Unlockcall
 		JSONObject location = new JSONObject();
 		Location currentLocation = GeofenceManager.getInstance().getLocation();
 		try {
