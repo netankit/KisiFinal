@@ -54,7 +54,7 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 				Toast.makeText(getApplicationContext(), R.string.passwords_not_match, Toast.LENGTH_SHORT).show();
 				return;
 			}
-			KisiAPI.getInstance().register(username, password, passwordConfirm, termsAgreed, this);
+			KisiAPI.getInstance().register(username, password, termsAgreed, this);
 			
 			break;
 		default:
@@ -65,7 +65,7 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 
 	@Override
 	public void onRegisterSuccess() {
-		Toast.makeText(getBaseContext(), R.string.registration_successful, Toast.LENGTH_SHORT).show();
+		Toast.makeText(getBaseContext(), R.string.registration_successful, Toast.LENGTH_LONG).show();
 	}
 
 	@Override

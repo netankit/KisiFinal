@@ -75,6 +75,7 @@
 	<string name="passwords_not_match"> Passwords do not match!</string>
 	<string name="fields_cannot_be_empty"> Fields cannot be empty!</string>
 	<string name="terms_and_conditions_not_agreed"> You need to agree to KISI\'s Terms &amp; Conditions.</string>
+	<string name="unknown_error"> Unknown Error!</string>
 	
 	
 	

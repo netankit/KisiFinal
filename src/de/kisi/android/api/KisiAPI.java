@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.location.Location;
 import android.os.Build;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -59,19 +58,20 @@ public class KisiAPI {
 	}
 	
 	// Registration: Registers user by sending in a JSON object with user information.
-	public void register(String user_email, String password, String password_confirmation, Boolean terms_and_conditions,  final RegisterCallback callback){
+	public void register(String user_email, String password, Boolean terms_and_conditions,  final RegisterCallback callback){
 		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(user_email);
-
+		
 		JSONObject registerJSON = new JSONObject();
 		JSONObject userJSON = new JSONObject();
 		JSONObject deviceJSON = new JSONObject();
+
 		try {
 			//build user object
 			userJSON.put("email", user_email);
 			userJSON.put("password", password);
 			userJSON.put("terms_and_conditions", terms_and_conditions == true?"1":"0");
 			registerJSON.put("user", userJSON);
-
+			
 			//build device object
 			if (deviceUUID != null) {
 				deviceJSON.put("uuid", deviceUUID);				
@@ -89,21 +89,9 @@ public class KisiAPI {
 			e1.printStackTrace();
 		}
 		KisiRestClient.getInstance().postWithoutAuthToken("users", registerJSON,  new JsonHttpResponseHandler() {
-
 			public void onSuccess(JSONObject response) {
-				try{
-					String id = response.getString("id");	
-					if(id != null && (!id.isEmpty())){
-						callback.onRegisterSuccess();
-						return;
-					}	
-				} catch (JSONException ej) {
-					ej.printStackTrace();
-				}
-				callback.onRegisterFail("Error!");
-				return;
+				callback.onRegisterSuccess();
 			}
-
 			public void onFailure(int statusCode, Throwable e, JSONObject response) {
 				String errormessage = "";
 				//no network connectivity
@@ -121,18 +109,16 @@ public class KisiAPI {
 						while(it.hasNext()){
 							String key = (String) it.next();
 							String value = errors.getString(key);
-							errormessage = errormessage + key + value + '\n';
+							errormessage = errormessage + key + " " + value + '\n';
 						};
 					}catch (JSONException ej) {
 						ej.printStackTrace();
-						errormessage = "Error!";
+						errormessage = context.getResources().getString(R.string.unknown_error);
 					}
-				}
-				else {
-					errormessage = "Error!";
+				} else {
+					errormessage = context.getResources().getString(R.string.unknown_error);;
 				}
 				callback.onRegisterFail(errormessage);
-				return;
 			};
 
 		});
@@ -197,7 +183,7 @@ public class KisiAPI {
 					}
 				}
 				else {
-					errormessage = "Error!";
+					errormessage = context.getResources().getString(R.string.unknown_error);;
 				}
 				callback.onLoginFail(errormessage);
 				return;
