@@ -8,6 +8,7 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.RegisterCallback;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,6 +41,8 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		Button registerButton = (Button) findViewById(R.id.registerButton);
 		registerButton.setOnClickListener(this);
 		
+		TextView readTermsAndConditions = (TextView) findViewById(R.id.termsConditionLink);
+		readTermsAndConditions.setOnClickListener(this);
 	}
 	private void focusOnField(TextView field, String error){
 		field.setError(error);			
@@ -96,6 +99,10 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		switch (v.getId()) {
 		case R.id.registerButton:
 			register();
+			break;
+		case R.id.termsConditionLink:
+			Intent termsViewIntent = new Intent(this, TermsAndConditionsActivity.class);
+			startActivity(termsViewIntent);
 			break;
 		default:
 			break;

@@ -76,12 +76,28 @@
             android:textColor="#ffffff"
             android:textColorHint="#ffffff" />
 
-        <CheckBox
-            android:id="@+id/termsCondition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/AgreeTermsConditions"
-            android:textColor="#ffffff" />
+       	<LinearLayout
+       	    
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+            android:orientation="vertical" >
+			
+       	    
+            <CheckBox
+                android:id="@+id/termsCondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/AgreeTermsConditions"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:id="@+id/termsConditionLink"
+                android:text="@string/read"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"/>
+
+        </LinearLayout>
 
 		<TextView
             android:id="@+id/ErrorMessage"
