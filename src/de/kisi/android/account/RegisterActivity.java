@@ -15,8 +15,8 @@ import android.view.View.OnClickListener;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +27,7 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 	private EditText emailField;
 	private EditText passwordField;
 //	private EditText passwordConfirmField;
-	private Switch agreedTermsField;
+	private CheckBox agreedTermsField;
 	private Button loginButton;
 	
 	private ProgressDialog progressDialog;
@@ -41,7 +41,7 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		emailField = (EditText) findViewById(R.id.email);
 		passwordField = (EditText) findViewById(R.id.password);
 //		passwordConfirmField = (EditText) findViewById(R.id.passwordConfirm);
-		agreedTermsField = (Switch) findViewById(R.id.termsCondition);
+		agreedTermsField = (CheckBox) findViewById(R.id.termsCondition);
 		loginButton = (Button) findViewById(R.id.backToLoginButton);
 		loginButton.setOnClickListener(this);
 		
