@@ -1,5 +1,6 @@
 package de.kisi.android;
 
+import java.util.HashSet;
 import java.util.Hashtable;
 
 import de.kisi.android.R;
@@ -39,6 +40,8 @@ public class PlaceFragment extends Fragment {
 	private final static long delay = 1000;
 	private int index;
 	private Lock lockToUnlock;
+	private String trigger;
+	private HashSet<Integer> suggestedNFC = new HashSet<Integer>();
 	private Activity mActivity;
 	
 	
@@ -63,6 +66,8 @@ public class PlaceFragment extends Fragment {
 		
 		buttonHashtable = new Hashtable<Integer, Button>();
 
+		suggestedNFC = new HashSet<Integer>();
+		
 		layout = (ScrollView) inflater.inflate(R.layout.place_fragment, container, false);
 		
 		index = getArguments().getInt("index");
@@ -156,7 +161,20 @@ public class PlaceFragment extends Fragment {
 						final ProgressDialog progressDialog = new ProgressDialog(mActivity);
 						progressDialog.setMessage(fragment.getString(R.string.opening));
 						progressDialog.show();
-
+						String buttonTrigger = "manual";
+						boolean automatic = false;
+						if("NFC".equals(trigger)){
+							buttonTrigger = "NFC";
+							automatic = true;
+						}
+						if("BLE".equals(trigger))
+							buttonTrigger = "beacon";
+						if("geofence".equals(trigger))
+							buttonTrigger = "geofence";
+						if(suggestedNFC.contains(lock.getId())){
+							buttonTrigger = "NFC";
+							automatic = false;
+						}
 						KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
 							
 							
@@ -170,7 +188,7 @@ public class PlaceFragment extends Fragment {
 							public void onUnlockFail(String alertMsg) {
 								progressDialog.dismiss();
 								changeButtonStyleToFailure(button, lock, alertMsg);
-							}}, "manual", false);
+							}}, buttonTrigger, automatic);
 					}
 				});
 				
@@ -191,6 +209,7 @@ public class PlaceFragment extends Fragment {
 				button.callOnClick();
 			}
 			lockToUnlock = null;
+			trigger = null;
 		}
 	}
 	
@@ -257,8 +276,9 @@ public class PlaceFragment extends Fragment {
 
 	}
 
-	public void setLockToUnlock(Lock lockToUnlock) {
+	public void setLockToUnlock(Lock lockToUnlock, String trigger) {
 		this.lockToUnlock = lockToUnlock;
+		this.trigger = trigger;
 		if(this.isVisible()) {
 			unlockLock();
 		}
@@ -266,6 +286,7 @@ public class PlaceFragment extends Fragment {
 	
 	@SuppressWarnings("deprecation")
 	public void setLockToHighlight(Lock lockToUnlock) {
+		suggestedNFC.add(lockToUnlock.getId());
 		if(this.isVisible()){
 			if(buttonHashtable.containsKey(lockToUnlock.getId())) {
 				Button button = buttonHashtable.get(lockToUnlock.getId());

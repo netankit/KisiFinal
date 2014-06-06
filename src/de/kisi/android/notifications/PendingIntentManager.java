@@ -38,16 +38,16 @@ public class PendingIntentManager {
 	private PendingIntentManager(){
 	}
 	
-	public PendingIntent getPendingIntentForPlace(Integer placeId){
+	public PendingIntent getPendingIntentForPlace(Integer placeId, String sender){
 		if(!usedPlaces.containsKey(placeId))
 			usedPlaces.put(placeId, index ++);
-		return createPendingIntent(placeId,-1,usedPlaces.get(placeId));
+		return createPendingIntent(placeId,-1,usedPlaces.get(placeId), sender);
 	}
 	
-	public PendingIntent getPendingIntentForLock(Integer placeId, Integer lockId){
+	public PendingIntent getPendingIntentForLock(Integer placeId, Integer lockId, String sender){
 		if(!usedLocks.containsKey(lockId))
 			usedLocks.put(lockId, index ++);
-		return createPendingIntent(placeId,lockId,usedLocks.get(lockId));
+		return createPendingIntent(placeId,lockId,usedLocks.get(lockId), sender);
 	}
 	
 	public PendingIntent getPendingIntentForBluetooth() {
@@ -59,12 +59,13 @@ public class PendingIntentManager {
 	}
 	
 	
-	private PendingIntent createPendingIntent(Integer placeId, Integer lockId, int pendingIntentId){
+	private PendingIntent createPendingIntent(Integer placeId, Integer lockId, int pendingIntentId, String sender){
 		Intent intent = new Intent(KisiApplication.getInstance(), KisiMain.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("Type", "unlock");
 		intent.putExtra("Place", placeId);
 		intent.putExtra("Lock", lockId);
+		intent.putExtra("Sender", sender);
 		return PendingIntent.getActivity(KisiApplication.getInstance(), pendingIntentId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 

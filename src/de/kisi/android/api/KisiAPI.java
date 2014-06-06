@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -47,7 +48,6 @@ public class KisiAPI {
 	private Context context;
 
 	private boolean oldAuthToken = true;
-	private boolean reloginSuccess = false;
 	private boolean loginInProgress = false; 
 	private final LinkedList<LoginCallback> loginCallbacks = new LinkedList<LoginCallback>();
 	public static KisiAPI getInstance() {
@@ -106,7 +106,6 @@ public class KisiAPI {
 
 					public void onSuccess(org.json.JSONObject response) {
 						oldAuthToken = false;
-						reloginSuccess = true;
 						Gson gson = new Gson();
 						User user = gson.fromJson(response.toString(), User.class);
 						DataManager.getInstance().saveUser(user);
@@ -123,7 +122,6 @@ public class KisiAPI {
 
 					public void onFailure(int statusCode, Throwable e, JSONObject response) {
 						oldAuthToken = false;
-						reloginSuccess = false;
 						String errormessage = null;
 						// no network connectivity
 						if (statusCode == 0) {
@@ -537,6 +535,8 @@ public class KisiAPI {
 		JSONObject location = generateJSONLocation();
 		JSONObject data = new JSONObject();
 		try {
+			Log.i("unlock","T: "+trigger);
+			Log.i("unlock","A: "+automatic);
 			data.put("location", location);
 			data.put("trigger", trigger);
 			data.put("automatic_execution", automatic);
@@ -629,7 +629,6 @@ public class KisiAPI {
 
 	private void showLoginScreen() {
 		oldAuthToken = true;
-		reloginSuccess = false;
 		KisiAPI.getInstance().logout();
 		Intent login = new Intent(KisiApplication.getInstance(), KisiMain.class);
 		login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -28,11 +28,11 @@ public class LockInVicinityActorFactory {
 			if(locator.isAutoUnlockEnabled())
 				return new NFCAutomaticUnlockActor();
 			if(locator.isSuggestUnlockEnabled())
-				return new HighlightLockActor();
+				return new NFCHighlightLockActor();
 		}
 		if("BLE".equals(locator.getType())){
 			if(locator.isAutoUnlockEnabled())
-				return new AutomaticUnlockActor();
+				return new BLEAutomaticUnlockActor();
 			if(locator.isSuggestUnlockEnabled())
 				return new ConfirmToUnlockActor();
 		}

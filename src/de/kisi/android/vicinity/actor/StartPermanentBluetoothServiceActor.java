@@ -17,7 +17,7 @@ public class StartPermanentBluetoothServiceActor implements LockInVicinityActorI
 		// Start BLE and make sure it runs in foreground mode
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
 				KisiApplication.getInstance().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-			NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getInstance(), locator.getPlace());
+			NotificationManager.getOrCreateBLEButtonNotification(KisiApplication.getInstance(), locator.getPlace(),"BLE");
 			BluetoothLEManager.getInstance().startService(true);
 		}
 	}
@@ -28,7 +28,7 @@ public class StartPermanentBluetoothServiceActor implements LockInVicinityActorI
 		// It is very unlikely that an iBeacon is outside of a Geofence, so 
 		// we do not need to run the service in Background mode
 		BluetoothLEManager.getInstance().stopService();//.startService(false);
-		NotificationManager.notifyBLEButtonNotificationDeleted();
+		NotificationManager.notifyBLEButtonNotificationDeleted("BLE");
 	}
 
 }

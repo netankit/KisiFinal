@@ -49,7 +49,7 @@ public class BluetoothAutoUnlockService extends Service {
 				info.message = message;
 				de.kisi.android.notifications.NotificationManager.setBLEAutoUnlockNotifictionResult(info);
 				}}
-		);
+		,"beacon" ,true);
 
 	}
 	

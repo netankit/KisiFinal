@@ -112,14 +112,14 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 			// i also noticed that the notification should be created with the service context 
 			// and not the the application context, thats why the service is a parameter of the 
 			// method
-			NotificationInformation notification = NotificationManager.getOrCreateBLEServiceNotification(this);
+			NotificationInformation notification = NotificationManager.getOrCreateBLEServiceNotification(this,"BLE");
 			if(notification != null){
 				startForeground(notification.notificationId, notification.notification);
 			}
 		}else{
 			try{
 				stopForeground(true);
-				NotificationManager.notifyBLEServiceNotificationDeleted();
+				NotificationManager.notifyBLEServiceNotificationDeleted("BLE");
 			}catch(Exception e){
 				// There might be an exception when we are already in background mode
 				// but i didn't find a mechansim to check
@@ -140,7 +140,7 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 		}
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.unBind(this);
-		NotificationManager.notifyBLEServiceNotificationDeleted();
+		NotificationManager.notifyBLEServiceNotificationDeleted("BLE");
 	}
 
 	// protect the actor for permanent fireing

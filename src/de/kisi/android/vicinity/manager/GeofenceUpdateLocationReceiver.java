@@ -40,6 +40,7 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
             	int placeID = Integer.parseInt(p[1]);
             	if(checkLocation(KisiAPI.getInstance().getPlaceById(placeID))){
             		Locator locator = new Locator();
+            		locator.setType("geofence");
             		locator.setPlaceId(placeID);
             		actor.actOnEntry(locator);
             	}
@@ -49,6 +50,7 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
             	String p[] = fence.getRequestId().split(": ");
             	int placeID = Integer.parseInt(p[1]);
         		Locator locator = new Locator();
+        		locator.setType("geofence");
         		locator.setPlaceId(placeID);
             	actor.actOnExit(locator);
             }

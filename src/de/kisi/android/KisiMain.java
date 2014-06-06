@@ -318,7 +318,7 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		// Its not a unlock request, nothing to do
 		if (!intent.getStringExtra("Type").equals("unlock"))
 			return;
-		
+		String trigger = intent.getStringExtra("Sender");
 		
 		int placeId = intent.getIntExtra("Place", -1);
 		for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
@@ -333,11 +333,11 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 				currentPage = j;
 				//check if fragment got already attach to the pager and otherwise get fragment from pagerAdapter
 				if(placeFragment != null) {
-					placeFragment.setLockToUnlock(lockToUnlock);
+					placeFragment.setLockToUnlock(lockToUnlock, trigger);
 				}
 				else {
 					placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
-					placeFragment.setLockToUnlock(lockToUnlock);
+					placeFragment.setLockToUnlock(lockToUnlock, trigger);
 				}
 				break;
 			}

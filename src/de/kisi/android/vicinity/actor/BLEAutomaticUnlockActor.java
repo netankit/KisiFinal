@@ -6,7 +6,7 @@ import de.kisi.android.model.Locator;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import de.kisi.android.vicinity.manager.BluetoothAutoUnlockService;
 
-public class AutomaticUnlockActor implements LockInVicinityActorInterface {
+public class BLEAutomaticUnlockActor implements LockInVicinityActorInterface {
 
 	// directly send a unlock process to the server
 	@Override
