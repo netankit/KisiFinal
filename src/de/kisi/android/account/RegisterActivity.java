@@ -41,6 +41,7 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		Button registerButton = (Button) findViewById(R.id.registerButton);
 		registerButton.setOnClickListener(this);
 		
+		//Read: On Cliking the Text a web view allows the user to read the terms and condition.
 		TextView readTermsAndConditions = (TextView) findViewById(R.id.termsConditionLink);
 		readTermsAndConditions.setOnClickListener(this);
 	}
@@ -100,10 +101,11 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		case R.id.registerButton:
 			register();
 			break;
-		case R.id.termsConditionLink:
+		case R.id.termsConditionLink: {
 			Intent termsViewIntent = new Intent(this, TermsAndConditionsActivity.class);
 			startActivity(termsViewIntent);
 			break;
+		}
 		default:
 			break;
 		}
