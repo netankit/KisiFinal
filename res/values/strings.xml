@@ -60,6 +60,8 @@
 	<string name="version">Version:\t</string>
 	<string name="location_not_available_title">Improve security of keys</string>
 	<string name="location_not_available_text">KISI needs to use the following services to improve the security of your keys.</string>
+	<string name="geofence_not_available_title">Geofencing Not Available</string>
+	<string name="geofence_not_available_text">Please, enable Wi-Fi or Network for location detection.</string>
 	<string name="cancel">Cancel</string>
 	<string name="dontaskagain">Later</string>
 	<string name="ok">OK</string>
