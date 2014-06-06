@@ -59,11 +59,9 @@ public class KisiAPI {
 	
 	// Registration: Registers user by sending in a JSON object with user information.
 	public void register(String user_email, String password, Boolean terms_and_conditions,  final RegisterCallback callback){
-		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(user_email);
-		
+	
 		JSONObject registerJSON = new JSONObject();
 		JSONObject userJSON = new JSONObject();
-		JSONObject deviceJSON = new JSONObject();
 
 		try {
 			//build user object
@@ -72,19 +70,6 @@ public class KisiAPI {
 			userJSON.put("terms_and_conditions", terms_and_conditions == true?"1":"0");
 			registerJSON.put("user", userJSON);
 			
-			//build device object
-			if (deviceUUID != null) {
-				deviceJSON.put("uuid", deviceUUID);				
-			}
-			deviceJSON.put("platform_name", "Android");
-			deviceJSON.put("platform_version", Build.VERSION.RELEASE);
-			deviceJSON.put("model", Build.MANUFACTURER + " " + Build.MODEL);
-			try {
-				deviceJSON.put("app_version", KisiApplication.getInstance().getVersion());
-			} catch (NameNotFoundException e) {
-				//no app version for you then...
-			}
-			registerJSON.put("device", deviceJSON);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
@@ -104,7 +89,7 @@ public class KisiAPI {
 				if(response != null) {
 					try{
 						JSONObject errors = response.getJSONObject("errors");
-						Iterator it = errors.keys();
+						Iterator<?> it = errors.keys();
 						
 						while(it.hasNext()){
 							String key = (String) it.next();
