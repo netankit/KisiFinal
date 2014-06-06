@@ -533,11 +533,13 @@ public class KisiAPI {
 	 *            Callback object for feedback, or null if no feedback is
 	 *            requested
 	 */
-	public void unlock(final Lock lock, final UnlockCallback callback) {
+	public void unlock(final Lock lock, final UnlockCallback callback, final String trigger, final boolean automatic) {
 		JSONObject location = generateJSONLocation();
 		JSONObject data = new JSONObject();
 		try {
 			data.put("location", location);
+			data.put("trigger", trigger);
+			data.put("automatic_execution", automatic);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
@@ -609,7 +611,7 @@ public class KisiAPI {
 
 							@Override
 							public void onLoginSuccess(String authtoken) {
-								unlock(lock, callback);
+								unlock(lock, callback, trigger, automatic);
 							}
 
 							@Override

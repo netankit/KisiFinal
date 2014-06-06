@@ -170,7 +170,7 @@ public class PlaceFragment extends Fragment {
 							public void onUnlockFail(String alertMsg) {
 								progressDialog.dismiss();
 								changeButtonStyleToFailure(button, lock, alertMsg);
-							}});
+							}}, "manual", false);
 					}
 				});
 				
@@ -264,6 +264,7 @@ public class PlaceFragment extends Fragment {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void setLockToHighlight(Lock lockToUnlock) {
 		if(this.isVisible()){
 			if(buttonHashtable.containsKey(lockToUnlock.getId())) {

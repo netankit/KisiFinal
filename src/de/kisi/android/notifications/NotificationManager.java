@@ -480,7 +480,7 @@ public class NotificationManager extends BroadcastReceiver {
 		return info;
 	}
 	
-	public static NotificationInformation getBLEAutoUnlockNotifictionResult(AutoUnlockNotificationInfo info) {
+	public static void setBLEAutoUnlockNotifictionResult(AutoUnlockNotificationInfo info) {
 		
 		notifications.remove(info);
 		Context context = KisiApplication.getInstance();
@@ -504,7 +504,6 @@ public class NotificationManager extends BroadcastReceiver {
 		info.notificationId = getUnusedId();
 		Notification notification = nc.build();
 		mNotificationManager.notify(info.notificationId, notification);
-		return info;
 	}
 
 	

@@ -16,20 +16,7 @@ public class CompositActor implements LockInVicinityActorInterface{
 		this.actorList = actorList;
 	}
 
-	@Override
-	public void actOnEntry(int placeID, int lockId) {
-		for(LockInVicinityActorInterface actor:actorList)
-			if(actor != null)
-				actor.actOnEntry(placeID, lockId);
-	}
 
-	@Override
-	public void actOnExit(int placeID, int lockId) {
-		for(LockInVicinityActorInterface actor:actorList)
-			if(actor != null)
-				actor.actOnExit(placeID, lockId);
-	}
-	
 	@Override
 	public void actOnEntry(Locator locator) {
 		for(LockInVicinityActorInterface actor:actorList)
