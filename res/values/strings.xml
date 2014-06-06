@@ -6,7 +6,7 @@
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="PasswordConfirm">Confirm password</string>
-    <string name="AgreeTermsConditions">I agree to KISI\'s Terms &amp; Conditions</string>
+    <string name="AgreeTermsConditions">I agree to <u>KISI\'s Terms &amp; Conditions</u></string>
     <string name="RememberMe">Remember password</string>
     <string name="Login">Login</string>
     <string name="Register">Register</string>
@@ -15,7 +15,6 @@
     <string name="logo">Logo</string>
     <string name="slogantwo">Unlock your world</string>
     <string name="forgot">Forgot your password?</string>
-    <string name="newUser">New? Get started on our website</string>
     <string name="login_success">Login successful"</string>
 
     <string name="action_settings">Settings</string>
@@ -45,7 +44,7 @@
     <string name="log_empty_place_error">You can not see the log of an empty place</string>
 	<string name="share_error_empty_email">You have to enter an email address to share a lock!</string>
 
-	<string name="new_user_html">New? <a href="https://www.kisi.de/users/sign_up">Get started on our website</a></string>
+	<string name="new_user_html">New? <u>Get an account</u></string>
 	<string name="forgot_html"><a href="https://www.kisi.de/users/password/new">Forgot your password?</a></string>
 	<string name="missing_login_data">Please type in EMail and Password first</string>
 	<string name="no_network">No network connectivity</string>
@@ -79,7 +78,9 @@
 	<string name="unknown_error"> Unknown Error!</string>
 	<string name="loading_message"> Please Wait..</string>
 	<string name="terms_and_conditions"> Terms &amp; Conditions</string>
-	<string name="read"> Read</string>
+	<string name="back_to_login"> <u>Go back to Login</u></string>
+	<string name="first_name"> First name</string>
+	<string name="last_name"> Last name</string>
 	
 	
 	

@@ -58,13 +58,15 @@ public class KisiAPI {
 	}
 	
 	// Registration: Registers user by sending in a JSON object with user information.
-	public void register(String user_email, String password, Boolean terms_and_conditions,  final RegisterCallback callback){
+	public void register(String first_name, String last_name, String user_email, String password, Boolean terms_and_conditions,  final RegisterCallback callback){
 	
 		JSONObject registerJSON = new JSONObject();
 		JSONObject userJSON = new JSONObject();
 
 		try {
 			//build user object
+			userJSON.put("first_name", first_name);
+			userJSON.put("last_name", last_name);
 			userJSON.put("email", user_email);
 			userJSON.put("password", password);
 			userJSON.put("terms_and_conditions", terms_and_conditions == true?"1":"0");

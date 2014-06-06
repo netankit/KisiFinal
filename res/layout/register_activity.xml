@@ -39,19 +39,43 @@
             android:textColor="#B0CDEB"
             android:textSize="38sp" />
 
-        <EditText
-            android:id="@+id/email"
+
+
+		<EditText
+            android:id="@+id/firstName"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="70dp"
             android:ems="10"
-            android:hint="@string/Email"
-            android:inputType="textEmailAddress"
+            android:hint="@string/first_name"
+            android:inputType="text"
             android:textColor="#FFFFFF"
             android:textColorHint="#ffffff" >
 
             <requestFocus />
         </EditText>
+        <EditText
+            android:id="@+id/lastName"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:ems="10"
+            android:hint="@string/last_name"
+            android:inputType="text"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#ffffff" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:ems="10"
+            android:hint="@string/Email"
+            android:inputType="textEmailAddress"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#ffffff" />
+
 
         <EditText
             android:id="@+id/password"
@@ -64,34 +88,33 @@
             android:textColor="#ffffff"
             android:textColorHint="#ffffff" />
 
-        <EditText
-            android:id="@+id/passwordConfirm"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:ems="10"
-            android:hint="@string/PasswordConfirm"
-            android:inputType="textPassword"
-            android:textColor="#ffffff"
-            android:textColorHint="#ffffff" />
+<!--         <EditText -->
+<!--             android:id="@+id/passwordConfirm" -->
+<!--             android:layout_width="300dp" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_marginTop="15dp" -->
+<!--             android:ems="10" -->
+<!--             android:hint="@string/PasswordConfirm" -->
+<!--             android:inputType="textPassword" -->
+<!--             android:textColor="#ffffff" -->
+<!--             android:textColorHint="#ffffff" /> -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <CheckBox
-                android:id="@+id/termsCondition"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/AgreeTermsConditions"
-                android:textColor="#ffffff" />
+            <Switch
+	            android:id="@+id/termsCondition"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="" />
 
             <TextView
                 android:id="@+id/termsConditionLink"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/read"
+                android:text="@string/AgreeTermsConditions"
                 android:textColor="#ffffff" />
         </LinearLayout>
 
@@ -120,15 +143,16 @@
         android:layout_alignParentLeft="true"
         android:background="#0F2938" >
 
-        <TextView
-            android:id="@+id/registerText"
+        <Button
+            android:id="@+id/backToLoginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="@string/new_user_html"
+            android:text="@string/back_to_login"
             android:textColor="#ffffff"
-            android:textSize="15sp" />
+            android:textSize="15sp" 
+            android:background="@android:color/transparent"/>
     </RelativeLayout>
 
 </RelativeLayout>

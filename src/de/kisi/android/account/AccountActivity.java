@@ -66,7 +66,7 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	    
 		Button loginButton = (Button) findViewById(R.id.loginButton);
 		loginButton.setOnClickListener(this);
-		Button registerButton = (Button) findViewById(R.id.registerButton);
+		TextView registerButton = (TextView) findViewById(R.id.registerButton);
 		registerButton.setOnClickListener(this);
 		
 		userNameField = (EditText) findViewById(R.id.email);
@@ -76,10 +76,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		TextView slogan = (TextView) findViewById(R.id.Slogan);
 		Typeface font = Typeface.createFromAsset(getAssets(), "Roboto-Light.ttf");
 		slogan.setTypeface(font);
-		
-
-		TextView newUser = (TextView) findViewById(R.id.registerText);
-		newUser.setMovementMethod(LinkMovementMethod.getInstance());
 		
 		TextView forgotPw = (TextView) findViewById(R.id.forgot);
 		forgotPw.setMovementMethod(LinkMovementMethod.getInstance());

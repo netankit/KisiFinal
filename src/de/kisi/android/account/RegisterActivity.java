@@ -15,17 +15,20 @@ import android.view.View.OnClickListener;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class RegisterActivity extends Activity implements OnClickListener, RegisterCallback{
 	
+	private EditText firstNameField;
+	private EditText lastNameField;
 	private EditText emailField;
 	private EditText passwordField;
-	private EditText passwordConfirmField;
-	private CheckBox agreedTermsField;
+//	private EditText passwordConfirmField;
+	private Switch agreedTermsField;
+	private Button loginButton;
 	
 	private ProgressDialog progressDialog;
 	
@@ -33,10 +36,14 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.register_activity);
 		
+		firstNameField = (EditText) findViewById(R.id.firstName);
+		lastNameField = (EditText) findViewById(R.id.lastName);
 		emailField = (EditText) findViewById(R.id.email);
 		passwordField = (EditText) findViewById(R.id.password);
-		passwordConfirmField = (EditText) findViewById(R.id.passwordConfirm);
-		agreedTermsField = (CheckBox) findViewById(R.id.termsCondition);
+//		passwordConfirmField = (EditText) findViewById(R.id.passwordConfirm);
+		agreedTermsField = (Switch) findViewById(R.id.termsCondition);
+		loginButton = (Button) findViewById(R.id.backToLoginButton);
+		loginButton.setOnClickListener(this);
 		
 		Button registerButton = (Button) findViewById(R.id.registerButton);
 		registerButton.setOnClickListener(this);
@@ -57,9 +64,11 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		return matcher.matches();
 	}
 	private void register(){
+		String first_name = firstNameField.getText().toString();
+		String last_name = lastNameField.getText().toString();
 		String email = emailField.getText().toString();
 		String password = passwordField.getText().toString();
-		String passwordConfirm = passwordConfirmField.getText().toString();
+//		String passwordConfirm = passwordConfirmField.getText().toString();
 		boolean termsAgreed = agreedTermsField.isChecked();
 		
 		boolean errorFlag = false;
@@ -68,20 +77,20 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 			focusOnField(emailField, getResources().getString(R.string.email_not_valid));
 			errorFlag = true;
 		}
-		if(!password.equals(passwordConfirm)){
-			focusOnField(passwordField, getResources().getString(R.string.passwords_not_match));
-			focusOnField(passwordConfirmField, getResources().getString(R.string.passwords_not_match));
-			errorFlag = true;
-		}else{
+//		if(!password.equals(passwordConfirm)){
+//			focusOnField(passwordField, getResources().getString(R.string.passwords_not_match));
+//			focusOnField(passwordConfirmField, getResources().getString(R.string.passwords_not_match));
+//			errorFlag = true;
+//		}else{
 			if(password.isEmpty() || password.length() < 8){
 				focusOnField(passwordField, getResources().getString(R.string.password_length_error));
 				errorFlag = true;
 			}
-			if(passwordConfirm.isEmpty() || passwordConfirm.length() < 8){
-				focusOnField(passwordConfirmField, getResources().getString(R.string.password_length_error));
-				errorFlag = true;
-			}
-		}
+//			if(passwordConfirm.isEmpty() || passwordConfirm.length() < 8){
+//				focusOnField(passwordConfirmField, getResources().getString(R.string.password_length_error));
+//				errorFlag = true;
+//			}
+//		}
 
 		if(!termsAgreed){
 			focusOnField(agreedTermsField, getResources().getString(R.string.terms_and_conditions_not_agreed));
@@ -92,7 +101,7 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 			progressDialog.setMessage(getString(R.string.loading_message));
 			progressDialog.setCancelable(false);
 			progressDialog.show();
-			KisiAPI.getInstance().register(email, password, termsAgreed, this);
+			KisiAPI.getInstance().register(first_name, last_name, email, password, termsAgreed, this);
 		}
 	}
 	@Override
@@ -101,11 +110,13 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		case R.id.registerButton:
 			register();
 			break;
-		case R.id.termsConditionLink: {
+		case R.id.termsConditionLink: 
 			Intent termsViewIntent = new Intent(this, TermsAndConditionsActivity.class);
 			startActivity(termsViewIntent);
 			break;
-		}
+		case R.id.backToLoginButton:
+			finish();
+			break;
 		default:
 			break;
 		}
@@ -114,9 +125,11 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 	@Override
 	public void onRegisterSuccess() {
 		progressDialog.dismiss();
+		firstNameField.setText("");
+		lastNameField.setText("");
 		emailField.setText("");
 		passwordField.setText("");
-		passwordConfirmField.setText("");
+//		passwordConfirmField.setText("");
 		agreedTermsField.setChecked(false);
 		
 		TextView errorText = (TextView) findViewById(R.id.ErrorMessage);
