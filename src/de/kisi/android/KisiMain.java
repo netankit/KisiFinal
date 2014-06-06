@@ -3,6 +3,7 @@ package de.kisi.android;
 import java.util.List;
 import java.util.Vector;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,11 +51,13 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 		kisiAPI = KisiAPI.getInstance();
 
 		AccountManager mAccountManager = AccountManager.get(this);
-		if(mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE).length!=1){
-			if(kisiAPI.getUser()==null){
-				Intent login = new Intent(this, AccountPickerActivity.class);
-				startActivityForResult(login, LOGIN_REQUEST_CODE);
+		if(kisiAPI.getUser()==null){
+			if(mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE).length==1){
+				Account account = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE)[0];
+				mAccountManager.removeAccount(account, null, null);
 			}
+			Intent login = new Intent(this, AccountPickerActivity.class);
+			startActivityForResult(login, LOGIN_REQUEST_CODE);
 		}
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
@@ -105,7 +109,11 @@ public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickL
 	@Override
 	public void onPlaceChanged(Place[] newPlaces) {
 		// build the UI again with fresh data from the server
+		try{
 		setupView(newPlaces);
+		}catch(IllegalStateException e){
+			// This happens when the App is closed while fetching fresh data 
+		}
 
 	}
 	

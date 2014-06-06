@@ -12,8 +12,7 @@ import de.kisi.android.R;
 
 public class GeofencingEnabler {
                                                                                 
-	public void enableGeofencing(ContentResolver contentResolver, 
-			BaseActivity activity) {
+	public void enableGeofencing(ContentResolver contentResolver, BaseActivity activity) {
 		String locationProviders = Settings.Secure.getString(contentResolver, Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 		if (!("gps".equals(locationProviders))) {                                 // !
 			return;
