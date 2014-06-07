@@ -136,7 +136,19 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 		errorText.setText("");
 		errorText.setVisibility(View.GONE);
 		
-		Toast.makeText(getBaseContext(), R.string.registration_successful, Toast.LENGTH_LONG).show();
+//		Toast.makeText(getBaseContext(), R.string.registration_successful, Toast.LENGTH_LONG).show();
+		onSuccessRegisterButtonAction();
+
+	}
+	
+	private void onSuccessRegisterButtonAction() {
+		// New Code -- Starts a new Activity after the toast message to confirm
+		// the successful registration by
+		// the user and intimates him to confirm his or her email.
+		Intent successfulRegistrationIntent = new Intent(this,
+				SuccessfulRegistrationActivity.class);
+		startActivity(successfulRegistrationIntent);
+
 	}
 
 	@Override

@@ -151,7 +151,9 @@
 		<activity android:name=".account.RegisterActivity" android:theme="@style/CustomThemeLogin" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
 		<activity android:name=".account.TermsAndConditionsActivity" android:theme="@style/CustomThemeLogin" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
 		<activity android:name="AccountPickerActivity" android:theme="@style/CustomThemeLogin" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
-		<!-- Account Manager end-->
+		<activity android:name=".account.SuccessfulRegistrationActivity" android:theme="@style/CustomThemeLogin" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
+		
+				<!-- Account Manager end-->
 		
 		<!-- NFC -->
 		<activity android:name="de.kisi.android.vicinity.manager.NFCReceiver">
