@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.location.Location;
 import android.os.Build;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -81,8 +80,7 @@ public class KisiAPI {
 				callback.onRegisterSuccess();
 			}
 			public void onFailure(int statusCode, Throwable e, JSONObject response) {
-				String errormessage = "";
-				Log.d("Register Fail", response.toString());
+				String errormessage = context.getResources().getString(R.string.unknown_error);
 				//no network connectivity
 				if(statusCode == 0) {
 					errormessage = context.getResources().getString(R.string.no_network);
@@ -109,11 +107,8 @@ public class KisiAPI {
 							errormessage = response.getString("error");
 						} catch (JSONException ej1) {
 							ej1.printStackTrace();
-							errormessage = context.getResources().getString(R.string.unknown_error);
 						}
 					}
-				} else {
-					errormessage = context.getResources().getString(R.string.unknown_error);;
 				}
 				callback.onRegisterFail(errormessage);
 			};
