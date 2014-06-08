@@ -52,7 +52,6 @@ public class KisiAPI {
 	
 	// -------------------- CALLS: --------------------
 	public void createGateway(JSONObject blinkUpResponse) {
-//		new CreateGatewayCall(blinkUpResponse).send();
 		this.sendCall(new CreateGatewayCall(blinkUpResponse));
 	}
 	

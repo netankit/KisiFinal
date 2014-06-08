@@ -88,7 +88,7 @@ public class RegisterCall extends GenericCall {
 	
 	@Override
 	protected void createJson() {
-		JSONObject registerJSON = new JSONObject();
+		super.createJson();
 		JSONObject userJSON = new JSONObject();
 		
 		try {
@@ -98,7 +98,7 @@ public class RegisterCall extends GenericCall {
 			userJSON.put("email", user_email);
 			userJSON.put("password", password);
 			userJSON.put("terms_and_conditions", terms_and_conditions == true?"1":"0");
-			registerJSON.put("user", userJSON);
+			this.json.put("user", userJSON);
 			
 		} catch (JSONException e1) {
 			e1.printStackTrace();
