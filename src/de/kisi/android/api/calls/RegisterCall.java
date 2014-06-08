@@ -64,7 +64,8 @@ public class RegisterCall extends GenericCall {
 						while(it.hasNext()){
 							String key = (String) it.next();
 							Gson gson = new Gson();
-							String[] errorMessages = gson.fromJson(errors.getJSONArray(key).toString(), String[].class);
+							String[] errorMessages = gson.fromJson(errors.getJSONArray(key).toString(), 
+									String[].class);
 							for(String msg : errorMessages) {
 								errormessage = errormessage + key + " " + msg + '\n';
 							}							
