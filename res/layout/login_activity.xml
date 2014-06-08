@@ -21,7 +21,7 @@
         android:contentDescription="@string/logo"
         android:src="@drawable/logo2" />
 
-    <LinearLayout
+   <LinearLayout
         android:id="@+id/placelinearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -83,6 +83,8 @@
             android:background="@drawable/login_button"
             android:text="@string/Login"
             android:textColor="#ffffff" />
+         
+
     </LinearLayout>
 
     <RelativeLayout
@@ -92,15 +94,17 @@
         android:layout_alignParentLeft="true"
         android:background="#0F2938" >
 
-        <TextView
-            android:id="@+id/registerText"
+
+        <Button
+            android:id="@+id/registerButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:text="@string/new_user_html"
             android:textColor="#ffffff"
-            android:textSize="15sp" />
+            android:textSize="15sp" 
+            android:background="@android:color/transparent"/>
     </RelativeLayout>
 
 </RelativeLayout>

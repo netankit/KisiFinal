@@ -52,23 +52,24 @@ public class KisiAPI {
 	
 	// -------------------- CALLS: --------------------
 	public void createGateway(JSONObject blinkUpResponse) {
-		new CreateGatewayCall(blinkUpResponse).send();
+//		new CreateGatewayCall(blinkUpResponse).send();
+		this.sendCall(new CreateGatewayCall(blinkUpResponse));
 	}
 	
 	public void getLatestVerion(final VersionCheckCallback callback) {
-		new VersionCheckCall(callback).send();
+		this.sendCall(new VersionCheckCall(callback));
 	}
 	
 	public void updateLocators(final Place place) {
-		new UpdateLocatorsCall(place).send();
+		this.sendCall(new UpdateLocatorsCall(place));
 	}
 	
 	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {
-		new UpdateLocksCall(place, listener).send();
+		this.sendCall(new UpdateLocksCall(place, listener));
 	}
 	
 	public boolean createNewKey(Place place, String email, List<Lock> locks) {
-		new CreateNewKeyCall(place, email, locks).send();
+		this.sendCall(new CreateNewKeyCall(place, email, locks));
 		return true;
 	}
 	
@@ -149,13 +150,19 @@ public class KisiAPI {
 	
 	// Registration: Registers user by sending in a JSON object with user information.
 	public void register(
+			String first_name, 
+			String last_name, 
 			String user_email, 
-			String password,
-			String password_confirmation, 
-			Boolean terms_and_conditions,
+			String password, 
+			Boolean terms_and_conditions,  
 			final RegisterCallback callback) {
 		
-		new RegisterCall(user_email, password, password_confirmation, terms_and_conditions, callback).send();
+		this.sendCall(new RegisterCall(first_name,
+				last_name,
+				user_email, 
+				password, 
+				terms_and_conditions, 
+				callback));
 	}
 	
 	
