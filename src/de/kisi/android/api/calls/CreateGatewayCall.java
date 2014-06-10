@@ -7,7 +7,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import de.kisi.android.api.KisiAPI;
 
-public class CreateGatewayCall extends GenericCall {
+public class CreateGatewayCall extends LocatableCall {
 
 	
 	
@@ -40,7 +40,7 @@ public class CreateGatewayCall extends GenericCall {
         if (impeeId != null) 
             impeeId = impeeId.trim();
 
-        JSONObject location = KisiAPI.getInstance().generateJSONLocation();
+        JSONObject location = generateJSONLocation();
     	JSONObject gateway = new JSONObject();
 		try {
 			gateway.put("name", "Gateway");

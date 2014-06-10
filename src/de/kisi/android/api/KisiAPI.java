@@ -13,6 +13,7 @@ import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.api.calls.CreateGatewayCall;
 import de.kisi.android.api.calls.CreateNewKeyCall;
 import de.kisi.android.api.calls.GenericCall;
+import de.kisi.android.api.calls.LocatableCall;
 import de.kisi.android.api.calls.LoginCall;
 import de.kisi.android.api.calls.LogoutCall;
 import de.kisi.android.api.calls.RegisterCall;
@@ -222,24 +223,6 @@ public class KisiAPI {
 	
 	
 	// -------------------- OTHER: --------------------
-	public JSONObject generateJSONLocation() { // TODO: put it in a superclass to CreateGatewaycall and Unlockcall
-		JSONObject location = new JSONObject();
-		Location currentLocation = GeofenceManager.getInstance().getLocation();
-		try {
-    		if(currentLocation != null) {
-    			location.put("latitude", currentLocation.getLatitude());
-    			location.put("longitude", currentLocation.getLongitude());
-    			location.put("horizontal_accuracy", currentLocation.getAccuracy());
-    			location.put("altitude", currentLocation.getAltitude());
-    			location.put("age", (System.currentTimeMillis() - currentLocation.getTime())/1000.0);
-    		} else { 
-	 			location.put("error:", "Location data not accessible");
-    		}
-		} catch (JSONException e1) {
-			e1.printStackTrace();
-		}
-        return location;
-	}
 	
 	public void refresh(OnPlaceChangedListener listener) {
 		DataManager.getInstance().deletePlaceLockLocatorFromDB();

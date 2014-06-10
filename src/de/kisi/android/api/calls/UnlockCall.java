@@ -13,10 +13,13 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Lock;
 
-public class UnlockCall extends GenericCall {
+public class UnlockCall extends LocatableCall {
 
 	public UnlockCall(Lock lock, final UnlockCallback callback) {
-		super(String.format(Locale.ENGLISH, "places/%d/locks/%d/access", lock.getPlaceId(), lock.getId()), HTTPMethod.POST);
+		super(String.format(Locale.ENGLISH, "places/%d/locks/%d/access", 
+				lock.getPlaceId(), 
+				lock.getId()), 
+				HTTPMethod.POST);
 		
 		handler = new JsonHttpResponseHandler() {
 			
@@ -70,7 +73,7 @@ public class UnlockCall extends GenericCall {
 
 	@Override
 	protected void createJson() {
-		JSONObject location =  KisiAPI.getInstance().generateJSONLocation();
+		JSONObject location =  generateJSONLocation();
 		JSONObject data = new JSONObject();
 		try {
 			data.put("location", location);
