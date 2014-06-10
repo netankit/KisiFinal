@@ -52,16 +52,13 @@ public class CreateGatewayCall extends LocatableCall {
 			e.printStackTrace();
 		}
     	
-		JSONObject data = new JSONObject();
+		this.json = new JSONObject();
 		
 		try {
-			data.put("gateway", gateway);
-			data.put("ei_plan_id", planId);
+			json.put("gateway", gateway);
+			json.put("ei_plan_id", planId);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
-		this.json = data;
 	}
-
 }

@@ -74,13 +74,11 @@ public class UnlockCall extends LocatableCall {
 	@Override
 	protected void createJson() {
 		JSONObject location =  generateJSONLocation();
-		JSONObject data = new JSONObject();
+		this.json = new JSONObject();
 		try {
-			data.put("location", location);
+			json.put("location", location);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
-		
-		json = data;
 	}
 }
