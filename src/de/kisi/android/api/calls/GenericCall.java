@@ -21,7 +21,7 @@ public abstract class GenericCall {
 
 	protected JsonHttpResponseHandler handler;
 	protected String path;
-	protected JSONObject json;
+	protected JSONObject json = new JSONObject();
 	protected HTTPMethod method;
 	
 	protected GenericCall(String path, HTTPMethod method) {
@@ -29,9 +29,12 @@ public abstract class GenericCall {
 		this.method = method;
 	}
 	
-	protected void createJson() {
-		this.json = new JSONObject();
-	}
+	/**
+	 * Subclasses can overwrite this method to put data in the json object
+	 */
+	protected void createJson(){
+		//this method should be empty here.
+	};
 	
 	public void send() {
 		final GenericCall call = this;

@@ -38,10 +38,5 @@ public class VersionCheckCall extends GenericCall {
 				callback.onVersionResult("error");
 			}
 		};
-		
-		
 	}
-	
-	
-
 }

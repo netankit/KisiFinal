@@ -6,10 +6,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.widget.Toast;
+
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-import android.app.Activity;
-import android.widget.Toast;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.model.Lock;
@@ -17,7 +17,6 @@ import de.kisi.android.model.Place;
 
 public class CreateNewKeyCall extends GenericCall {
 
-	
 	private String email;
 	private List<Lock> locks;
 
@@ -41,8 +40,6 @@ public class CreateNewKeyCall extends GenericCall {
 			}
 			
 		};
-		
-		
 	}
 	
 	@Override
@@ -52,16 +49,14 @@ public class CreateNewKeyCall extends GenericCall {
 			lock_ids.put(l.getId());
 		}
 		JSONObject key = new JSONObject();
-		JSONObject data = new JSONObject();
+		
 		//changed in the API from assignee_email to issued_to_email
 		try {
 			key.put("lock_ids", lock_ids);
 			key.put("issued_to_email", email);
-			data.put("key", key);
+			json.put("key", key);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		this.json=data;
 	}
-
 }

@@ -31,10 +31,7 @@ public class UpdateLocatorsCall extends GenericCall {
 					OnPlaceChangedEventHandler.getInstance().notifyAllOnPlaceChangedListener();
 				} catch (NullPointerException e) {
 				}
-				
 			}
-			
 		};
 	}
-
 }

@@ -66,18 +66,15 @@ public class LoginCall extends GenericCall {
 	
 	@Override
 	protected void createJson() {
-		super.createJson();
-		String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(this.email);
-		
-		JSONObject userJSON = new JSONObject();
-		JSONObject deviceJSON = new JSONObject();
 		try {
+			JSONObject userJSON = new JSONObject();
 			//build user object
 			userJSON.put("email", this.email);
 			userJSON.put("password", this.password);
-			this.json.put("user", userJSON);
 			
 			//build device object
+			JSONObject deviceJSON = new JSONObject();
+			String deviceUUID = KisiAccountManager.getInstance().getDeviceUUID(this.email);
 			if (deviceUUID != null) {
 				deviceJSON.put("uuid", deviceUUID);				
 			}
@@ -89,10 +86,11 @@ public class LoginCall extends GenericCall {
 			} catch (NameNotFoundException e) {
 				//no app version for you then...
 			}
+			
+			this.json.put("user", userJSON);
 			this.json.put("device", deviceJSON);
-		} catch (JSONException e1) {
-			e1.printStackTrace();
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
-
 	}
 }

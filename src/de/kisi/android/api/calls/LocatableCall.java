@@ -12,7 +12,16 @@ public abstract class LocatableCall extends GenericCall {
 		super(path, method);
 	}
 	
-	protected JSONObject generateJSONLocation() { 
+	@Override
+	protected void createJson() {
+		try {
+			this.json.put("location", generateJSONLocation());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected JSONObject generateJSONLocation() {
 		JSONObject location = new JSONObject();
 		Location currentLocation = GeofenceManager.getInstance().getLocation();
 		try {

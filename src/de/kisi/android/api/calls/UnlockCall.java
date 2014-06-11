@@ -9,7 +9,6 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Lock;
 
@@ -17,8 +16,8 @@ public class UnlockCall extends LocatableCall {
 
 	public UnlockCall(Lock lock, final UnlockCallback callback) {
 		super(String.format(Locale.ENGLISH, "places/%d/locks/%d/access", 
-				lock.getPlaceId(), 
-				lock.getId()), 
+					lock.getPlaceId(), 
+					lock.getId()), 
 				HTTPMethod.POST);
 		
 		handler = new JsonHttpResponseHandler() {
@@ -69,16 +68,5 @@ public class UnlockCall extends LocatableCall {
 
 			}	
 		};
-	}
-
-	@Override
-	protected void createJson() {
-		JSONObject location =  generateJSONLocation();
-		this.json = new JSONObject();
-		try {
-			json.put("location", location);
-		} catch (JSONException e1) {
-			e1.printStackTrace();
-		}
 	}
 }

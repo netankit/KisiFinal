@@ -4,16 +4,12 @@ package de.kisi.android.api;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
-import android.location.Location;
 import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.api.calls.CreateGatewayCall;
 import de.kisi.android.api.calls.CreateNewKeyCall;
 import de.kisi.android.api.calls.GenericCall;
-import de.kisi.android.api.calls.LocatableCall;
 import de.kisi.android.api.calls.LoginCall;
 import de.kisi.android.api.calls.LogoutCall;
 import de.kisi.android.api.calls.RegisterCall;
@@ -29,7 +25,6 @@ import de.kisi.android.model.User;
 import de.kisi.android.notifications.NotificationManager;
 import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 import de.kisi.android.vicinity.manager.BluetoothLEManager;
-import de.kisi.android.vicinity.manager.GeofenceManager;
 
 
 public class KisiAPI {
