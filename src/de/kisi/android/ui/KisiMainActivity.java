@@ -8,12 +8,14 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +44,6 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
     private LockListAdapter mLockListAdapter; 
     private ActionBarDrawerToggle mDrawerToggle;
     private int selectedPosition = 0;
-    private Intent mStartIntent;
     
     private MergeAdapter  mMergeAdapter;
     
@@ -64,6 +65,9 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		mDrawerList.setFocusableInTouchMode(false);
 		mMergeAdapter = new MergeAdapter();
 		mDrawerListAdapter = new DrawerListAdapter(this);
+		
+		buildTopDivider();
+		
 		mMergeAdapter.addAdapter(mDrawerListAdapter);
 		
 		buildStaticMenuItems();
@@ -72,8 +76,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayShowHomeEnabled(true);	
-		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
-		
+		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_USE_LOGO);		
 		mDrawerToggle = new ActionBarDrawerToggle( this,  mDrawerLayout, R.drawable.ic_drawer,  R.string.place_overview,  R.string.kisi ) {
 	            public void onDrawerClosed(View view) {
 	            	super.onDrawerClosed(view);
@@ -133,7 +136,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	private void setUiIntoStartState() {
 		Place place = KisiAPI.getInstance().getPlaceAt(0);
 		if(place != null) {
-			selectItem(selectedPosition, mDrawerListAdapter.getItemId(selectedPosition));
+			// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
+			selectItem(selectedPosition + 2, mDrawerListAdapter.getItemId(selectedPosition));
 		}
 		else {
 			//check if user is even login 
@@ -148,22 +152,22 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	private void selectItem(int position, long id) {
 		getActionBar().setTitle(KisiAPI.getInstance().getPlaceById((int) id).getName());
-		selectedPosition = position;
-		mDrawerListAdapter.selectItem(position);
+		// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
+		selectedPosition = position - 2;
+		mDrawerListAdapter.selectItem(selectedPosition);
 		mLockListAdapter = new LockListAdapter(this, (int) id);
 		mLockList.setAdapter(mLockListAdapter);
 		mLockList.setOnItemClickListener(new LockListOnItemClickListener(KisiAPI.getInstance().getPlaceById((int) id)));
 		mLockList.invalidate();
 	    // Highlight the selected item, update the title, and close the drawer and check if the position is available 
-		if( position < mDrawerListAdapter.getCount()) {
+		// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
+		if( position < mDrawerListAdapter.getCount() + 2) {
 			mDrawerList.setItemChecked(position, true);
-			mDrawerList.setSelection(position);
 		}
 		else {
-			mDrawerList.setItemChecked(0, true);
-			mDrawerList.setSelection(0);
+			mDrawerList.setItemChecked(2, true);
 		}
-	    mDrawerLayout.closeDrawer(mDrawerList);
+		mDrawerLayout.closeDrawer(mDrawerList);
 	}
 	
 	
@@ -245,8 +249,9 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 							int mActivePosition = mLockListAdapter.getItemPosition(lockId);
 							mLockList.invalidate();
 							Log.d("handle intent", String.valueOf(mLockList.getCount()) );
-							mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition,
-						        mLockList.getAdapter().getItemId(mActivePosition));
+							// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
+							mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition + 2,
+						        mLockList.getAdapter().getItemId(mActivePosition+2));
 						}
 					}
 				}
@@ -290,11 +295,29 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		refreshViews();
 	}
 
+	private void buildTopDivider() {
+		LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		final TextView places = (TextView) li.inflate(R.layout.drawer_list_section_item, null);
+		places.setText(getResources().getText(R.string.place_overview));
+		mMergeAdapter.addView(places);
+		
+		final View divider =  (View) li.inflate(R.layout.drawer_list_divider, null);
+		mMergeAdapter.addView(divider);
+	}
+	
+	
+	
 		
 	private void buildStaticMenuItems() {
-	
+		
 		LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View divider =  (View) li.inflate(R.layout.drawer_list_divider, null);
+	
+		final TextView settings = (TextView) li.inflate(R.layout.drawer_list_section_item, null);
+		settings.setText(getResources().getText(R.string.settings));
+		mMergeAdapter.addView(settings);
+		
+		final View divider =  (View) li.inflate(R.layout.drawer_list_divider, null);
 		mMergeAdapter.addView(divider);
 	
 		StaticMenuOnClickListener listener =  new StaticMenuOnClickListener(this);
@@ -306,12 +329,16 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		refreshButton.setOnClickListener(listener);
 		mMergeAdapter.addView(refreshButton);
 		
+		addDivider();
+		
 		final TextView setup_kisi_button = (TextView) li.inflate(R.layout.drawer_list_item, null);
 		setup_kisi_button.setId(R.id.setup_kisi_button);
 		setup_kisi_button.setText(getResources().getText(R.string.setup));
 		setup_kisi_button.setClickable(true);
 		setup_kisi_button.setOnClickListener(listener);
 		mMergeAdapter.addView(setup_kisi_button);
+		
+		addDivider();
 		
 		final TextView notification = (TextView) li.inflate(R.layout.drawer_list_item, null);
 		notification.setId(R.id.notification_settings_button);
@@ -320,6 +347,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		notification.setOnClickListener(listener);
 		mMergeAdapter.addView(notification);
 		
+		addDivider();
+		
 		final TextView about = (TextView) li.inflate(R.layout.drawer_list_item, null);
 		about.setId(R.id.about_button);
 		about.setText(getResources().getText(R.string.about));
@@ -327,6 +356,20 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		about.setOnClickListener(listener);
 		mMergeAdapter.addView(about);
 		
+		final TextView account = (TextView) li.inflate(R.layout.drawer_list_section_item, null);
+		account.setText(getResources().getText(R.string.account));
+		mMergeAdapter.addView(account);
+		
+		final View divider2 =  (View) li.inflate(R.layout.drawer_list_divider, null);
+		mMergeAdapter.addView(divider2);
+		
+		
+		final TextView accountName = (TextView) li.inflate(R.layout.drawer_list_item, null);
+		accountName.setText(KisiAPI.getInstance().getUser() == null ?  " " : KisiAPI.getInstance().getUser().getEmail() );
+		accountName.setTextColor(Color.GRAY);
+		mMergeAdapter.addView(accountName);
+		
+		addDivider();
 		
 		final TextView logout = (TextView) li.inflate(R.layout.drawer_list_item, null);	
 		logout.setId(R.id.logout_button);
@@ -334,7 +377,17 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		logout.setClickable(true);
 		logout.setOnClickListener(listener);
 		mMergeAdapter.addView(logout);
+		
+	
+		
 
 	}
+	
+	private void addDivider() {
+		LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		final View divider =  (View) li.inflate(R.layout.drawer_list_small_divider, null);
+		mMergeAdapter.addView(divider);
+	}
+	
 
 	}

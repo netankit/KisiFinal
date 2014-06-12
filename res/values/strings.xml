@@ -54,7 +54,7 @@
 	<string name="try_again">Try again</string>
 	<string name="close_app">Exit</string>
 	<string name="notification_settings">Notification settings</string>
-	<string name="place_overview">Places</string>
+	<string name="place_overview">PLACES</string>
 	<string name="about">About</string>
 	<string name="version">Version:\t</string>
 	<string name="location_not_available_title">Improve security of keys</string>
@@ -68,4 +68,6 @@
 	<string name="bluetooth_on">Bluetooth detection on</string>
 	<string name="bluetooth_off">Bluetooth detection off</string>
 	<string name="update"> New version available.\n<u>Touch here to update</u></string>
+	<string name="account">ACCOUNT</string>
+	<string name="settings">SETTINGS</string>
 </resources>
