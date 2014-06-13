@@ -3,6 +3,7 @@ package de.kisi.android.account;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
+import de.kisi.android.takeatour.TakeATourActivity;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountAuthenticatorResponse;
@@ -107,6 +108,9 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onClick(View v) {
+		Intent takeTour = new Intent(this, TakeATourActivity.class);
+		startActivity(takeTour);
+		
 		progressDialog = new ProgressDialog(this);
 		progressDialog.setMessage(getString(R.string.login_loading_message));
 		progressDialog.setCancelable(false);
