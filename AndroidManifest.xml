@@ -227,7 +227,8 @@
         <!-- Bluetooth end -->
         <activity
             android:name="de.kisi.android.takeatour.TakeATourActivity"
-            android:label="@string/title_activity_take_atour" >
+            android:label="@string/title_activity_take_atour"
+            android:theme="@style/CustomThemeLogin">
         </activity>
     </application>
 

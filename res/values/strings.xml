@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">KISI</string>
+    <string name="take_tour">Take a tour</string>
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="RememberMe">Remember password</string>

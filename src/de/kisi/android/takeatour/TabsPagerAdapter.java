@@ -1,37 +1,65 @@
 package de.kisi.android.takeatour;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
- 
+import de.kisi.android.KisiApplication;
+import de.kisi.android.R;
+
 public class TabsPagerAdapter extends FragmentPagerAdapter {
- 
-    public TabsPagerAdapter(FragmentManager fm) {
-        super(fm);
-    }
- 
-    @Override
-    public Fragment getItem(int index) {
- 
-        switch (index) {
-        case 0:
-            // Top Rated fragment activity
-            return new TopRatedFragment();
-        case 1:
-            // Games fragment activity
-            return new GamesFragment();
-        case 2:
-            // Movies fragment activity
-            return new MoviesFragment();
-        }
- 
-        return null;
-    }
- 
-    @Override
-    public int getCount() {
-        // get item count - equal to number of tabs
-        return 3;
-    }
- 
+
+	private Bundle bundle;
+	private Fragment frag;
+
+	public TabsPagerAdapter(FragmentManager fm) {
+		super(fm);
+	}
+
+	@Override
+	public Fragment getItem(int index) {
+
+		frag = new TopRatedFragment();
+		bundle = new Bundle();
+		bundle.putInt(
+				"IMG_ID",
+				KisiApplication
+						.getInstance()
+						.getResources()
+						.getIdentifier("taketourimage" + (index + 1), "drawable",
+								KisiApplication.getInstance().getPackageName()));
+		frag.setArguments(bundle);
+		return frag;
+
+	}
+
+	@Override
+	public int getCount() {
+		// get item count - equal to number of tabs
+		
+		Field[] fields = R.drawable.class.getFields();
+	    List<Integer> drawables = new ArrayList<Integer>();
+	    for (Field field : fields) {
+	        // Take only those with name starting with "taketourimage"
+	        if (field.getName().startsWith("taketourimage")) {
+	            try {
+					drawables.add(field.getInt(null));
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	    }
+	    int lngth = drawables.size();
+	    return lngth;
+	}
+
 }

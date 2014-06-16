@@ -52,6 +52,8 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Intent takeTour = new Intent(this, TakeATourActivity.class);
+		startActivity(takeTour);
 		//Log.d("AccountActivity", "entered onCreate");
 		setContentView(R.layout.login_activity);
 
@@ -108,8 +110,8 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onClick(View v) {
-		Intent takeTour = new Intent(this, TakeATourActivity.class);
-		startActivity(takeTour);
+//		Intent takeTour = new Intent(this, TakeATourActivity.class);
+//		startActivity(takeTour);
 		
 		progressDialog = new ProgressDialog(this);
 		progressDialog.setMessage(getString(R.string.login_loading_message));

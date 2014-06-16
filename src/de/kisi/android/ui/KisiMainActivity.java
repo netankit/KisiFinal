@@ -356,6 +356,15 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		about.setOnClickListener(listener);
 		mMergeAdapter.addView(about);
 		
+		addDivider();
+		
+		final TextView takeTour = (TextView) li.inflate(R.layout.drawer_list_item, null);
+		takeTour.setId(R.id.taketour_button);
+		takeTour.setText(getResources().getText(R.string.take_tour));
+		takeTour.setClickable(true);
+		takeTour.setOnClickListener(listener);
+		mMergeAdapter.addView(takeTour);
+		
 		final TextView account = (TextView) li.inflate(R.layout.drawer_list_section_item, null);
 		account.setText(getResources().getText(R.string.account));
 		mMergeAdapter.addView(account);

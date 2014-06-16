@@ -7,6 +7,11 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.Window;
+
+import com.viewpagerindicator.LinePageIndicator;
+import com.viewpagerindicator.PageIndicator;
+
 import de.kisi.android.R;
 
 public class TakeATourActivity extends FragmentActivity implements
@@ -14,43 +19,31 @@ public class TakeATourActivity extends FragmentActivity implements
 
 	private ViewPager viewPager;
 	private TabsPagerAdapter mAdapter;
-	private ActionBar actionBar;
-
+	
+	private PageIndicator mIndicator;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.activity_take_atour);
 
 		// Initialization
 		viewPager = (ViewPager) findViewById(R.id.pager);
-		actionBar = getActionBar();
 		mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 
 		viewPager.setAdapter(mAdapter);
-		actionBar.setHomeButtonEnabled(false);
-//		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		
+		LinePageIndicator indicator = (LinePageIndicator)findViewById(R.id.indicator);
+        mIndicator = indicator;
+        indicator.setViewPager(viewPager);
 
-
-//		/**
-//		 * on swiping the viewpager make respective tab selected
-//		 * */
-//		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//
-//			@Override
-//			public void onPageSelected(int position) {
-//				// on changing the page
-//				// make respected tab selected
-//				actionBar.setSelectedNavigationItem(position);
-//			}
-//
-//			@Override
-//			public void onPageScrolled(int arg0, float arg1, int arg2) {
-//			}
-//
-//			@Override
-//			public void onPageScrollStateChanged(int arg0) {
-//			}
-//		});
+        final float density = getResources().getDisplayMetrics().density;
+        indicator.setSelectedColor(0xFF2EAADC);
+        indicator.setUnselectedColor(0xFF888888);
+        indicator.setStrokeWidth(4 * density);
+        indicator.setLineWidth(30 * density);
+        
 	}
 
 	@Override

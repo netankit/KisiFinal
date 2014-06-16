@@ -5,4 +5,5 @@
      <item name="about_button" type="id"/>
      <item name="notification_settings_button" type="id"/>
      <item name="logout_button" type="id"/>
+     <item name="taketour_button" type="id"/>
 </resources>

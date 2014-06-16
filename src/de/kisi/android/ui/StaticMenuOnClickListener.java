@@ -15,6 +15,7 @@ import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
+import de.kisi.android.takeatour.TakeATourActivity;
 
 public class StaticMenuOnClickListener implements OnClickListener {
 	private KisiMainActivity activity;
@@ -77,6 +78,11 @@ public class StaticMenuOnClickListener implements OnClickListener {
 		case R.id.notification_settings_button:
 			Intent settingsIntent = new Intent(activity, PlaceNotificationSettings.class);
 			activity.startActivity(settingsIntent);
+			return;
+			
+		case R.id.taketour_button:
+			Intent takeTour = new Intent(activity, TakeATourActivity.class);
+			activity.startActivity(takeTour);
 			return;
 			
 
