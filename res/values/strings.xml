@@ -38,6 +38,9 @@
     <string name="no_lock">No locks for this place</string>
     <string name="share_empty_place_error">You can not share an empty place!</string>
     <string name="log_empty_place_error">You can not see the log of an empty place</string>
+    <string name="automatic_relogin_failed">Automatic login failed. For your security, please sign in again.</string>
+    <string name="geofence_not_available_title">Geofencing Not Available</string>
+    <string name="geofence_not_available_text">Please, enable Wi-Fi or Network for location detection.</string>
     <string name="share_error_empty_email">You have to enter an email address to share a lock!</string>
     <string name="new_user_html">New? <a href="https://www.kisi.de/users/sign_up">Get started on our website</a></string>
     <string name="forgot_html"><a href="https://www.kisi.de/users/password/new">Forgot your password?</a></string>
