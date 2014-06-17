@@ -9,10 +9,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
@@ -24,7 +22,6 @@ public class LogInfo extends Activity implements LogsCallback{
 
 	
 	private ListView mListView;
-	private ProgressBar progressBar;
 	
 	
 	public void onCreate(Bundle savedInstanceState) {
@@ -98,14 +95,6 @@ public class LogInfo extends Activity implements LogsCallback{
 	            vi = inflater.inflate(R.layout.loginfo_list_item, null);
 	        TextView eventTextView = (TextView) vi.findViewById(R.id.logEventTextView);
 	        eventTextView.setText(events.get(position).getMessage());
-        	TextView addressTextView = (TextView) vi.findViewById(R.id.logAddressTextView);
-	        if(events.get(position).getAddress() != null) {
-	        	addressTextView.setText(events.get(position).getAddress());
-	        }
-	        else {
-	        	//hack to set the size of the textview to zero
-	        	addressTextView.setTextSize(0.0f);;
-	        }
 	        TextView dateTextView = (TextView) vi.findViewById(R.id.logDateTextVIew);
 	        dateTextView.setText(events.get(position).getCreatedAt().toLocaleString());
 	        return vi;
