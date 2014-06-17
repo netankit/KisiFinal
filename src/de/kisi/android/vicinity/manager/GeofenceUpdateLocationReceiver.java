@@ -6,10 +6,10 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
-import de.kisi.android.vicinity.VicinityTypeEnum;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +27,7 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
 	public void onReceive(Context context, Intent intent) {
 		
 		// get the actor for Geofence
-		LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.Geofence);
+		LockInVicinityActorInterface actor = LockInVicinityActorFactory.getGeofenceActor();
 		
 		// get a list of all affected geofences
 		List<Geofence> fences = LocationClient.getTriggeringGeofences(intent);
@@ -39,14 +39,20 @@ public class GeofenceUpdateLocationReceiver extends BroadcastReceiver{
             	String p[] = fence.getRequestId().split(": ");
             	int placeID = Integer.parseInt(p[1]);
             	if(checkLocation(KisiAPI.getInstance().getPlaceById(placeID))){
-            		actor.actOnEntry(placeID,0);
+            		Locator locator = new Locator();
+            		locator.setType("geofence");
+            		locator.setPlaceId(placeID);
+            		actor.actOnEntry(locator);
             	}
             }
         else if(transitionType == Geofence.GEOFENCE_TRANSITION_EXIT)
             for(Geofence fence : fences){
             	String p[] = fence.getRequestId().split(": ");
             	int placeID = Integer.parseInt(p[1]);
-            	actor.actOnExit(placeID,0);
+        		Locator locator = new Locator();
+        		locator.setType("geofence");
+        		locator.setPlaceId(placeID);
+            	actor.actOnExit(locator);
             }
 	}
 	

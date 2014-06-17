@@ -1,11 +1,8 @@
 package de.kisi.android.notifications;
 
 import java.util.Date;
-import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.LinkedList;
-
-
-
 
 
 import android.annotation.TargetApi;
@@ -37,8 +34,8 @@ import de.kisi.android.vicinity.LockInVicinityDisplayManager;
  */
 public class NotificationManager extends BroadcastReceiver {
 
-	private static HashSet<Integer> enteredPlaces = new HashSet<Integer>();
-	private static HashSet<Integer> enteredLocks = new HashSet<Integer>();
+	private static Hashtable<Integer,String> enteredPlaces = new Hashtable<Integer,String>();
+	private static Hashtable<Integer,String> enteredLocks = new Hashtable<Integer,String>();
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -62,24 +59,24 @@ public class NotificationManager extends BroadcastReceiver {
 			info.valid = false;
 		}
 		for(Place place:places){
-			if(enteredPlaces.contains(place.getId()) && place.getNotificationEnabled()){
+			if(enteredPlaces.containsKey(place.getId()) && place.getNotificationEnabled()){
 				if(!containsNotificationForPlace(place)){
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-						createNotificationForPlace(place);
+						createNotificationForPlace(place, enteredPlaces.get(place.getId()));
 					}else {
-						createNotificationForPlaceSupport(place);
+						createNotificationForPlaceSupport(place, enteredPlaces.get(place.getId()));
 					}		
 				} else {
 					getNotificationForPlace(place).valid = true;
 				}
 			}
 			for(Lock lock:place.getLocks()){
-				if(enteredLocks.contains(lock.getId())) {
+				if(enteredLocks.containsKey(lock.getId())) {
 					if(!containsNotificationForLock(lock)) {
 						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-							createNotificationForLock(place,lock);
+							createNotificationForLock(place, lock, enteredLocks.get(lock.getId()));
 						}else {
-							createNotificationForLockSupport(place,lock);
+							createNotificationForLockSupport(place, lock, enteredLocks.get(lock.getId()));
 						}
 					}else {
 						getNotificationForLock(lock).valid = true;
@@ -101,17 +98,17 @@ public class NotificationManager extends BroadcastReceiver {
 	}
 	
 	
-	private static void createNotificationForPlace(Place place){
+	private static void createNotificationForPlace(Place place, String sender){
 		NotificationInformation info = getBLENotification();
 		Context context = getDefaultContext();
 		if(info != null && info.type == NotificationInformation.Type.BLEOnly){
-			info.notification = getExpandedNotification(place, info, context);
+			info.notification = getExpandedNotification(place, info, context, sender);
 			info.type = Type.Place;
 			info.typeId = place.getId();
 			info.object = place;
 		}else{
 			info = new NotificationInformation();
-			info.notification = getExpandedNotification(place);
+			info.notification = getExpandedNotification(place, sender);
 			info.notificationId = getUnusedId();
 			info.object = place;
 			info.type = Type.Place;
@@ -122,13 +119,13 @@ public class NotificationManager extends BroadcastReceiver {
 		mNotificationManager.notify(info.notificationId, info.notification);
 	}
 	
-	private static Notification getExpandedNotification(Place place){
+	private static Notification getExpandedNotification(Place place, String sender){
 		NotificationInformation info = new NotificationInformation();
-		return getExpandedNotification(place, info, getDefaultContext()); 
+		return getExpandedNotification(place, info, getDefaultContext(), sender); 
 	}
 	
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	private static Notification getExpandedNotification(Place place, NotificationInformation info, Context context){
+	private static Notification getExpandedNotification(Place place, NotificationInformation info, Context context, String sender){
 		NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
 		nb.setSmallIcon(R.drawable.notification_icon);
 		nb.setContentTitle("KISI");
@@ -137,7 +134,7 @@ public class NotificationManager extends BroadcastReceiver {
 	    nb.setOnlyAlertOnce(true);
 		nb.setWhen(0);
 		nb.setOngoing(true);
-		nb.setContentIntent(PendingIntentManager.getInstance().getPendingIntentForPlace(place.getId()));
+		nb.setContentIntent(PendingIntentManager.getInstance().getPendingIntentForPlace(place.getId(), sender));
 		RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_view);
 		contentView.setTextViewText(R.id.place, place.getName());
 
@@ -173,7 +170,7 @@ public class NotificationManager extends BroadcastReceiver {
 			RemoteViews button;
 			button = new RemoteViews(context.getPackageName(), R.layout.notification_item);
 			button.setTextViewText(R.id.unlockButton, lock.getName());
-			button.setOnClickPendingIntent(R.id.unlockButton, PendingIntentManager.getInstance().getPendingIntentForLock(place.getId(),lock.getId()));
+			button.setOnClickPendingIntent(R.id.unlockButton, PendingIntentManager.getInstance().getPendingIntentForLock(place.getId(), lock.getId(), sender));
 			contentView.addView(R.id.widget2, button);
 			buttonCount++;
 		}
@@ -189,7 +186,7 @@ public class NotificationManager extends BroadcastReceiver {
 		return notification;
 	}
 	
-	private static void createNotificationForLock(Place place, Lock lock){
+	private static void createNotificationForLock(Place place, Lock lock, String sender){
 		NotificationInformation info = new NotificationInformation();
 		info.type = NotificationInformation.Type.Lock;
 		info.typeId = lock.getId();
@@ -205,7 +202,7 @@ public class NotificationManager extends BroadcastReceiver {
 		nc.setContentTitle(lock.getName() + " - " + place.getName());
 		nc.setDefaults(Notification.DEFAULT_ALL);
 		nc.setWhen(0);
-		nc.setContentIntent(PendingIntentManager.getInstance().getPendingIntentForLock(place.getId(), lock.getId()));
+		nc.setContentIntent(PendingIntentManager.getInstance().getPendingIntentForLock(place.getId(), lock.getId(), sender));
 
 		info.notification = nc.build();
 		notifications.add(info);
@@ -217,14 +214,15 @@ public class NotificationManager extends BroadcastReceiver {
 	private void handleIntent(Intent intent){
 		Bundle extras = intent.getExtras();
 		String type = extras.getString("Type");
+		String sender = extras.getString("Sender");
 		int lockId = extras.getInt("Lock", -1);
 		int placeId = extras.getInt("Place", -2);
 		if(type.equals(LockInVicinityDisplayManager.TRANSITION_ENTER_LOCK)){
-			enteredLocks.add(lockId);
+			enteredLocks.put(lockId,sender);
 		}else if(type.equals(LockInVicinityDisplayManager.TRANSITION_EXIT_LOCK)){
 			enteredLocks.remove(lockId);
 		}else if(type.equals(LockInVicinityDisplayManager.TRANSITION_ENTER_PLACE)){
-			enteredPlaces.add(placeId);
+			enteredPlaces.put(placeId,sender);
 		}else if(type.equals(LockInVicinityDisplayManager.TRANSITION_EXIT_PLACE)){
 			enteredPlaces.remove(placeId);
 		}
@@ -240,7 +238,7 @@ public class NotificationManager extends BroadcastReceiver {
 	
 	
 	
-	public static NotificationInformation getOrCreateBLEServiceNotification(Context context){
+	public static NotificationInformation getOrCreateBLEServiceNotification(Context context, String sender){
 		NotificationInformation bleNotification = getBLEButtonNotification();
 		if(bleNotification != null){
 			android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -251,7 +249,7 @@ public class NotificationManager extends BroadcastReceiver {
 				//bleNotification.notification = getNotificationForBLEButton();
 			}
 			else {
-				bleNotification.notification = getExpandedNotification((Place) bleNotification.object, bleNotification, getDefaultContext());
+				bleNotification.notification = getExpandedNotification((Place) bleNotification.object, bleNotification, getDefaultContext(), sender);
 				mNotificationManager.notify(bleNotification.notificationId, bleNotification.notification);
 			}
 			
@@ -259,7 +257,7 @@ public class NotificationManager extends BroadcastReceiver {
 		return bleNotification; 
 	}
 
-	public static void notifyBLEServiceNotificationDeleted() {
+	public static void notifyBLEServiceNotificationDeleted(String sender) {
 		NotificationInformation bleNotification = getBLEButtonNotification();
 		if(bleNotification != null){
 			android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);	
@@ -270,7 +268,7 @@ public class NotificationManager extends BroadcastReceiver {
 				//	bleNotification.notification = getNotificationForBLEButton();
 			}
 			else {
-				bleNotification.notification = getExpandedNotification((Place) bleNotification.object, bleNotification, getDefaultContext());
+				bleNotification.notification = getExpandedNotification((Place) bleNotification.object, bleNotification, getDefaultContext(), sender);
 				mNotificationManager.notify(bleNotification.notificationId, bleNotification.notification);
 			}
 			LockInVicinityDisplayManager.getInstance().update();
@@ -292,7 +290,7 @@ public class NotificationManager extends BroadcastReceiver {
 	}
 	
 	
-	public static NotificationInformation getOrCreateBLEButtonNotification(Context context, Place place){
+	public static NotificationInformation getOrCreateBLEButtonNotification(Context context, Place place, String sender){
 		NotificationInformation bleButtonNotification = getBLEButtonNotification();
 		if(bleButtonNotification != null){
 			// if BLE Button is already in a Notification Do nothing
@@ -301,7 +299,7 @@ public class NotificationManager extends BroadcastReceiver {
 			bleButtonNotification = getNotificationForBLEButton(context, place);			
 			bleButtonNotification.BLEButton = true;
 			if(bleButtonNotification.type == NotificationInformation.Type.Place) {
-				bleButtonNotification.notification = getExpandedNotification((Place)bleButtonNotification.object,bleButtonNotification,context);				
+				bleButtonNotification.notification = getExpandedNotification((Place)bleButtonNotification.object, bleButtonNotification, context, sender);				
 			}
 			android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);
 			mNotificationManager.notify(bleButtonNotification.notificationId, bleButtonNotification.notification);
@@ -309,7 +307,7 @@ public class NotificationManager extends BroadcastReceiver {
 		}
 	}
 	
-	public static void notifyBLEButtonNotificationDeleted() {
+	public static void notifyBLEButtonNotificationDeleted(String sender) {
 		NotificationInformation bleButtonNotification = getBLEButtonNotification();
 		if(bleButtonNotification != null){
 			android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getDefaultContext().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -317,7 +315,7 @@ public class NotificationManager extends BroadcastReceiver {
 			if(bleButtonNotification.type == Type.BLEOnly && !bleButtonNotification.containsBLE){
 				mNotificationManager.cancel(bleButtonNotification.notificationId);
 			}else {
-				bleButtonNotification.notification = getExpandedNotification((Place) bleButtonNotification.object, bleButtonNotification, getDefaultContext());
+				bleButtonNotification.notification = getExpandedNotification((Place) bleButtonNotification.object, bleButtonNotification, getDefaultContext(), sender);
 				mNotificationManager.notify(bleButtonNotification.notificationId, bleButtonNotification.notification);
 			}
 			LockInVicinityDisplayManager.getInstance().update();
@@ -480,7 +478,7 @@ public class NotificationManager extends BroadcastReceiver {
 		return info;
 	}
 	
-	public static NotificationInformation getBLEAutoUnlockNotifictionResult(AutoUnlockNotificationInfo info) {
+	public static void setBLEAutoUnlockNotifictionResult(AutoUnlockNotificationInfo info) {
 		
 		notifications.remove(info);
 		Context context = KisiApplication.getInstance();
@@ -504,7 +502,6 @@ public class NotificationManager extends BroadcastReceiver {
 		info.notificationId = getUnusedId();
 		Notification notification = nc.build();
 		mNotificationManager.notify(info.notificationId, notification);
-		return info;
 	}
 
 	
@@ -528,13 +525,13 @@ public class NotificationManager extends BroadcastReceiver {
 	//*********** Support Code for Android 4.0 ***********
 	//****************************************************
 	
-	private static void createNotificationForPlaceSupport(Place place){
+	private static void createNotificationForPlaceSupport(Place place, String sender){
 		for(Lock lock : place.getLocks())
-			createNotificationForLockSupport(place,lock);
+			createNotificationForLockSupport(place, lock, sender);
 	}
 	
-	private static void createNotificationForLockSupport(Place place, Lock lock){
-		createNotificationForLock(place,lock);
+	private static void createNotificationForLockSupport(Place place, Lock lock, String sender){
+		createNotificationForLock(place, lock, sender);
 
 	}
 	

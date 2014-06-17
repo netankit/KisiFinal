@@ -30,7 +30,6 @@ import android.widget.CheckBox;
 // by extending this class the activity always checks if the location and the wifi is available  when it getting started
 public class BaseActivity extends FragmentActivity implements VersionCheckCallback{
 	
-	private	Dialog permissionDialog;
 	private Dialog mUpdateDialog;
 	private static long TWO_WEEKS_IN_MS = 1209600000;
 	
@@ -39,8 +38,6 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 		super.onResume();
 		//check if there is already a dialog and if the user is already log in
 		if(KisiAPI.getInstance().getUser() != null) {
-			if(permissionDialog != null) 
-				permissionDialog.dismiss();
 			checkForServices();
 			KisiAPI.getInstance().getLatestVerion(this);
 		}
@@ -48,52 +45,34 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 	}
 	
 	private void checkForServices() {
-		boolean locationEnabled = true;
-		boolean wifiEnabled = true;
-		boolean bluetoothEnabled = true;
 		
-		SharedPreferences prefs = KisiApplication.getInstance().getSharedPreferences("userconfig", Context.MODE_PRIVATE);
-		boolean disableDialog = prefs.getBoolean(KisiAPI.getInstance().getUser().getId() + "-dontAskAgain", false);
-		long datePerfMS = prefs.getLong(KisiAPI.getInstance().getUser().getId() + "-dontAskAgainDate", -1);
-		//asked user again if more than 2 weeks have elapsed since the last checkbox
-		if(datePerfMS != -1) {
-			if(System.currentTimeMillis() - datePerfMS > TWO_WEEKS_IN_MS) {
-				disableDialog = false;
-			}
-		}
-		else {
-			disableDialog = false;
-		}
+
+		boolean disableDialog = checkDialogDisabled();
 		
 		if(disableDialog) {
 			return; 
 		}
 		
-		String locationProviders = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-		if(!locationProviders.contains("gps") && !locationProviders.contains("network")) {
-			locationEnabled = false;
-		}
-		
-		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		if (!wifi.isWifiEnabled() && !BluetoothLEManager.getInstance().getServiceStatus()) {
-			wifiEnabled = false;
-		}
-		
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
-				 KisiApplication.getInstance().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-			BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-			if(!mBluetoothAdapter.isEnabled()) {
-				bluetoothEnabled = false;
-			}
-		}else{
-			bluetoothEnabled = true;
-		}
-		
+
+
+		boolean locationEnabled = checkGpsService() || checkNetworkService();
+		boolean wifiEnabled = checkWifiService();
+		boolean bluetoothEnabled = checkBluetoothService();
+			
 		//check if there is a need to enable anything
 		if(locationEnabled && wifiEnabled && bluetoothEnabled) {
+			showGeofenceWarningIfNecessary();
 			return;
 		}
 		
+
+		Dialog permissionDialog = buildPermissionDialog(locationEnabled,wifiEnabled,bluetoothEnabled);
+		permissionDialog.show();
+
+	}
+	
+	private Dialog buildPermissionDialog(boolean locationEnabled,boolean wifiEnabled,boolean bluetoothEnabled){
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater adbInflater = LayoutInflater.from(this);
 	    View checkboxLayout = adbInflater.inflate(R.layout.checkbox, null);
@@ -130,26 +109,117 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 						}
 						dialog.dismiss();
 						dialog = null;
+						showGeofenceWarningIfNecessary();
+
 					}
 				});
 		
 		builder.setNegativeButton(R.string.dontaskagain,  new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				showGeofenceWarningIfNecessary();
+			}
+		});
+		Dialog dialog = builder.create();
+		dialog.setCanceledOnTouchOutside(false);
+
+		return dialog;
+	}
+	
+	private void showGeofenceWarningIfNecessary(){
+		if(checkGpsService() && !checkNetworkService()){
+			Dialog geofenceWarningDialog = buildGeofenceWarning();
+			geofenceWarningDialog.show();
+		}
+
+	}
+	private Dialog buildGeofenceWarning(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.geofence_not_available_title);
+		builder.setMessage(R.string.geofence_not_available_text);
+		builder.setPositiveButton(R.string.ok,  new DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				SharedPreferences prefs = KisiApplication.getInstance().getSharedPreferences("userconfig", Context.MODE_PRIVATE);
-				Date date = new Date(System.currentTimeMillis());
-				
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putBoolean(KisiAPI.getInstance().getUser().getId() + "-dontAskAgain" , true);
-				editor.putLong(KisiAPI.getInstance().getUser().getId() + "-dontAskAgainDate", date.getTime());
-				editor.commit();
-			} });
+				startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+			} 
+		});
+		builder.setNegativeButton(R.string.dontaskagain,  null);
 		
+		Dialog dialog = builder.create();
+		dialog.setCanceledOnTouchOutside(false);
+		return dialog;
+	}
+	
+	
+	private boolean checkDialogDisabled(){
+		SharedPreferences prefs = KisiApplication.getInstance().getSharedPreferences("userconfig", Context.MODE_PRIVATE);
+		boolean disableDialog = prefs.getBoolean(KisiAPI.getInstance().getUser().getId() + "-dontAskAgain", false);
+		long datePerfMS = prefs.getLong(KisiAPI.getInstance().getUser().getId() + "-dontAskAgainDate", -1);
+		//asked user again if more than 2 weeks have elapsed since the last checkbox
+		if(datePerfMS != -1) {
+			if(System.currentTimeMillis() - datePerfMS > TWO_WEEKS_IN_MS) {
+				disableDialog = false;
+			}
+		}
+		else {
+			disableDialog = false;
+		}
+		
+		if(disableDialog)
+			return true;
+		
+		// Disable Popups for the next two weeks
+		Date date = new Date(System.currentTimeMillis());
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(KisiAPI.getInstance().getUser().getId() + "-dontAskAgain" , true);
+		editor.putLong(KisiAPI.getInstance().getUser().getId() + "-dontAskAgainDate", date.getTime());
+		editor.commit();
 
-		permissionDialog = builder.create();
-		permissionDialog.setCanceledOnTouchOutside(false);
-		permissionDialog.show();
+		return false;
+	}
+	
+	private boolean checkGpsService(){
+		@SuppressWarnings("deprecation")
+		String locationProviders = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+		if(!locationProviders.contains("gps")) {
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean checkNetworkService(){
+		@SuppressWarnings("deprecation")
+		String locationProviders = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+		if(!locationProviders.contains("network")) {
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean checkWifiService(){
+		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		if (!wifi.isWifiEnabled() && !BluetoothLEManager.getInstance().getServiceStatus()) {
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean checkBluetoothService(){
+		boolean bluetoothEnabled = true;
+		//check if this device supports BLE
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2 && 
+				KisiApplication.getInstance().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+			BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+			if(!mBluetoothAdapter.isEnabled()) {
+				bluetoothEnabled = false;
+			}
+		}
+		else{ // dont ask for bluetooth if device does not support BLE
+			bluetoothEnabled = true;
+		}
+		return bluetoothEnabled;
 	}
 	
 	@Override
@@ -162,12 +232,9 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 	
 	@Override
 	protected void onStop() {
-		if(KisiAPI.getInstance().getUser() != null) {
-			GeofenceManager.getInstance().stopLocationUpdate();;
-		}
+		GeofenceManager.getInstance().stopLocationUpdate();
 		super.onStop();
 	}
-	
 	
 	private void updateButton() {
 

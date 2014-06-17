@@ -1,5 +1,7 @@
 package de.kisi.android.ui;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
@@ -8,14 +10,12 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +26,7 @@ import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.BaseActivity;
 import de.kisi.android.R;
+import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
@@ -46,6 +47,9 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
     private int selectedPosition = 0;
     
     private MergeAdapter  mMergeAdapter;
+    
+    
+    private TextView accountName;
     
 	// just choose a random value
 	// TODO: change this later
@@ -92,9 +96,20 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		 };
 		 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);	 
-		KisiAPI.getInstance().registerOnPlaceChangedListener(this);
-		Intent login = new Intent(this, AccountPickerActivity.class);
-		startActivityForResult(login, LOGIN_REQUEST_CODE);
+		
+		
+		AccountManager mAccountManager = AccountManager.get(this);
+		if(KisiAPI.getInstance().getUser()==null){
+			if(mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE).length==1){
+				Account account = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE)[0];
+				mAccountManager.removeAccount(account, null, null);
+			}
+			Intent login = new Intent(this, AccountPickerActivity.class);
+			startActivityForResult(login, LOGIN_REQUEST_CODE);
+		}
+		else {
+			setUiIntoStartState();
+		}
 	}
 	
 	
@@ -135,17 +150,13 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	private void setUiIntoStartState() {
 		Place place = KisiAPI.getInstance().getPlaceAt(0);
+		accountName.setText(KisiAPI.getInstance().getUser() == null ?  " " : KisiAPI.getInstance().getUser().getEmail() );
 		if(place != null) {
 			// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
 			selectItem(selectedPosition + 2, mDrawerListAdapter.getItemId(selectedPosition));
 		}
 		else {
-			//check if user is even login 
-			if(KisiAPI.getInstance().getUser() != null) {
-				//TODO: implement so dialog here
-			}
-				
-			
+			KisiAPI.getInstance().updatePlaces(this);
 		}
 	}
 	
@@ -259,31 +270,34 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 			}
 	}
 	
-	
+
+
+	// callback for blinkup and login
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == LOGIN_REQUEST_CODE) {
-			if (resultCode == AccountPickerActivity.LOGIN_FAILED) {
-				finish();
-				return;
-			}
-			if (resultCode == AccountPickerActivity.LOGIN_SUCCESS) {
-				//start an update of the places
-			
-				KisiAPI.getInstance().refresh(new OnPlaceChangedListener() {
-					@Override
-					public void onPlaceChanged(Place[] newPlaces) {
-						setUiIntoStartState();
-					}
-				});
-				return;
+			switch(resultCode){
+				case AccountPickerActivity.LOGIN_FAILED:
+					KisiAPI.getInstance().logout();
+					Intent login = new Intent(this, AccountPickerActivity.class);
+					startActivityForResult(login, LOGIN_REQUEST_CODE);
+					return;
+
+				case AccountPickerActivity.LOGIN_OPTIMISTIC_SUCCESS:
+				case AccountPickerActivity.LOGIN_REAL_SUCCESS:
+					setUiIntoStartState();
+					return;
+
+				case AccountPickerActivity.LOGIN_CANCELED:
+					finish();
 			}
 		} else {
-			BlinkupController.getInstance().handleActivityResult(this,
-					requestCode, resultCode, data);
+			BlinkupController.getInstance().handleActivityResult(this,requestCode, resultCode, data);
 		}
 	}
 
+	
+	
 	public void logout() {
 		KisiAPI.getInstance().logout();
 		Intent login = new Intent(this, AccountPickerActivity.class);
@@ -295,6 +309,10 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		refreshViews();
 	}
 
+	
+	//these methods fill the drawer with its static elements
+	
+	
 	private void buildTopDivider() {
 		LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -364,7 +382,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		mMergeAdapter.addView(divider2);
 		
 		
-		final TextView accountName = (TextView) li.inflate(R.layout.drawer_list_item, null);
+		accountName = (TextView) li.inflate(R.layout.drawer_list_item, null);
 		accountName.setText(KisiAPI.getInstance().getUser() == null ?  " " : KisiAPI.getInstance().getUser().getEmail() );
 		accountName.setTextColor(Color.GRAY);
 		mMergeAdapter.addView(accountName);

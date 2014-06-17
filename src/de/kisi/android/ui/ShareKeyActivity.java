@@ -121,7 +121,7 @@ public class ShareKeyActivity extends Activity {
 					Toast.makeText(getApplicationContext(), R.string.share_error_empty_email, Toast.LENGTH_LONG).show();
 					return;
 				}
-				KisiAPI.getInstance().createNewKey(place, email, sendlocks, activity);
+				KisiAPI.getInstance().createNewKey(place, email, sendlocks);
 				finish();
 			}
 		});

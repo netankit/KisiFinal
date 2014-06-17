@@ -1,6 +1,7 @@
 package de.kisi.android.vicinity;
 
 import de.kisi.android.KisiApplication;
+import de.kisi.android.model.Locator;
 import android.content.Context;
 import android.content.Intent;
 
@@ -41,9 +42,12 @@ public class LockInVicinityDisplayManager {
 	 * @param placeId Id of the Place where the lock belongs to
 	 * @param lockId Id of the Lock
 	 */
-	public void addLock(int placeId, int lockId){
+	public void addLock(Locator locator){
+		int placeId = locator.getPlaceId();
+		int lockId = locator.getLockId();
 		Intent intent = new Intent("de.kisi.android.VICINITY_CHANGED");
 		intent.putExtra("Place", placeId);
+		intent.putExtra("Sender", locator.getType());
 		intent.putExtra("Lock", lockId);
 		intent.putExtra("Type", TRANSITION_ENTER_LOCK);
 		mContext.sendBroadcast(intent);
@@ -58,7 +62,9 @@ public class LockInVicinityDisplayManager {
 	 * @param placeId Id of the Place where the lock belongs to
 	 * @param lockId Id of the Lock
 	 */
-	public void removeLock(int placeId, int lockId){
+	public void removeLock(Locator locator){
+		int placeId = locator.getPlaceId();
+		int lockId = locator.getLockId();
 		Intent intent = new Intent("de.kisi.android.VICINITY_CHANGED");
 		intent.putExtra("Place", placeId);
 		intent.putExtra("Lock", lockId);
@@ -82,9 +88,11 @@ public class LockInVicinityDisplayManager {
 	 * 
 	 * @param placeId Id of the Place
 	 */
-	public void addPlace(int placeId){
+	public void addPlace(Locator locator){
+		int placeId = locator.getPlaceId();
 		Intent intent = new Intent("de.kisi.android.VICINITY_CHANGED");
 		intent.putExtra("Place", placeId);
+		intent.putExtra("Sender", locator.getType());
 		intent.putExtra("Type", TRANSITION_ENTER_PLACE);
 		mContext.sendBroadcast(intent);
 	}
@@ -95,7 +103,8 @@ public class LockInVicinityDisplayManager {
 	 * 
 	 * @param placeId Id of the Place
 	 */
-	public void removePlace(int placeId){
+	public void removePlace(Locator locator){
+		int placeId = locator.getPlaceId();
 		Intent intent = new Intent("de.kisi.android.VICINITY_CHANGED");
 		intent.putExtra("Place", placeId);
 		intent.putExtra("Type", TRANSITION_EXIT_PLACE);
