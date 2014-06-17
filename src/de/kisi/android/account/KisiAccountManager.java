@@ -15,9 +15,6 @@ import de.kisi.android.KisiApplication;
 public class KisiAccountManager {
 	private static KisiAccountManager instance;
 	
-	//TODO: put this into strings.xml
-	private static final String ACCOUNT_TYPE =  "de.kisi";
-	
 	//TODO: necessary to keep this alive over the whole life time of the singleton?
 	//why not fetch it dynamically whenever you need it? Any issues with this?
 	private  AccountManager accManager;

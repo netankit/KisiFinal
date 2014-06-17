@@ -1,17 +1,22 @@
 package de.kisi.android.ui;
 
+import com.electricimp.blinkup.BlinkupController;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -25,15 +30,18 @@ import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
 
-public class AccountPickerActivity extends Activity implements LoginCallback{
+public class AccountPickerActivity extends Activity{
 
-    public static int LOGIN_FAILED = -1;
-    public static int LOGIN_SUCCESS = 0;
+    public static final int LOGIN_FAILED = -1;
+    public static final int LOGIN_OPTIMISTIC_SUCCESS = 1;
+    public static final int LOGIN_REAL_SUCCESS = 2;
+	public static final int LOGIN_CANCELED = 10;
 	
 	private AccountManager mAccountManager;
 	private ProgressDialog progressDialog;
 	private final Activity activity = this;
-	private final LoginCallback mloginCallback = this;
+	private final LoginCallback mSingleLoginCallback = new SingleAccountLoginHandler(this);
+	private final LoginCallback mMultipleLoginCallback = new MultipleAccountsLoginHandler(this);
 	
 	
 	
@@ -65,7 +73,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		Account availableAccounts[] = mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE);
 		
 		
-		
+		Log.i("AccountPickerActivity","Try "+availableAccounts.length);
 		//if there is no account show the user the login screen
 		if (availableAccounts.length == 0) {
 			  addAccount();
@@ -73,14 +81,17 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		 }
 		// if there is just one account login into this account
 		else if(availableAccounts.length == 1) {
+			//TODO: This Block is not needed anymore, due to optimistic sign in
 			Account acc = availableAccounts[0];
 			String password = mAccountManager.getPassword(acc);
-			//show progress dialog
-			progressDialog = new ProgressDialog(this);
-			progressDialog.setMessage(getString(R.string.login_loading_message));
-			progressDialog.setCancelable(false);
-			progressDialog.show();
-			KisiAPI.getInstance().login(acc.name, password, mloginCallback);
+			
+			Log.i("AccountPickerActivity","Login");
+			KisiAPI.getInstance().login(acc.name, password, mSingleLoginCallback);
+			
+			//We are happy by the fact that there is a account
+			setResult(LOGIN_OPTIMISTIC_SUCCESS);
+			finish();
+
 			return;
 		}
 		//if there are more then one account let the user choose the right one
@@ -125,7 +136,7 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 							progressDialog.setMessage(getString(R.string.login_loading_message));
 							progressDialog.setCancelable(false);
 							progressDialog.show();
-							KisiAPI.getInstance().login(acc.name, password, mloginCallback);
+							KisiAPI.getInstance().login(acc.name, password, mMultipleLoginCallback);
 						}
 					});
 				
@@ -135,16 +146,22 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 	}
 	
 	private void addAccount() {
+		@SuppressWarnings("unused")
 		final AccountManagerFuture<Bundle> future = mAccountManager.addAccount(KisiAuthenticator.ACCOUNT_TYPE, KisiAuthenticator.AUTHTOKEN_TYPE_DEFAULT, null, null, this, new AccountManagerCallback<Bundle>() {
             @Override
             public void run(AccountManagerFuture<Bundle> future) {
                 try {
                     Bundle bnd = future.getResult();  
                     buildAccountDailog(); 
-
+                    
+                } catch ( OperationCanceledException e){
+        			setResult(LOGIN_CANCELED);
+                	finish();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.w("AccountPickerActivity","Message: "+e.getMessage()+" / "+e.getClass());
+                    if(e.getMessage()!=null && e.getMessage().length()>0)
+                    	Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         }, null);
@@ -159,39 +176,92 @@ public class AccountPickerActivity extends Activity implements LoginCallback{
 		finish();
 	}
 	
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.i("AccountPickerActivity","requestCode: "+requestCode+" resultCode: "+resultCode+" "+data);
+		if (requestCode == KisiMainActivity.LOGIN_REQUEST_CODE) {
+			switch(resultCode){
+				case AccountPickerActivity.LOGIN_FAILED:
+				case AccountPickerActivity.LOGIN_CANCELED:
+					System.exit(resultCode);
+					return;
+					
+				case AccountPickerActivity.LOGIN_OPTIMISTIC_SUCCESS:
+				case AccountPickerActivity.LOGIN_REAL_SUCCESS:
+			}
+		} else {
+			BlinkupController.getInstance().handleActivityResult(this,requestCode, resultCode, data);
+		}
+	}
+
 	
-	@Override
-	public void onLoginSuccess(String authtoken) {
-		// Switch the activity to internal Views
-		progressDialog.dismiss();
-		//Intent mainScreen = new Intent(getApplicationContext(), KisiMain.class);
-		//mainScreen.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		//finish login activity
-//		Intent mainActivity = new Intent(this, KisiMainActivity.class);
-//		startActivity(mainActivity);
-		//move this later to the KisiAPI
-		finish();
-	}
+	private class SingleAccountLoginHandler implements LoginCallback{
 
-	@Override
-	public void onLoginFail(String errormessage) {
-		progressDialog.dismiss();
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(errormessage)
-               .setPositiveButton(getString(R.string.try_again), new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                	   buildAccountDailog();
-                   }
-               })
-               .setNegativeButton(getString(R.string.close_app), new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                	   setResult(LOGIN_FAILED);
-                	   finish();
-                   }
-               });
-        // Create the AlertDialog object and return it
-        builder.show();
-	}
+		private Activity mActivity;
+		
+		public SingleAccountLoginHandler(Activity activity){
+			mActivity = activity;
+		}
 
+		@Override
+		public void onLoginSuccess(String authtoken) {
+		}
+
+		@Override
+		public void onLoginFail(String errormessage) {
+			Log.i("AccountPickerActivity",errormessage);
+			//The only good message is the no Internet response
+			if(!getResources().getString(R.string.no_network).equals(errormessage)){
+				KisiAPI.getInstance().logout();
+				Intent login = new Intent(mActivity, KisiMainActivity.class);
+				login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
+	                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
+	                    Intent.FLAG_ACTIVITY_NEW_TASK);				
+				mActivity.startActivity(login);
+
+			}
+		}
+	}
+	private class MultipleAccountsLoginHandler implements LoginCallback{
+		
+		private Activity mActivity;
+		
+		public MultipleAccountsLoginHandler(Activity activity){
+			mActivity = activity;
+		}
+		
+		@Override
+		public void onLoginSuccess(String authtoken) {
+			// Switch the activity to internal Views
+			progressDialog.dismiss();
+			
+			//finish login activity
+			setResult(LOGIN_OPTIMISTIC_SUCCESS);
+			//move this later to the KisiAPI
+			finish();
+		}
+
+		@Override
+		public void onLoginFail(String errormessage) {
+			
+			progressDialog.dismiss();
+			AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+	        builder.setMessage(errormessage)
+	               .setPositiveButton(getString(R.string.try_again), new DialogInterface.OnClickListener() {
+	                   public void onClick(DialogInterface dialog, int id) {
+	                	   buildAccountDailog();
+	                   }
+	               })
+	               .setNegativeButton(getString(R.string.close_app), new DialogInterface.OnClickListener() {
+	                   public void onClick(DialogInterface dialog, int id) {
+	                	   setResult(LOGIN_FAILED);
+	                	   finish();
+	                   }
+	               });
+	        // Create the AlertDialog object and return it
+	        builder.show();
+	        
+		}
+	}
 	
 }

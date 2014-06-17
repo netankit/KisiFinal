@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 public class KisiAuthenticator extends AbstractAccountAuthenticator {
 	
+	//TODO: put this into strings.xml
 	//TODO: maybe add later more
 	 public static final String AUTHTOKEN_TYPE_DEFAULT = "kisidefault";
 	 public static final String ACCOUNT_TYPE = "de.kisi";

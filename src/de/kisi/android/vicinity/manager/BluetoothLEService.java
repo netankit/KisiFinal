@@ -20,7 +20,6 @@ import de.kisi.android.notifications.NotificationInformation;
 import de.kisi.android.notifications.NotificationManager;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
-import de.kisi.android.vicinity.VicinityTypeEnum;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -105,6 +104,7 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// check if foreground mode is requested
+		Log.d("onStartCommand intent:", intent.toString());
 		if(intent.getExtras()!=null && intent.getExtras().getBoolean("foreground", false)){
 			// foreground mode needs a permanent notification to run on level 1
 			// if the notification is not valid, e.g. no notification shows up
@@ -113,14 +113,14 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 			// i also noticed that the notification should be created with the service context 
 			// and not the the application context, thats why the service is a parameter of the 
 			// method
-			NotificationInformation notification = NotificationManager.getOrCreateBLEServiceNotification(this);
+			NotificationInformation notification = NotificationManager.getOrCreateBLEServiceNotification(this,"BLE");
 			if(notification != null){
 				startForeground(notification.notificationId, notification.notification);
 			}
 		}else{
 			try{
 				stopForeground(true);
-				NotificationManager.notifyBLEServiceNotificationDeleted();
+				NotificationManager.notifyBLEServiceNotificationDeleted("BLE");
 			}catch(Exception e){
 				// There might be an exception when we are already in background mode
 				// but i didn't find a mechansim to check
@@ -141,13 +141,12 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 		}
 		iBeaconManager = IBeaconManager.getInstanceForApplication(getApplicationContext());
 		iBeaconManager.unBind(this);
-		NotificationManager.notifyBLEServiceNotificationDeleted();
+		NotificationManager.notifyBLEServiceNotificationDeleted("BLE");
 	}
 
 	// protect the actor for permanent fireing
 	// those are only used in the ranging
-	private static HashSet<Integer> unlockSuggest = new HashSet<Integer>();
-	private static HashSet<Integer> automaticUnlock = new HashSet<Integer>();
+	private static HashSet<Integer> unlockLocatorId = new HashSet<Integer>();
 			
 	/**
 	 * Connection succeeded, so we can start to set our notifier
@@ -186,27 +185,14 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 				
 				try{
 					locator = KisiAPI.getInstance().getPlaceById(placeId).getLockById(lockId).getLocatorById(locatorId);
-					if(locator.isSuggestUnlockEnabled()){
-						LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLE);
-						if(unlockSuggest.contains(locatorId) && locator.getSuggestUnlockTreshold()<maxRssi){
-							unlockSuggest.remove(locatorId);
-							actor.actOnExit(placeId,lockId);
-						}
-						if(!unlockSuggest.contains(locatorId) && locator.getSuggestUnlockTreshold()>maxRssi){
-							unlockSuggest.add(locatorId);
-							actor.actOnEntry(placeId,lockId);
-						}
+					LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
+					if(unlockLocatorId.contains(locatorId) && locator.getSuggestUnlockTreshold()<maxRssi){
+						unlockLocatorId.remove(locatorId);
+						actor.actOnExit(locator);
 					}
-					if(locator.isAutoUnlockEnabled()){
-						LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLEAutoUnlock);
-						if(automaticUnlock.contains(locatorId) && locator.getAutoUnlockTreshold()<maxRssi){
-							automaticUnlock.remove(locatorId);
-							actor.actOnExit(placeId,lockId);
-						}
-						if(!automaticUnlock.contains(locatorId) && locator.getAutoUnlockTreshold()>maxRssi){
-							automaticUnlock.add(locatorId);
-							actor.actOnEntry(placeId,lockId);
-						}
+					if(!unlockLocatorId.contains(locatorId) && locator.getSuggestUnlockTreshold()>maxRssi){
+						unlockLocatorId.add(locatorId);
+						actor.actOnEntry(locator);
 					}
 				}catch(NullPointerException e){
 					// Do nothing if there is no such locator
@@ -246,16 +232,13 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 				
 				try{
 					Locator locator = KisiAPI.getInstance().getPlaceById(placeId).getLockById(lockId).getLocatorById(locatorId);
-					// Check BLE Type
-					if(locator.isAutoUnlockEnabled())
-						actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLEAutoUnlock);
-					else
-						actor = LockInVicinityActorFactory.getActor(VicinityTypeEnum.BluetoothLE);
+
+					actor = LockInVicinityActorFactory.getActor(locator);
 					
 					if(entered)
-						actor.actOnEntry(placeId,lockId);
+						actor.actOnEntry(locator);
 					else
-						actor.actOnExit(placeId, lockId);
+						actor.actOnExit(locator);
 					
 					// refresh time for shut down 
 					BluetoothLEManager.getInstance().resetShutDownTime();

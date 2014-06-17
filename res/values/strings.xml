@@ -3,6 +3,7 @@
 
     <string name="app_name">KISI</string>
     <string name="take_tour">Take a tour</string>
+    <string name="app_name_empty"></string>
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="RememberMe">Remember password</string>
@@ -63,10 +64,11 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="bluetooth_on">Bluetooth detection on</string>
     <string name="bluetooth_off">Bluetooth detection off</string>
-    <string name="update"> New version available.\n<u>Touch here to update</u></string>
     <string name="account">ACCOUNT</string>
     <string name="settings">SETTINGS</string>
     <string name="title_activity_take_atour">TakeATourActivity</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="update">New version available.\n<u>Touch here to update</u></string>
+    <string name="restricted_access">Access restricted</string>
+    <string name="no_access_to_lock">Unfortunately, you do not have access to this lock.</string>
 
 </resources>

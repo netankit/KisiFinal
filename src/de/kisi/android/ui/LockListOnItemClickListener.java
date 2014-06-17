@@ -20,6 +20,7 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 
 	private Place place;
 	private static long delay = 1500;
+	private String trigger;
 	
 	
 	public LockListOnItemClickListener(Place place) {
@@ -35,6 +36,27 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 		progressDialog.show();
 		final Lock lock = place.getLocks().get(position);
 		Log.d("LockListOnItemClick", String.valueOf(parent.getAdapter().getCount()));
+		
+		
+		
+		//TODO: implement this!!!
+		String buttonTrigger = "manual";
+		boolean automatic = false;
+		if("NFC".equals(trigger)){
+			buttonTrigger = "NFC";
+			automatic = true;
+		}
+		if("BLE".equals(trigger))
+			buttonTrigger = "beacon";
+		if("geofence".equals(trigger))
+			buttonTrigger = "geofence";
+//		if(suggestedNFC.contains(lock.getId())){
+//			buttonTrigger = "NFC";
+//			automatic = false;
+//		}
+//		
+		
+		
 		
 		KisiAPI.getInstance().unlock(lock, new UnlockCallback(){
 			
@@ -105,7 +127,7 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 				}, delay);
 
 			}				
-			});
+			},buttonTrigger, automatic);
 
 	
 	}

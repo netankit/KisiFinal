@@ -29,14 +29,7 @@ public class StaticMenuOnClickListener implements OnClickListener {
 		
 		switch(v.getId()) {
 			case R.id.refreshButton:
-				KisiAPI.getInstance().refresh(new OnPlaceChangedListener() {
-	
-					@Override
-					public void onPlaceChanged(Place[] newPlaces) {
-	
-					}
-	
-				});
+				KisiAPI.getInstance().refresh(activity);
 			return;
 		
 

@@ -50,6 +50,8 @@
         <activity
             android:name="de.kisi.android.account.AccountActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:label="@string/app_name_empty"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/CustomThemeLogin" >
         </activity>
