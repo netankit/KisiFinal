@@ -24,7 +24,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
 	@Override
 	public Fragment getItem(int index) {
 
-		frag = new TopRatedFragment();
+		frag = new TakeTourFragment();
 		bundle = new Bundle();
 		bundle.putInt(
 				"IMG_ID",

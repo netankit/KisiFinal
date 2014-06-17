@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import de.kisi.android.R;
 
-public class TopRatedFragment extends Fragment {
+public class TakeTourFragment extends Fragment {
 	ImageView image;
 	private int idPicture;
 	
@@ -17,7 +17,7 @@ public class TopRatedFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View rootView = inflater.inflate(R.layout.fragment_top_rated,
+		View rootView = inflater.inflate(R.layout.fragment_taketour,
 				container, false);
 		Bundle bundle = this.getArguments();
 		idPicture = bundle.getInt("IMG_ID", R.drawable.one);

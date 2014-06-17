@@ -26,7 +26,7 @@ public class TakeATourActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.activity_take_atour);
+		setContentView(R.layout.activity_taketour);
 
 		// Initialization
 		viewPager = (ViewPager) findViewById(R.id.pager);
