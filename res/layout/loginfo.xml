@@ -4,13 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_centerVertical="true"
-    android:layout_gravity="center"
-    android:background="@drawable/testbackground" >
+    android:layout_gravity="center">
 
-    <WebView
-        android:id="@+id/webView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_centerVertical="true" />
+    <ListView
+        android:id="@+id/logListVIew"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" >
+    </ListView>
 
 </RelativeLayout>

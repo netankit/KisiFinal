@@ -18,6 +18,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
@@ -26,6 +28,7 @@ import de.kisi.android.R;
 import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.db.DataManager;
+import de.kisi.android.model.Event;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -731,4 +734,36 @@ public class KisiAPI {
 			}
 		});
 	}
+
+	public void getLogs(Place place, final LogsCallback callback) {
+		KisiRestClient.getInstance().get("places/" + place.getId() + "/events", new JsonHttpResponseHandler() {
+			
+			public void onSuccess(JSONArray jsonArray) {
+				List<Event> events = new LinkedList<Event>();
+				GsonBuilder gb = new GsonBuilder();
+				gb.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+				Gson gson = gb.create();
+				for(int i = 0; i < jsonArray.length(); i++) {
+					Event event = null;
+					try {
+						event = gson.fromJson(jsonArray.getJSONObject(i).toString(), Event.class);
+					} catch (JsonSyntaxException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					events.add(event);
+				}
+				callback.onLogsResult(events);
+			}
+
+			public void onFailure(java.lang.Throwable e, org.json.JSONArray errorResponse) {
+				callback.onLogsResult(null);
+			}
+		});
+	}
+	
+
 }
