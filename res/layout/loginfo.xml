@@ -7,7 +7,7 @@
     android:layout_gravity="center">
 
     <ListView
-        android:id="@+id/logListVIew"
+        android:id="@+id/place_notification_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"

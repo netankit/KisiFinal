@@ -44,6 +44,9 @@ public class Place {
 	@DatabaseField
 	@SerializedName("user_id")
 	private int ownerId;
+	@DatabaseField
+	@SerializedName("suggest_unlock")
+	private boolean suggestUnlock;
 
 	@ForeignCollectionField(eager=false)
     private ForeignCollection<Locator> locators;	
@@ -153,7 +156,13 @@ public class Place {
 	public boolean getNotificationEnabled() {
 		Context context = KisiApplication.getInstance().getApplicationContext();
 		SharedPreferences prefs = context.getSharedPreferences("userconfig", Context.MODE_PRIVATE);
-		return prefs.getBoolean(generateSharedPreferencesKey(), true);
+		//check if there is already a value for enabling/disabling notifications is already set
+		//otherwise use the one from the server
+		if(prefs.contains(generateSharedPreferencesKey())) {
+			return prefs.getBoolean(generateSharedPreferencesKey(), true);
+		} else {
+			return this.isSuggestUnlock();
+		}	
 	}
 	
 	public void setNotificationEnabled(boolean value) {
@@ -174,4 +183,15 @@ public class Place {
 		}
 	}
 
+
+	public boolean isSuggestUnlock() {
+		return suggestUnlock;
+	}
+
+
+	public void setSuggestUnlock(boolean suggestUnlock) {
+		this.suggestUnlock = suggestUnlock;
+	}
+
+	
 }
