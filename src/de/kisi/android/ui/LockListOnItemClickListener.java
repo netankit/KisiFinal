@@ -20,7 +20,6 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 
 	private Place place;
 	private static long delay = 1500;
-	private String trigger;
 	
 	
 	public LockListOnItemClickListener(Place place) {
@@ -38,7 +37,8 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 		Log.d("LockListOnItemClick", String.valueOf(parent.getAdapter().getCount()));
 		
 		
-		
+		LockListAdapter adapter = (LockListAdapter)parent.getAdapter();
+		String trigger = adapter.getTrigger(); 
 		//TODO: implement this!!!
 		String buttonTrigger = "manual";
 		boolean automatic = false;
@@ -50,11 +50,11 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 			buttonTrigger = "beacon";
 		if("geofence".equals(trigger))
 			buttonTrigger = "geofence";
-//		if(suggestedNFC.contains(lock.getId())){
-//			buttonTrigger = "NFC";
-//			automatic = false;
-//		}
-//		
+		if(adapter.isSuggestedNFC(lock.getId())){
+			buttonTrigger = "NFC";
+			automatic = false;
+		}
+		
 		
 		
 		

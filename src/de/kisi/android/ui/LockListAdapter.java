@@ -1,5 +1,6 @@
 package de.kisi.android.ui;
 
+import java.util.HashSet;
 import java.util.List;
 
 import android.content.Context;
@@ -19,10 +20,13 @@ public class LockListAdapter extends BaseAdapter {
 
 	private Context mContext;
 	private int placeId;
+	private String trigger;
+	private HashSet<Integer> suggestedNFC;
 
 	public LockListAdapter(Context context, int  placeId) {
 		this.mContext = context;
 		this.placeId = placeId;
+		this.suggestedNFC = new HashSet<Integer>();
 	}
 	
 	@Override
@@ -36,7 +40,24 @@ public class LockListAdapter extends BaseAdapter {
 		}
 		return 0;
 	}
-
+	public String getTrigger(){
+		String result = trigger;
+		trigger = null;
+		return result;
+	}
+	public void setTrigger(String t){
+		trigger = t;
+	}
+	public boolean isSuggestedNFC(int lockId){
+		return suggestedNFC.contains(lockId);
+	}
+	public void clearSuggestedNFC(){
+		suggestedNFC.clear();
+	}
+	public void addSuggestedNFC(int lockId){
+		suggestedNFC.add(lockId);
+	}
+	
 	@Override
 	public Object getItem(int position) {
 		Place place = KisiAPI.getInstance().getPlaceById(placeId);

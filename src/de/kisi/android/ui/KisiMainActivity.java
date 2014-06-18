@@ -3,6 +3,7 @@ package de.kisi.android.ui;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -129,7 +130,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		super.onStart();
 		if(getIntent().hasExtra("Type")) {
 			Log.d("Onstart", String.valueOf(mLockList.getCount()) );
-			handleUnlockIntent(getIntent());
+			handleIntent(getIntent());
 			getIntent().removeExtra("Type");
 		}
 	}
@@ -140,7 +141,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		super.onNewIntent(intent);
 		
 		if(intent.hasExtra("Type")) {
-			handleUnlockIntent(intent);
+			handleIntent(intent);
 			intent.removeExtra("Type");
 		}
 	}
@@ -249,12 +250,31 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	
 	
+	private void handleIntent(Intent intent) {
+		// No extras, nothing to do
+		if (intent.getExtras() == null)
+			return;
+		String type = intent.getStringExtra("Type");
+		if (type.equals("unlock"))
+			handleUnlockIntent(intent);
+		if (type.equals("highlight"))
+			handleHighlightIntent(intent);
+		if (type.equals("nfcNoLock"))
+			handleNFCNoLockIntent();
+	}
+
+	private void handleNFCNoLockIntent(){
+		AlertDialog alertDialog = new AlertDialog.Builder(this).setPositiveButton(getResources().getString(R.string.ok),null).create();
+		alertDialog.setTitle(R.string.restricted_access);
+		alertDialog.setMessage(getResources().getString(R.string.no_access_to_lock));
+		alertDialog.show();
+	}
 	
 	
 	private void handleUnlockIntent(Intent intent) {
 		String sender = intent.getStringExtra("Sender");
 		Log.i("sender","sender: "+sender);
-		if (intent.getExtras() != null)
+		if (intent.getExtras() != null){
 			if (intent.getStringExtra("Type").equals("unlock")) {
 				int placeId = intent.getIntExtra("Place", -1);
 				for (int j = 0; j < KisiAPI.getInstance().getPlaces().length; j++) {
@@ -264,6 +284,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 						//check if there is a lockId in the intent and then unlock the right lock
 						if(lockId != -1) {
 							int mActivePosition = mLockListAdapter.getItemPosition(lockId);
+							mLockListAdapter.setTrigger(sender);
 							mLockList.invalidate();
 							Log.d("handle intent", String.valueOf(mLockList.getCount()) );
 							// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
@@ -275,9 +296,12 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 				}
 
 			}
+		}
 	}
 	
+	private void handleHighlightIntent(Intent intent){
 
+	}
 
 	// callback for blinkup and login
 	@Override
