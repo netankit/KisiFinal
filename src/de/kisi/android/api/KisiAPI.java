@@ -63,8 +63,11 @@ public class KisiAPI {
 		this.context = context;
 	}
 
-
 	public void login(String login, String password, final LoginCallback callback) {
+		oldAuthToken = true;
+		automaticLogin(login, password, callback);
+	}
+	public void automaticLogin(String login, String password, final LoginCallback callback) {
 
 		synchronized(loginCallbacks) {
 			if (loginInProgress) {
@@ -249,7 +252,7 @@ public class KisiAPI {
 							if (a.name.equals(getUser().getEmail()))
 								acc = a;
 						String password = mAccountManager.getPassword(acc);
-						KisiAPI.getInstance().login(acc.name, password, new LoginCallback() {
+						KisiAPI.getInstance().automaticLogin(acc.name, password, new LoginCallback() {
 
 							@Override
 							public void onLoginSuccess(String authtoken) {
@@ -302,7 +305,7 @@ public class KisiAPI {
 							if (a.name.equals(getUser().getEmail()))
 								acc = a;
 						String password = mAccountManager.getPassword(acc);
-						KisiAPI.getInstance().login(acc.name, password, new LoginCallback() {
+						KisiAPI.getInstance().automaticLogin(acc.name, password, new LoginCallback() {
 
 							@Override
 							public void onLoginSuccess(String authtoken) {
@@ -355,7 +358,8 @@ public class KisiAPI {
 
 			public void onSuccess(JSONArray response) {
 				Gson gson = new Gson();
-				Locator[] locators = gson.fromJson(response.toString(), Locator[].class);
+				String jsonString = response.toString();
+				Locator[] locators = gson.fromJson(jsonString, Locator[].class);
 				try {// Prevent App from crashing when closing during a
 						// refresh
 					for (Locator l : locators) {
@@ -385,7 +389,7 @@ public class KisiAPI {
 							if (a.name.equals(getUser().getEmail()))
 								acc = a;
 						String password = mAccountManager.getPassword(acc);
-						KisiAPI.getInstance().login(acc.name, password, new LoginCallback() {
+						KisiAPI.getInstance().automaticLogin(acc.name, password, new LoginCallback() {
 
 							@Override
 							public void onLoginSuccess(String authtoken) {
@@ -451,7 +455,7 @@ public class KisiAPI {
 							if (a.name.equals(getUser().getEmail()))
 								acc = a;
 						String password = mAccountManager.getPassword(acc);
-						KisiAPI.getInstance().login(acc.name, password, new LoginCallback() {
+						KisiAPI.getInstance().automaticLogin(acc.name, password, new LoginCallback() {
 
 							@Override
 							public void onLoginSuccess(String authtoken) {
@@ -541,13 +545,14 @@ public class KisiAPI {
 		try {
 			Log.i("unlock","T: "+trigger);
 			Log.i("unlock","A: "+automatic);
+			Log.i("unlock","Place:"+lock.getPlaceId()+" Lock:"+lock.getId());
 			data.put("location", location);
 			data.put("trigger", trigger);
 			data.put("automatic_execution", automatic);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
-
+		//Log.i("unlock","Json\n"+data.toString());
 		String url = String.format(Locale.ENGLISH, "places/%d/locks/%d/access", lock.getPlaceId(), lock.getId());
 
 		KisiRestClient.getInstance().post(url, data, new JsonHttpResponseHandler() {
@@ -611,7 +616,7 @@ public class KisiAPI {
 							if (a.name.equals(getUser().getEmail()))
 								acc = a;
 						String password = mAccountManager.getPassword(acc);
-						KisiAPI.getInstance().login(acc.name, password, new LoginCallback() {
+						KisiAPI.getInstance().automaticLogin(acc.name, password, new LoginCallback() {
 
 							@Override
 							public void onLoginSuccess(String authtoken) {

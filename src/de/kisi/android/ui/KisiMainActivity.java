@@ -84,7 +84,11 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		mDrawerToggle = new ActionBarDrawerToggle( this,  mDrawerLayout, R.drawable.ic_drawer,  R.string.place_overview,  R.string.kisi ) {
 	            public void onDrawerClosed(View view) {
 	            	super.onDrawerClosed(view);
-	            	getActionBar().setTitle(((Place)mDrawerListAdapter.getItem(selectedPosition)).getName());
+	            	Place place = (Place)mDrawerListAdapter.getItem(selectedPosition);
+	            	if (place !=null){
+	            		String newTitle = place.getName();
+	            		getActionBar().setTitle(newTitle);
+	            	}
 	            	invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
 	            }
 
@@ -248,6 +252,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	
 	private void handleUnlockIntent(Intent intent) {
+		String sender = intent.getStringExtra("Sender");
+		Log.i("sender","sender: "+sender);
 		if (intent.getExtras() != null)
 			if (intent.getStringExtra("Type").equals("unlock")) {
 				int placeId = intent.getIntExtra("Place", -1);
@@ -261,8 +267,9 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 							mLockList.invalidate();
 							Log.d("handle intent", String.valueOf(mLockList.getCount()) );
 							// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
-							mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition + 2,
-						        mLockList.getAdapter().getItemId(mActivePosition+2));
+							//TODO: review this code: +2 caused an indexOutOfBoundsException so i removed it 
+							mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition,
+						        mLockList.getAdapter().getItemId(mActivePosition));
 						}
 					}
 				}

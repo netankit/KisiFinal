@@ -96,7 +96,8 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onClick(View v) {
-		progressDialog = new ProgressDialog(this);
+		if (progressDialog == null)
+			progressDialog = new ProgressDialog(this);
 		progressDialog.setMessage(getString(R.string.login_loading_message));
 		progressDialog.setCancelable(false);
 		progressDialog.show();
@@ -134,6 +135,7 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onLoginSuccess(String authToken) {
+		Log.i("Login","Success");
 		progressDialog.dismiss();
 		final String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 		Bundle data = new Bundle();
@@ -150,6 +152,7 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onLoginFail(String errormessage) {
+		Log.i("Login","Fail");
 		progressDialog.dismiss();
 		Toast.makeText(getBaseContext(), errormessage, Toast.LENGTH_SHORT).show();
 	}
