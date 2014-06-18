@@ -284,7 +284,12 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 					return;
 
 				case AccountPickerActivity.LOGIN_OPTIMISTIC_SUCCESS:
+					Log.i("onActivityResult", "LOGIN_OPTIMISTIC_SUCCESS");
+					KisiAPI.getInstance().updatePlaces(this);
+					return;
 				case AccountPickerActivity.LOGIN_REAL_SUCCESS:
+					Log.i("onActivityResult", "LOGIN_REAL_SUCCESS");
+					KisiAPI.getInstance().updatePlaces(this);
 					setUiIntoStartState();
 					return;
 
@@ -307,6 +312,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	@Override
 	public void onPlaceChanged(Place[] newPlaces) {
 		refreshViews();
+		setUiIntoStartState();
 	}
 
 	

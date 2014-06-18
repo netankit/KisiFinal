@@ -63,7 +63,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 		loginButton = (Button) findViewById(R.id.loginButton);
 		loginButton.setOnClickListener(this);
-		loginButton.setEnabled(false);
 		
 		userNameField = (EditText) findViewById(R.id.email);
 		passwordField = (EditText) findViewById(R.id.password);
@@ -101,7 +100,7 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		progressDialog.setMessage(getString(R.string.login_loading_message));
 		progressDialog.setCancelable(false);
 		progressDialog.show();
-
+		
 		username = userNameField.getText().toString();
 		password = passwordField.getText().toString();
 		Log.i("Login", "AccountActivity.onClick()");

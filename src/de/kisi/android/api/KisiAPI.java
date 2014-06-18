@@ -66,8 +66,8 @@ public class KisiAPI {
 
 	public void login(String login, String password, final LoginCallback callback) {
 
-		synchronized(loginCallbacks){
-			if ( loginInProgress){
+		synchronized(loginCallbacks) {
+			if (loginInProgress) {
 				loginCallbacks.add(callback);
 				return;
 			}

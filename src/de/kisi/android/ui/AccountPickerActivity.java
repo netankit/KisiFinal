@@ -82,11 +82,11 @@ public class AccountPickerActivity extends Activity{
 		// if there is just one account login into this account
 		else if(availableAccounts.length == 1) {
 			//TODO: This Block is not needed anymore, due to optimistic sign in
-			Account acc = availableAccounts[0];
-			String password = mAccountManager.getPassword(acc);
-			
-			Log.i("AccountPickerActivity","Login");
-			KisiAPI.getInstance().login(acc.name, password, mSingleLoginCallback);
+//			Account acc = availableAccounts[0];
+//			String password = mAccountManager.getPassword(acc);
+//			
+//			Log.i("AccountPickerActivity","Login");
+//			KisiAPI.getInstance().login(acc.name, password, mSingleLoginCallback);
 			
 			//We are happy by the fact that there is a account
 			setResult(LOGIN_OPTIMISTIC_SUCCESS);
