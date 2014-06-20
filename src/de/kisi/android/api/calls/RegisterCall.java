@@ -19,7 +19,6 @@ public class RegisterCall extends GenericCall {
 	private String last_name;
 	private String password;
 	private Boolean terms_and_conditions;
-	private final RegisterCallback callback;
 	
 	public RegisterCall(
 			String first_name, 
@@ -36,7 +35,6 @@ public class RegisterCall extends GenericCall {
 		this.user_email = user_email;
 		this.password = password;
 		this.terms_and_conditions = terms_and_conditions;
-		this.callback = callback;
 		
 		this.handler = new JsonHttpResponseHandler() {
 

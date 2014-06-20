@@ -8,11 +8,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+
+
+
+
+
+import android.content.Intent;
+import android.widget.Toast;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import de.kisi.android.KisiApplication;
+import de.kisi.android.R;
 import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.api.calls.CreateGatewayCall;
 import de.kisi.android.api.calls.CreateNewKeyCall;
@@ -39,7 +50,6 @@ import de.kisi.android.vicinity.manager.BluetoothLEManager;
 
 public class KisiAPI {
 	
-	private boolean oldAuthToken = true;
 	private boolean loginInProgress = false; 
 	private final LinkedList<GenericCall> callQueue = new LinkedList<GenericCall>();
 	
@@ -126,12 +136,21 @@ public class KisiAPI {
 	
 	public void logout(){
 		new LogoutCall().send();
-		KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
+		if(KisiAPI.getInstance().getUser()!=null)
+			KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
 		clearCache();
 		BluetoothLEManager.getInstance().stopService();
 		LockInVicinityDisplayManager.getInstance().update();
 		NotificationManager.removeAllNotification();
-		
+	}
+	
+	public void showLoginScreen() {
+		logout();
+		Intent login = new Intent(KisiApplication.getInstance(), KisiMainActivity.class);
+		login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+		KisiApplication.getInstance().startActivity(login);
+
+		Toast.makeText(KisiApplication.getInstance(), KisiApplication.getInstance().getResources().getString(R.string.automatic_relogin_failed), Toast.LENGTH_LONG).show();
 	}
 	
 	public void updatePlaces(final OnPlaceChangedListener listener) {

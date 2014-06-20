@@ -148,7 +148,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	}
 	
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
-	    @Override
+	    @SuppressWarnings("rawtypes")
+		@Override
 	    public void onItemClick(AdapterView parent, View view, int position, long id) {
 	    	selectItem(position, id);
 	    }

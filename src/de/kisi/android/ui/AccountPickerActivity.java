@@ -40,7 +40,6 @@ public class AccountPickerActivity extends Activity{
 	private AccountManager mAccountManager;
 	private ProgressDialog progressDialog;
 	private final Activity activity = this;
-	private final LoginCallback mSingleLoginCallback = new SingleAccountLoginHandler(this);
 	private final LoginCallback mMultipleLoginCallback = new MultipleAccountsLoginHandler(this);
 	
 	
@@ -48,12 +47,9 @@ public class AccountPickerActivity extends Activity{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-//		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		
 		setContentView(R.layout.pick_account);
 		
-	//	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.log_title);
 		mAccountManager = AccountManager.get(this);
 		buildAccountDailog();
 		
@@ -79,16 +75,9 @@ public class AccountPickerActivity extends Activity{
 			  addAccount();
 			  return;
 		 }
-		// if there is just one account login into this account
 		else if(availableAccounts.length == 1) {
-			//TODO: This Block is not needed anymore, due to optimistic sign in
-//			Account acc = availableAccounts[0];
-//			String password = mAccountManager.getPassword(acc);
-//			
-//			Log.i("AccountPickerActivity","Login");
-//			KisiAPI.getInstance().login(acc.name, password, mSingleLoginCallback);
+			// if there is just one account login into this account
 			
-			//We are happy by the fact that there is a account
 			setResult(LOGIN_OPTIMISTIC_SUCCESS);
 			finish();
 
@@ -195,33 +184,7 @@ public class AccountPickerActivity extends Activity{
 	}
 
 	
-	private class SingleAccountLoginHandler implements LoginCallback{
 
-		private Activity mActivity;
-		
-		public SingleAccountLoginHandler(Activity activity){
-			mActivity = activity;
-		}
-
-		@Override
-		public void onLoginSuccess(String authtoken) {
-		}
-
-		@Override
-		public void onLoginFail(String errormessage) {
-			Log.i("AccountPickerActivity",errormessage);
-			//The only good message is the no Internet response
-			if(!getResources().getString(R.string.no_network).equals(errormessage)){
-				KisiAPI.getInstance().logout();
-				Intent login = new Intent(mActivity, KisiMainActivity.class);
-				login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
-	                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-	                    Intent.FLAG_ACTIVITY_NEW_TASK);				
-				mActivity.startActivity(login);
-
-			}
-		}
-	}
 	private class MultipleAccountsLoginHandler implements LoginCallback{
 		
 		private Activity mActivity;

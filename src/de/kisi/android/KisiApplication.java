@@ -1,9 +1,7 @@
 package de.kisi.android;
 
 import android.app.Application;
-import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.widget.Toast;
 import de.kisi.android.vicinity.manager.GeofenceManager;
 
 
@@ -12,7 +10,6 @@ public class KisiApplication extends Application {
 	private static KisiApplication instance;
 	/**
 	 * Retuns a valid Context object
-	 * @author Thomas Hoermann
 	 */
 	public static KisiApplication getInstance() {
 		return instance;
@@ -27,7 +24,6 @@ public class KisiApplication extends Application {
 	 * This is the first method called by Android.
 	 * Here we use all the initialization of the different 
 	 * Manager that have to start right before everything else.
-	 * @author Thomas Hoermann
 	 */
 	@Override
 	public void onCreate() {

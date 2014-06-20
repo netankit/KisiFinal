@@ -107,7 +107,6 @@ public class ShareKeyActivity extends Activity {
 		submit.setTextSize(25);
 		layoutParams = new LinearLayout.LayoutParams(width, LinearLayout.LayoutParams.WRAP_CONTENT);
 		layoutParams.setMargins(margin, margin, margin, margin);
-		final Activity activity = this;
 		submit.setOnClickListener(new OnClickListener(){
 
 			@Override

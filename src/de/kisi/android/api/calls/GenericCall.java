@@ -52,22 +52,22 @@ public abstract class GenericCall {
 			public void onFailure(int statusCode, Throwable e, JSONObject response) {
 				Log.d("GenericCall", "call failed: "+response.toString());
 				if (loggedOut(statusCode)) {
-					
+					call.handler.onFailure(statusCode, e, response);
 				} else if (call.handler != null) {
 					call.handler.onFailure(statusCode, e, response);
 				}
 			}
 			
 			private void logout() {
-				KisiAPI.getInstance().logout();
-				Toast.makeText(KisiApplication.getInstance(), KisiApplication.getInstance().getResources()
-						.getString(R.string.automatic_relogin_failed), Toast.LENGTH_LONG).show();
+				KisiAPI.getInstance().showLoginScreen();
+//				Toast.makeText(KisiApplication.getInstance(), KisiApplication.getInstance().getResources()
+//						.getString(R.string.automatic_relogin_failed), Toast.LENGTH_LONG).show();
 			}
 			
 			private boolean loggedOut(int statusCode) {
 				if (statusCode == 401) {
 					if (call instanceof LoginCall)
-						logout();
+						return false;
 					else { // retry
 
 						AccountManager mAccountManager = AccountManager.get(KisiApplication.getInstance());

@@ -1,12 +1,10 @@
 package de.kisi.android.account;
 
-import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
-import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -31,8 +29,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	private String username;
 	private String password;
 	private Button loginButton;
-	
-	private AccountAuthenticatorResponse response;
 	
 	private ProgressDialog progressDialog;
 	
@@ -59,7 +55,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 		mAccountManager = AccountManager.get(getBaseContext());
 		
-		String accountName = getIntent().getStringExtra(ARG_ACCOUNT_NAME);
 	    mAuthTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
 		
 	    if(mAuthTokenType == null){
@@ -85,15 +80,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		TextView forgotPw = (TextView) findViewById(R.id.forgot);
 		forgotPw.setMovementMethod(LinkMovementMethod.getInstance());
 		
-        Bundle extras = getIntent().getExtras();
-
-        if (extras != null) {
-            /*
-             * Pass the new account back to the account manager
-             */
-            response = extras.getParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
-        }
-
 		
 		
 	}

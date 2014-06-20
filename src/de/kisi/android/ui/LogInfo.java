@@ -87,6 +87,7 @@ public class LogInfo extends Activity implements LogsCallback{
 			return events.get(position).getId();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View vi = convertView;

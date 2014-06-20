@@ -10,7 +10,6 @@ import android.os.Parcelable;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Locator;
-import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.ui.KisiMainActivity;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;

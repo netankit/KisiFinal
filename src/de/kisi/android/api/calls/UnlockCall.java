@@ -5,8 +5,6 @@ import java.util.Locale;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import de.kisi.android.KisiApplication;
