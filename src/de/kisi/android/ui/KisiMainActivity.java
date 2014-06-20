@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -167,13 +168,16 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	
 	private void selectItem(int position, long id) {
-		getActionBar().setTitle(KisiAPI.getInstance().getPlaceById((int) id).getName());
+		Place place = KisiAPI.getInstance().getPlaceById((int) id);
+		if(place!=null)
+			getActionBar().setTitle(place.getName());
 		// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
 		selectedPosition = position - 2;
 		mDrawerListAdapter.selectItem(selectedPosition);
+		mLockListAdapter.clearSuggestedNFC();
 		mLockListAdapter = new LockListAdapter(this, (int) id);
 		mLockList.setAdapter(mLockListAdapter);
-		mLockList.setOnItemClickListener(new LockListOnItemClickListener(KisiAPI.getInstance().getPlaceById((int) id)));
+		mLockList.setOnItemClickListener(new LockListOnItemClickListener(place));
 		mLockList.invalidate();
 	    // Highlight the selected item, update the title, and close the drawer and check if the position is available 
 		// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
@@ -275,32 +279,47 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		String sender = intent.getStringExtra("Sender");
 		Log.i("sender","sender: "+sender);
 		if (intent.getExtras() != null){
-			if (intent.getStringExtra("Type").equals("unlock")) {
-				int placeId = intent.getIntExtra("Place", -1);
-				for (int j = 0; j < KisiAPI.getInstance().getPlaces().length; j++) {
-					if (KisiAPI.getInstance().getPlaces()[j].getId() == placeId) {
-						selectItem(j, placeId);
-						int lockId = intent.getIntExtra("Lock", -1);
-						//check if there is a lockId in the intent and then unlock the right lock
-						if(lockId != -1) {
-							int mActivePosition = mLockListAdapter.getItemPosition(lockId);
-							mLockListAdapter.setTrigger(sender);
-							mLockList.invalidate();
-							Log.d("handle intent", String.valueOf(mLockList.getCount()) );
-							// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
-							//TODO: review this code: +2 caused an indexOutOfBoundsException so i removed it 
-							mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition,
-						        mLockList.getAdapter().getItemId(mActivePosition));
-						}
+			int placeId = intent.getIntExtra("Place", -1);
+			for (int j = 0; j < KisiAPI.getInstance().getPlaces().length; j++) {
+				if (KisiAPI.getInstance().getPlaces()[j].getId() == placeId) {
+					selectItem(j, placeId);
+					int lockId = intent.getIntExtra("Lock", -1);
+					//check if there is a lockId in the intent and then unlock the right lock
+					if(lockId != -1) {
+						int mActivePosition = mLockListAdapter.getItemPosition(lockId);
+						mLockListAdapter.setTrigger(sender);
+						mLockList.invalidate();
+						Log.d("handle intent", String.valueOf(mLockList.getCount()) );
+						// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
+						//TODO: review this code: +2 caused an indexOutOfBoundsException so i removed it 
+						mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition,
+								mLockList.getAdapter().getItemId(mActivePosition));
 					}
 				}
-
 			}
 		}
 	}
 	
 	private void handleHighlightIntent(Intent intent){
-
+		if (intent.getExtras() != null){
+			int placeId = intent.getIntExtra("Place", -1);
+			for (int j = 0; j < KisiAPI.getInstance().getPlaces().length; j++) {
+				if (KisiAPI.getInstance().getPlaces()[j].getId() == placeId) {
+					selectItem(j, placeId);
+					int lockId = intent.getIntExtra("Lock", -1);
+					//check if there is a lockId in the intent and then unlock the right lock
+					if(lockId != -1) {
+						int mActivePosition = mLockListAdapter.getItemPosition(lockId);
+						mLockListAdapter.addSuggestedNFC(lockId);
+						mLockList.invalidate();
+						Log.d("handle intent", String.valueOf(mLockList.getCount()) );
+						Button highlightElement = (Button)mLockList.getAdapter().getView(mActivePosition, null, null);
+						Log.i("nfc",highlightElement.getText().toString());
+						highlightElement.setBackgroundColor(Color.BLACK);
+					}
+				}
+			}
+		}
 	}
 
 	// callback for blinkup and login

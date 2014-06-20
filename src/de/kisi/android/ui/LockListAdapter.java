@@ -1,9 +1,11 @@
 package de.kisi.android.ui;
 
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +24,13 @@ public class LockListAdapter extends BaseAdapter {
 	private int placeId;
 	private String trigger;
 	private HashSet<Integer> suggestedNFC;
+	private Hashtable<Integer,Button> buttonList;
 
 	public LockListAdapter(Context context, int  placeId) {
 		this.mContext = context;
 		this.placeId = placeId;
-		this.suggestedNFC = new HashSet<Integer>();
+		suggestedNFC = new HashSet<Integer>();
+		buttonList = new Hashtable<Integer,Button>();
 	}
 	
 	@Override
@@ -102,15 +106,23 @@ public class LockListAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Place place = KisiAPI.getInstance().getPlaceById(placeId);
+		Lock lock = place.getLocks().get(position);
+		Log.i("getView",""+position);
 		Button button;
 		if(convertView == null) {
-			LayoutInflater li = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			 button = (Button) li.inflate(R.layout.lock_button, parent, false);
+			if(buttonList.containsKey(lock.getId())){
+				button = buttonList.get(lock.getId());
+			}else{
+				LayoutInflater li = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				button = (Button) li.inflate(R.layout.lock_button, parent, false);
+				buttonList.put(lock.getId(), button);
+			}
 		}
 		else {
-			 button = (Button) convertView;
+			button = (Button) convertView;
+			buttonList.put(lock.getId(), button);
 		}
-		button.setText(place.getLocks().get(position).getName());
+		button.setText(lock.getName());
 		//disable the clickability of the buttons so that the OnItemClickListner of the ListView handels the clicks 
 		button.setFocusable(false);
 		button.setClickable(false);

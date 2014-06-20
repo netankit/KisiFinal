@@ -42,15 +42,13 @@ public class NFCReceiver extends Activity{
 	        // Test all locators for equality to the data string
 	        boolean foundLock = false;
 	        for(Place place : KisiAPI.getInstance().getPlaces()){
-	        	for(Lock lock : place.getLocks()){
-	        		for(Locator locator : lock.getLocators()){
-	        			if (nfcData.equals(locator.getTag())){
-	        		        // get actor for NFC
-	        				LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
-	        				// act
-	        				actor.actOnEntry(locator);
-	        				foundLock = true;
-	        			}
+	        	for(Locator locator : place.getLocators()){
+	        		if (locator.isEnabled() && nfcData.equals(locator.getTag())){
+	        			// get actor for NFC
+	        			LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
+	        			// act
+	        			actor.actOnEntry(locator);
+	        			foundLock = true;
 	        		}
 	        	}
 	        }
