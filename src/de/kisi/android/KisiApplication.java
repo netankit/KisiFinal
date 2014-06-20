@@ -23,12 +23,6 @@ public class KisiApplication extends Application {
 		return versionName;
 	}
 	
-	public void showLoginScreen() {
-		Intent login = new Intent(KisiApplication.getInstance(), KisiMain.class);
-		login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(login);
-	}
-
 	/**
 	 * This is the first method called by Android.
 	 * Here we use all the initialization of the different 

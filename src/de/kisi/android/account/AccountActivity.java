@@ -1,6 +1,5 @@
 package de.kisi.android.account;
 
-import de.kisi.android.AccountPickerActivity;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
@@ -25,12 +24,13 @@ import android.widget.Toast;
 
 // see https://github.com/Udinic/AccountAuthenticator/blob/master/src/com/udinic/accounts_authenticator_example/authentication/AuthenticatorActivity.java
 
-public class AccountActivity extends AccountAuthenticatorActivity implements OnClickListener, LoginCallback{
+public class AccountActivity extends AccountAuthenticatorActivity implements OnClickListener, LoginCallback, TextWatcher{
 
 	private EditText userNameField;
 	private EditText passwordField;
 	private String username;
 	private String password;
+	private Button loginButton;
 	
 	private AccountAuthenticatorResponse response;
 	
@@ -157,7 +157,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onLoginSuccess(String authToken) {
-		Log.i("Login","Success");
 		progressDialog.dismiss();
 		final String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 		Bundle data = new Bundle();
@@ -174,7 +173,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onLoginFail(String errormessage) {
-		Log.i("Login","Fail");
 		progressDialog.dismiss();
 		Toast.makeText(getBaseContext(), errormessage, Toast.LENGTH_SHORT).show();	
 	}

@@ -55,7 +55,9 @@
     <string name="version">Version:\t</string>
     <string name="location_not_available_title">Improve security of keys</string>
     <string name="location_not_available_text">KISI needs to use the following services to improve the security of your keys.</string>
-    <string name="cancel">Cancel</string>
+	<string name="geofence_not_available_title">Geofencing Not Available</string>
+	<string name="geofence_not_available_text">Please, enable Wi-Fi or Network for location detection.</string>
+	<string name="cancel">Cancel</string>
     <string name="dontaskagain">Later</string>
     <string name="ok">OK</string>
     <string name="location">Location Service</string>
@@ -81,5 +83,8 @@
     <string name="success_reg">Registration Successful!</string>
     <string name="successful_reg">We\'ve sent you an email to confirm your address. Please check your inbox and follow the instructions in the message.</string>
     <string name="click_login">Once done, come back to the KISI app and log in.</string>
-
+	<string name="place_overview">PLACES</string>
+	<string name="settings">SETTINGS</string>
+	<string name="account">ACCOUNT</string>
+	<string name="default_settings">default</string>
 </resources>

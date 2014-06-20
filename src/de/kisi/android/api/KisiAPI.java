@@ -4,7 +4,14 @@ package de.kisi.android.api;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import de.kisi.android.account.KisiAccountManager;
 import de.kisi.android.api.calls.CreateGatewayCall;
@@ -19,10 +26,12 @@ import de.kisi.android.api.calls.UpdateLocksCall;
 import de.kisi.android.api.calls.UpdatePlacesCall;
 import de.kisi.android.api.calls.VersionCheckCall;
 import de.kisi.android.db.DataManager;
+import de.kisi.android.model.Event;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
 import de.kisi.android.notifications.NotificationManager;
+import de.kisi.android.rest.KisiRestClient;
 import de.kisi.android.ui.KisiMainActivity;
 import de.kisi.android.vicinity.LockInVicinityDisplayManager;
 import de.kisi.android.vicinity.manager.BluetoothLEManager;
@@ -133,14 +142,26 @@ public class KisiAPI {
 	}
 	
 	/**
+	 * Checks if the place is owned by the user or just shared
+	 * 
+	 * @param place
+	 *            Place to be checked
+	 * @return true if user is owner, false if someone else shares this place
+	 *         with the user
+	 */
+	public boolean userIsOwner(Place place) {
+		return place.getOwnerId() == this.getUser().getId();
+	}
+	
+	/**
 	 * Send a request to the server to unlock this lock. The callback will
 	 * run on another Thread, so do no direct UI modifications in there
 	 * 
 	 * @param lock The lock that should be unlocked
 	 * @param callback Callback object for feedback, or null if no feedback is requested
 	 */
-	public void unlock(Lock lock, final UnlockCallback callback){
-		new UnlockCall(lock, callback).send();
+	public void unlock(Lock lock, final UnlockCallback callback, String trigger, boolean automatic_unlock){
+		new UnlockCall(lock, callback, trigger, automatic_unlock).send();
 	}
 	
 	// Registration: Registers user by sending in a JSON object with user information.

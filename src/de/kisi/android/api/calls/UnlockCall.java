@@ -5,6 +5,8 @@ import java.util.Locale;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import de.kisi.android.KisiApplication;
@@ -14,12 +16,16 @@ import de.kisi.android.model.Lock;
 
 public class UnlockCall extends LocatableCall {
 
-	public UnlockCall(Lock lock, final UnlockCallback callback) {
+	public UnlockCall(Lock lock, final UnlockCallback callback, String trigger, boolean automatic_unlock) {
 		super(String.format(Locale.ENGLISH, "places/%d/locks/%d/access", 
 					lock.getPlaceId(), 
 					lock.getId()), 
 				HTTPMethod.POST);
-		
+		try {
+			json.put("trigger", trigger);
+			json.put("automatic_execution", automatic_unlock);
+		} catch (JSONException e1) {
+		}
 		handler = new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONObject response) {

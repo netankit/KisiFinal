@@ -15,7 +15,6 @@ import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
-import de.kisi.android.vicinity.VicinityTypeEnum;
 
 /**
  * This BroadcastReceiver receives Geofence Transitions defined by the 
