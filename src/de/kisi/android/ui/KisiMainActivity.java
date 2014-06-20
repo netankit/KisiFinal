@@ -174,7 +174,6 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
 		selectedPosition = position - 2;
 		mDrawerListAdapter.selectItem(selectedPosition);
-		mLockListAdapter.clearSuggestedNFC();
 		mLockListAdapter = new LockListAdapter(this, (int) id);
 		mLockList.setAdapter(mLockListAdapter);
 		mLockList.setOnItemClickListener(new LockListOnItemClickListener(place));
