@@ -4,25 +4,27 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationClient.OnRemoveGeofencesResultListener;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationStatusCodes;
-import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListener;
-
-import de.kisi.android.KisiApplication;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.model.Place;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListener;
+import com.google.android.gms.location.LocationClient.OnRemoveGeofencesResultListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationStatusCodes;
+
+import de.kisi.android.KisiApplication;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.OnPlaceChangedEventHandler;
+import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.model.Place;
 
 /**
  * GeofenceManager is realized as a Singleton.
@@ -99,7 +101,7 @@ public class GeofenceManager implements GooglePlayServicesClient.ConnectionCallb
 		reconnectTries = 0;
 		startLocationUpdate();
         // Show interest on any change of the Places
-        KisiAPI.getInstance().registerOnPlaceChangedListener(this);
+		OnPlaceChangedEventHandler.getInstance().registerOnPlaceChangedListener(this);
         // Register Places as Geofences
         registerGeofences(KisiAPI.getInstance().getPlaces());
 	}

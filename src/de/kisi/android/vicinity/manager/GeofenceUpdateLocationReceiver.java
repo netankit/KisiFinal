@@ -2,6 +2,11 @@ package de.kisi.android.vicinity.manager;
 
 import java.util.List;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
+
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 
@@ -10,10 +15,7 @@ import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.location.Location;
+import de.kisi.android.vicinity.VicinityTypeEnum;
 
 /**
  * This BroadcastReceiver receives Geofence Transitions defined by the 

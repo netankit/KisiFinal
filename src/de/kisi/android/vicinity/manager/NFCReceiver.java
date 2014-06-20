@@ -1,5 +1,12 @@
 package de.kisi.android.vicinity.manager;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.os.Bundle;
+import android.os.Parcelable;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Locator;
@@ -8,14 +15,7 @@ import de.kisi.android.model.Place;
 import de.kisi.android.ui.KisiMainActivity;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
-import android.app.Activity;
-import android.content.Intent;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.os.Bundle;
-import android.os.Parcelable;
-import android.widget.Toast;
+
 
 public class NFCReceiver extends Activity{
 

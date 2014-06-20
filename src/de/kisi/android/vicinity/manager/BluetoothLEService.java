@@ -5,6 +5,13 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
+import android.app.IntentService;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.util.Log;
+
 import com.radiusnetworks.ibeacon.IBeacon;
 import com.radiusnetworks.ibeacon.IBeaconConsumer;
 import com.radiusnetworks.ibeacon.IBeaconManager;
@@ -13,6 +20,7 @@ import com.radiusnetworks.ibeacon.RangeNotifier;
 import com.radiusnetworks.ibeacon.Region;
 
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.OnPlaceChangedEventHandler;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
@@ -20,13 +28,6 @@ import de.kisi.android.notifications.NotificationInformation;
 import de.kisi.android.notifications.NotificationManager;
 import de.kisi.android.vicinity.LockInVicinityActorFactory;
 import de.kisi.android.vicinity.LockInVicinityActorInterface;
-
-import android.app.IntentService;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.util.Log;
 
 public class BluetoothLEService extends IntentService implements IBeaconConsumer{
 
@@ -261,7 +262,7 @@ public class BluetoothLEService extends IntentService implements IBeaconConsumer
 			}
 			
 		});
-		KisiAPI.getInstance().registerOnPlaceChangedListener(new OnPlaceChangedListener(){
+		OnPlaceChangedEventHandler.getInstance().registerOnPlaceChangedListener(new OnPlaceChangedListener(){
 
 			@Override
 			public void onPlaceChanged(Place[] newPlaces) {

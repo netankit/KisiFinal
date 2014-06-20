@@ -1,0 +1,370 @@
+package de.kisi.android;
+
+import java.util.List;
+import java.util.Vector;
+
+import android.accounts.AccountManager;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.PopupMenu;
+import android.widget.Toast;
+
+import com.electricimp.blinkup.BlinkupController;
+import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
+import com.newrelic.agent.android.NewRelic;
+
+import de.kisi.android.account.KisiAuthenticator;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.model.Lock;
+import de.kisi.android.model.Place;
+
+public class KisiMain extends BaseActivity implements PopupMenu.OnMenuItemClickListener,OnPlaceChangedListener {
+
+	private static final String API_KEY = "08a6dd6db0cd365513df881568c47a1c";
+
+	private ViewPager pager;
+	private KisiAPI kisiAPI;
+	private PlaceFragmentPagerAdapter pagerAdapter;
+
+	private int currentPage = 0;
+
+	// just choose a random value
+	// TODO: change this later
+	public static int LOGIN_REQUEST_CODE = 5;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		NewRelic.withApplicationToken("AAe80044cf73854b68f6e83881c9e61c0df9d92e56").start(this.getApplication());
+		
+		kisiAPI = KisiAPI.getInstance();
+
+		AccountManager mAccountManager = AccountManager.get(this);
+		if(mAccountManager.getAccountsByType(KisiAuthenticator.ACCOUNT_TYPE).length!=1){
+			if(kisiAPI.getUser()==null){
+				Intent login = new Intent(this, AccountPickerActivity.class);
+				startActivityForResult(login, LOGIN_REQUEST_CODE);
+			}
+		}
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+
+		setContentView(R.layout.kisi_main);
+
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
+
+		FragmentManager fm = getSupportFragmentManager();
+		pagerAdapter = new PlaceFragmentPagerAdapter(fm);
+		pager = (ViewPager) findViewById(R.id.pager);
+	
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		buildUI();
+		
+		//receives intents when activity is started by an intent
+		if(getIntent().hasExtra("Type")) {
+			handleIntent(getIntent());
+			//removing the unlock intent, because otherwise the lock would be unlock every time the app is start from the background
+			getIntent().removeExtra("Type");
+		}
+	}
+	
+	//receives intents when activity is already running
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+
+		if(intent.hasExtra("Type")) {
+			handleIntent(intent);
+			intent.removeCategory("Type");
+		}
+	}
+
+	
+	private void buildUI() { 
+		Place[] places;
+		if((places = kisiAPI.getPlaces()) != null) {
+			// build the UI now with persistent data
+			setupView(places);
+		}
+		
+		kisiAPI.updatePlaces(this);
+	}
+
+	@Override
+	public void onPlaceChanged(Place[] newPlaces) {
+		// build the UI again with fresh data from the server
+		setupView(newPlaces);
+
+	}
+	
+
+	// creating popup-menu for settings
+	public void showPopup(View v) {
+		PopupMenu popup = new PopupMenu(this, v);
+		MenuInflater inflater = popup.getMenuInflater();
+		inflater.inflate(R.menu.settings, popup.getMenu());
+		popup.setOnMenuItemClickListener(this);
+
+		popup.show();
+	}
+
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	public boolean onMenuItemClick(MenuItem item) {
+		// get all places
+		Place[] places = kisiAPI.getPlaces();
+
+		switch (item.getItemId()) {
+		case R.id.refresh:
+			// Trigger a refresh of the data
+			kisiAPI.refresh(this);
+			return true;
+
+		case R.id.share:
+			// check if user has a place
+			if (places.length == 0) {
+				Toast.makeText(this, R.string.share_empty_place_error, Toast.LENGTH_LONG).show();
+				return false;
+			}
+
+			Place p = places[pager.getCurrentItem()];
+			// check if user is owner
+			if ( ! p.userIsOwner() ) {
+				Toast.makeText(this, R.string.share_owner_only, Toast.LENGTH_LONG).show();
+				return false;
+			}
+
+			Intent intent = new Intent(getApplicationContext(), ShareKeyActivity.class);
+			intent.putExtra("place", pager.getCurrentItem());
+			startActivity(intent);
+			return true;
+
+		case R.id.showLog:
+			// check if user has a place
+			if (places.length == 0) {
+				Toast.makeText(this, R.string.log_empty_place_error, Toast.LENGTH_LONG).show();
+				return false;
+			}
+			Place place = places[pager.getCurrentItem()];
+			Intent logView = new Intent(getApplicationContext(), LogInfo.class);
+			logView.putExtra("place_id", place.getId());
+			startActivity(logView);
+
+			return true;
+
+		case R.id.setup:
+
+			BlinkupController blinkup = BlinkupController.getInstance();
+			blinkup.intentBlinkupComplete = new Intent(this, BlinkupCompleteActivity.class);
+
+			if (kisiAPI.getUser().getEiPlanId() != null)
+				blinkup.setPlanID(kisiAPI.getUser().getEiPlanId());
+
+			blinkup.selectWifiAndSetupDevice(this, API_KEY,
+					new ServerErrorHandler() {
+						@Override
+						public void onError(String errorMsg) {
+							Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
+						}
+					});
+			return true;
+			
+		case R.id.notification:
+			Intent settingsIntent = new Intent(this, PlaceNotificationSettings.class);
+			startActivity(settingsIntent);
+			return true;
+			
+		case R.id.logout:
+			logout();
+			return true;
+			
+		case R.id.about_version:
+			/*
+			for(Place place2 : KisiAPI.getInstance().getPlaces()){
+	        	for(Lock lock : place2.getLocks()){
+	        		for(Locator locator : lock.getLocators()){
+	        			if ("bla".equals(locator.getTag())){
+	        		        // get actor for NFC
+	        				LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
+	        				// act
+	        				actor.actOnEntry(locator);
+	        				return true;
+	        			}
+	        		}
+	        	}
+	        }
+    		Intent i = new Intent(KisiApplication.getInstance(), KisiMain.class);
+    		i.putExtra("Type", "nfcNoLock");
+    		startActivity(i);*/
+			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+			alertDialog.setTitle(R.string.kisi);
+			String versionName = null;
+			try {
+				versionName = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
+			} catch (NameNotFoundException e) {
+				e.printStackTrace();
+			}
+			alertDialog.setMessage(getResources().getString(R.string.version) + versionName);
+			alertDialog.show();
+			return true;
+
+		default:
+			return false;
+		}
+
+	}
+
+	// callback for blinkup and login
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == LOGIN_REQUEST_CODE) {
+			switch(resultCode){
+				case AccountPickerActivity.LOGIN_FAILED:
+					kisiAPI.logout();
+					Intent login = new Intent(this, AccountPickerActivity.class);
+					startActivityForResult(login, LOGIN_REQUEST_CODE);
+					return;
+					
+				case AccountPickerActivity.LOGIN_OPTIMISTIC_SUCCESS:
+				case AccountPickerActivity.LOGIN_REAL_SUCCESS:
+					buildUI();
+					return;
+					
+				case AccountPickerActivity.LOGIN_CANCELED:
+					finish();
+			}
+		} else {
+			BlinkupController.getInstance().handleActivityResult(this,requestCode, resultCode, data);
+		}
+	}
+
+	private void logout() {
+		kisiAPI.logout();
+		// Go back to the login screen
+		Intent login = new Intent(this, AccountPickerActivity.class);
+		startActivityForResult(login, LOGIN_REQUEST_CODE);
+		//finish();
+	}
+
+	private void setupView(Place[] places) {
+		currentPage = pager.getCurrentItem();
+		
+		List<PlaceFragment> fragments = new Vector<PlaceFragment>();
+		
+		for (int j = 0; j < places.length; j++)
+			fragments.add(PlaceFragment.newInstance(j));
+	
+		pagerAdapter.setFragementList(fragments);
+		if(pager.getAdapter() == null) {
+			pager.setAdapter(pagerAdapter);
+		}
+		
+		//when view get refreshed to pager should show that fragment, which was shown before 
+		//if place got delete the pager shows the first fragment
+		if(currentPage < pagerAdapter.getCount()) {
+			pager.setCurrentItem(currentPage, false);
+		}
+		else {
+			pager.setCurrentItem(0, false);
+		}
+		pager.invalidate();
+	}
+
+	private void handleIntent(Intent intent) {
+		// No extras, nothing to do
+		if (intent.getExtras() == null)
+			return;
+		String type = intent.getStringExtra("Type");
+		if (type.equals("unlock"))
+			handleUnlockIntent(intent);
+		if (type.equals("highlight"))
+			handleHighlightIntent(intent);
+		if (type.equals("nfcNoLock"))
+			handleNFCNoLockIntent();
+	}
+	
+	private void handleNFCNoLockIntent(){
+		AlertDialog alertDialog = new AlertDialog.Builder(this).setPositiveButton(getResources().getString(R.string.ok),null).create();
+		alertDialog.setTitle(R.string.restricted_access);
+		alertDialog.setMessage(getResources().getString(R.string.no_access_to_lock));
+		alertDialog.show();
+	}
+	
+	private void handleUnlockIntent(Intent intent){
+		// Its not a unlock request, nothing to do
+		if (!intent.getStringExtra("Type").equals("unlock"))
+			return;
+		
+		
+		int placeId = intent.getIntExtra("Place", -1);
+		for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
+			if (kisiAPI.getPlaces()[j].getId() == placeId) {
+				int lockId = intent.getIntExtra("Lock", -1);
+				Lock lockToUnlock = KisiAPI.getInstance().getLockById(kisiAPI.getPlaceById(placeId), lockId);
+				pager.setCurrentItem(j, false);
+				int id  = pager.getCurrentItem();
+				// http://tofu0913.blogspot.de/2013/06/adnroid-get-current-fragment-when-using.html
+				// BAD HACK see: String android.support.v4.app.FragmentPagerAdapter.makeFragmentName(int viewId, long id)
+				PlaceFragment placeFragment = (PlaceFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+id); 
+				currentPage = j;
+				//check if fragment got already attach to the pager and otherwise get fragment from pagerAdapter
+				if(placeFragment != null) {
+					placeFragment.setLockToUnlock(lockToUnlock);
+				}
+				else {
+					placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
+					placeFragment.setLockToUnlock(lockToUnlock);
+				}
+				break;
+			}
+		}
+	}
+	
+
+	private void handleHighlightIntent(Intent intent){
+		// Its not a highlight request, nothing to do
+		if (!intent.getStringExtra("Type").equals("highlight"))
+			return;
+		
+		
+		int placeId = intent.getIntExtra("Place", -1);
+		for (int j = 0; j < kisiAPI.getPlaces().length; j++) {
+			if (kisiAPI.getPlaces()[j].getId() == placeId) {
+				int lockId = intent.getIntExtra("Lock", -1);
+				Lock lockToUnlock = kisiAPI.getLockById(kisiAPI.getPlaceById(placeId), lockId);
+				pager.setCurrentItem(j, false);
+				int id  = pager.getCurrentItem();
+				// http://tofu0913.blogspot.de/2013/06/adnroid-get-current-fragment-when-using.html
+				// BAD HACK see: String android.support.v4.app.FragmentPagerAdapter.makeFragmentName(int viewId, long id)
+				PlaceFragment placeFragment = (PlaceFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+id); 
+				currentPage = j;
+				//check if fragment got already attach to the pager and otherwise get fragment from pagerAdapter
+				if(placeFragment != null) {
+					placeFragment.setLockToHighlight(lockToUnlock);
+				}
+				else {
+					placeFragment = (PlaceFragment) pagerAdapter.getItem(j);
+					placeFragment.setLockToHighlight(lockToUnlock);
+				}
+				break;
+			}
+		}
+	}	
+}
