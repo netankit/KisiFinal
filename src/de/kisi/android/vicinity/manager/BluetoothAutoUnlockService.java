@@ -1,12 +1,12 @@
 package de.kisi.android.vicinity.manager;
 
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.UnlockCallback;
 import de.kisi.android.model.Lock;
 import de.kisi.android.notifications.AutoUnlockNotificationInfo;
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
 
 
 //this service is responsible to handle automatic unlock

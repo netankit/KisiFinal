@@ -10,7 +10,6 @@ public class KisiApplication extends Application {
 	private static KisiApplication instance;
 	/**
 	 * Retuns a valid Context object
-	 * @author Thomas Hoermann
 	 */
 	public static KisiApplication getInstance() {
 		return instance;
@@ -20,12 +19,11 @@ public class KisiApplication extends Application {
 		String versionName = (this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);
 		return versionName;
 	}
-
+	
 	/**
 	 * This is the first method called by Android.
 	 * Here we use all the initialization of the different 
 	 * Manager that have to start right before everything else.
-	 * @author Thomas Hoermann
 	 */
 	@Override
 	public void onCreate() {

@@ -3,6 +3,7 @@ package de.kisi.android.ui;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,9 +47,11 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
     private LockListAdapter mLockListAdapter; 
     private ActionBarDrawerToggle mDrawerToggle;
     private int selectedPosition = 0;
-    
+
     private MergeAdapter  mMergeAdapter;
     
+    private Place mPlace = null;
+
     
     private TextView accountName;
     
@@ -84,7 +88,12 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		mDrawerToggle = new ActionBarDrawerToggle( this,  mDrawerLayout, R.drawable.ic_drawer,  R.string.place_overview,  R.string.kisi ) {
 	            public void onDrawerClosed(View view) {
 	            	super.onDrawerClosed(view);
-	            	getActionBar().setTitle(((Place)mDrawerListAdapter.getItem(selectedPosition)).getName());
+	            	Place place = (Place)mDrawerListAdapter.getItem(selectedPosition);
+	            	mPlace = place;
+	            	if (place !=null){
+	            		String newTitle = place.getName();
+	            		getActionBar().setTitle(newTitle);
+	            	}
 	            	invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
 	            }
 
@@ -125,7 +134,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		super.onStart();
 		if(getIntent().hasExtra("Type")) {
 			Log.d("Onstart", String.valueOf(mLockList.getCount()) );
-			handleUnlockIntent(getIntent());
+			handleIntent(getIntent());
 			getIntent().removeExtra("Type");
 		}
 	}
@@ -136,13 +145,14 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		super.onNewIntent(intent);
 		
 		if(intent.hasExtra("Type")) {
-			handleUnlockIntent(intent);
+			handleIntent(intent);
 			intent.removeExtra("Type");
 		}
 	}
 	
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
-	    @Override
+	    @SuppressWarnings("rawtypes")
+		@Override
 	    public void onItemClick(AdapterView parent, View view, int position, long id) {
 	    	selectItem(position, id);
 	    }
@@ -162,13 +172,15 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	
 	private void selectItem(int position, long id) {
-		getActionBar().setTitle(KisiAPI.getInstance().getPlaceById((int) id).getName());
+		Place place = KisiAPI.getInstance().getPlaceById((int) id);
+		if(place!=null)
+			getActionBar().setTitle(place.getName());
 		// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
 		selectedPosition = position - 2;
 		mDrawerListAdapter.selectItem(selectedPosition);
 		mLockListAdapter = new LockListAdapter(this, (int) id);
 		mLockList.setAdapter(mLockListAdapter);
-		mLockList.setOnItemClickListener(new LockListOnItemClickListener(KisiAPI.getInstance().getPlaceById((int) id)));
+		mLockList.setOnItemClickListener(new LockListOnItemClickListener(place));
 		mLockList.invalidate();
 	    // Highlight the selected item, update the title, and close the drawer and check if the position is available 
 		// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
@@ -237,40 +249,92 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		}
 	}
 	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.main, menu);
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu){
+	    MenuInflater inflater = getMenuInflater();
+	    menu.clear();
+	    if (KisiAPI.getInstance().userIsOwner(mPlace))
+	    	inflater.inflate(R.menu.main, menu);
+	    else
+	    	inflater.inflate(R.menu.main_no_share, menu);
+	    return true;
+	}
 	
 	
+	private void handleIntent(Intent intent) {
+		// No extras, nothing to do
+		if (intent.getExtras() == null)
+			return;
+		String type = intent.getStringExtra("Type");
+		if (type.equals("unlock"))
+			handleUnlockIntent(intent);
+		if (type.equals("highlight"))
+			handleHighlightIntent(intent);
+		if (type.equals("nfcNoLock"))
+			handleNFCNoLockIntent();
+	}
+
+	private void handleNFCNoLockIntent(){
+		AlertDialog alertDialog = new AlertDialog.Builder(this).setPositiveButton(getResources().getString(R.string.ok),null).create();
+		alertDialog.setTitle(R.string.restricted_access);
+		alertDialog.setMessage(getResources().getString(R.string.no_access_to_lock));
+		alertDialog.show();
+	}
 	
 	
 	private void handleUnlockIntent(Intent intent) {
-		if (intent.getExtras() != null)
-			if (intent.getStringExtra("Type").equals("unlock")) {
-				int placeId = intent.getIntExtra("Place", -1);
-				for (int j = 0; j < KisiAPI.getInstance().getPlaces().length; j++) {
-					if (KisiAPI.getInstance().getPlaces()[j].getId() == placeId) {
-						selectItem(j, placeId);
-						int lockId = intent.getIntExtra("Lock", -1);
-						//check if there is a lockId in the intent and then unlock the right lock
-						if(lockId != -1) {
-							int mActivePosition = mLockListAdapter.getItemPosition(lockId);
-							mLockList.invalidate();
-							Log.d("handle intent", String.valueOf(mLockList.getCount()) );
-							// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
-							mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition + 2,
-						        mLockList.getAdapter().getItemId(mActivePosition+2));
-						}
+		String sender = intent.getStringExtra("Sender");
+		Log.i("sender","sender: "+sender);
+		if (intent.getExtras() != null){
+			int placeId = intent.getIntExtra("Place", -1);
+			for (int j = 0; j < KisiAPI.getInstance().getPlaces().length; j++) {
+				if (KisiAPI.getInstance().getPlaces()[j].getId() == placeId) {
+					selectItem(j, placeId);
+					int lockId = intent.getIntExtra("Lock", -1);
+					//check if there is a lockId in the intent and then unlock the right lock
+					if(lockId != -1) {
+						int mActivePosition = mLockListAdapter.getItemPosition(lockId);
+						mLockListAdapter.setTrigger(sender);
+						mLockList.invalidate();
+						Log.d("handle intent", String.valueOf(mLockList.getCount()) );
+						// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
+						//TODO: review this code: +2 caused an indexOutOfBoundsException so i removed it 
+						mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition,
+								mLockList.getAdapter().getItemId(mActivePosition));
 					}
 				}
-
 			}
+		}
 	}
 	
-
+	private void handleHighlightIntent(Intent intent){
+		if (intent.getExtras() != null){
+			int placeId = intent.getIntExtra("Place", -1);
+			for (int j = 0; j < KisiAPI.getInstance().getPlaces().length; j++) {
+				if (KisiAPI.getInstance().getPlaces()[j].getId() == placeId) {
+					selectItem(j, placeId);
+					int lockId = intent.getIntExtra("Lock", -1);
+					//check if there is a lockId in the intent and then unlock the right lock
+					if(lockId != -1) {
+						int mActivePosition = mLockListAdapter.getItemPosition(lockId);
+						mLockListAdapter.addSuggestedNFC(lockId);
+						mLockList.invalidate();
+						Log.d("handle intent", String.valueOf(mLockList.getCount()) );
+						Button highlightElement = (Button)mLockList.getAdapter().getView(mActivePosition, null, null);
+						Log.i("nfc",highlightElement.getText().toString());
+						highlightElement.setBackgroundColor(Color.BLACK);
+					}
+				}
+			}
+		}
+	}
 
 	// callback for blinkup and login
 	@Override
@@ -284,7 +348,12 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 					return;
 
 				case AccountPickerActivity.LOGIN_OPTIMISTIC_SUCCESS:
+					Log.i("onActivityResult", "LOGIN_OPTIMISTIC_SUCCESS");
+					KisiAPI.getInstance().updatePlaces(this);
+					return;
 				case AccountPickerActivity.LOGIN_REAL_SUCCESS:
+					Log.i("onActivityResult", "LOGIN_REAL_SUCCESS");
+					KisiAPI.getInstance().updatePlaces(this);
 					setUiIntoStartState();
 					return;
 
@@ -307,6 +376,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	@Override
 	public void onPlaceChanged(Place[] newPlaces) {
 		refreshViews();
+		setUiIntoStartState();
 	}
 
 	

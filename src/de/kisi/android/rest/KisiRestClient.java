@@ -47,40 +47,47 @@ public class KisiRestClient {
 		 client.setUserAgent("de.kisi.android");
 	}
 
-
-
-	public void get(String url, AsyncHttpResponseHandler responseHandler) {
+	public void get(String path, AsyncHttpResponseHandler responseHandler) {
+		Log.d("get", "get path: " + path);
 		String authToken = null;
 		if(KisiAPI.getInstance().getUser() != null) {
 			authToken = KisiAPI.getInstance().getUser().getAuthentication_token();
 		}
+		
+		String url;
 		if(authToken != null) {
-			client.get(getAbsoluteUrl(url, authToken), responseHandler);
+			url = getAbsoluteUrl(path, authToken);
 		}
 		else {
-			client.get(getAbsoluteUrl(url), responseHandler);
+			url = getAbsoluteUrl(path);
 		}
+		
+		Log.d("get", "get url: " + url); //TODO: remove this in release versions!
+		client.get(url, responseHandler);
 	}
 
-	public void post(String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
+	public void post(String path, JSONObject data, AsyncHttpResponseHandler responseHandler) {
+		Log.d("post", "post path: " + path);
 		String authToken = null;
 		if(KisiAPI.getInstance().getUser() != null) {
 			authToken = KisiAPI.getInstance().getUser().getAuthentication_token();
 		}
-		if(authToken != null) {
-			client.post(KisiApplication.getInstance(), getAbsoluteUrl(url, authToken), JSONtoStringEntity(data), "application/json", responseHandler);
+		
+		String url;
+		if(authToken != null && !path.equals("users/sign_in")) {
+
+			url = getAbsoluteUrl(path, authToken);
 		}
 		else {
-			client.post(KisiApplication.getInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
+			url = getAbsoluteUrl(path);
 		}
+		
+		Log.d("post", "post url: " + url); //TODO: remove this in release versions!
+		if(data!=null){
+			Log.d("post", "post data: " + data.toString()); //TODO: remove this in release versions!
+		}
+		client.post(KisiApplication.getInstance(), url, JSONtoStringEntity(data), "application/json", responseHandler);
 	}
-	
-	//workaround method so that the login call is done without the authtoken and so renews the old authtoken
-	public void postWithoutAuthToken (String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
-		client.post(KisiApplication.getInstance(), getAbsoluteUrl(url), JSONtoStringEntity(data), "application/json", responseHandler);
-	}
-
-	
 	
 	public  void delete(String url, AsyncHttpResponseHandler responseHandler) {
 		String authToken = null;
@@ -93,27 +100,6 @@ public class KisiRestClient {
 		}
 
 	}
-
-	//this method is for KisiAuthenticator.getAuthToken()
-	public String signIn (String url, JSONObject data) throws ClientProtocolException, IOException { 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpPost httpPost = new HttpPost(getAbsoluteUrl(url));
-		httpPost.setEntity(JSONtoStringEntity(data));
-		
-		HttpResponse response;
-		String responseString = null;
-		//TODO: maybe should the method pass the exception
-		response = httpClient.execute(httpPost);
-		responseString = EntityUtils.toString(response.getEntity());
-		Gson gson = new Gson();
-		User user;
-		user = gson.fromJson(responseString, User.class);
-		
-		return user.getAuthentication_token();
-
-	}
-	
-	
 	
 	private  String getAbsoluteUrl(String relativeUrl) {
 		return BASE_URL + relativeUrl + URL_SUFFIX;
@@ -130,15 +116,26 @@ public class KisiRestClient {
 		} catch (UnsupportedEncodingException e2) {
 			e2.printStackTrace();
 		}
+        //TODO: entity can still be null! Fix that.
         entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         return entity;
 	}
 	
-	
-
-	
+	//this method is for KisiAuthenticator.getAuthToken()
+	public String signIn (String url, JSONObject data) throws ClientProtocolException, IOException { 
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpPost httpPost = new HttpPost(getAbsoluteUrl(url));
+		httpPost.setEntity(JSONtoStringEntity(data));
+		
+		HttpResponse response;
+		String responseString = null;
+		//TODO: maybe should the method pass the exception
+		response = httpClient.execute(httpPost);
+		responseString = EntityUtils.toString(response.getEntity());
+		Gson gson = new Gson();
+		User user;
+		user = gson.fromJson(responseString, User.class);
+		
+		return user.getAuthentication_token();
+	}
 }
-
-
-
-

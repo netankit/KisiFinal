@@ -50,7 +50,7 @@
         <activity
             android:name="de.kisi.android.account.AccountActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:label="@string/app_name_empty"
+            android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/CustomThemeLogin" >
@@ -169,11 +169,30 @@
         </service>
 
         <activity
-            android:name="de.kisi.android.AccountPickerActivity"
+            android:name=".account.RegisterActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
             android:theme="@style/CustomThemeLogin" >
         </activity>
+        <activity
+            android:name=".account.TermsAndConditionsActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomThemeLogin" >
+        </activity>
+        <activity
+            android:name="AccountPickerActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomThemeLogin" >
+        </activity>
+        <activity
+            android:name=".account.SuccessfulRegistrationActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomThemeLogin" >
+        </activity>
+
         <!-- Account Manager end -->
 
 
@@ -233,5 +252,4 @@
             android:theme="@style/CustomThemeLogin">
         </activity>
     </application>
-
 </manifest>

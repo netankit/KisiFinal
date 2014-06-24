@@ -2,10 +2,6 @@ package de.kisi.android;
 
 import java.util.Date;
 
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.VersionCheckCallback;
-import de.kisi.android.vicinity.manager.BluetoothLEManager;
-import de.kisi.android.vicinity.manager.GeofenceManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
@@ -24,6 +20,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.VersionCheckCallback;
+import de.kisi.android.vicinity.manager.BluetoothLEManager;
+import de.kisi.android.vicinity.manager.GeofenceManager;
 
 
 // base activity for the main activity 

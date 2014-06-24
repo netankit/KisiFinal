@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
-
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.content.BroadcastReceiver;

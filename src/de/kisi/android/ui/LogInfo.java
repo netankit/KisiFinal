@@ -30,14 +30,13 @@ public class LogInfo extends Activity implements LogsCallback{
 		setContentView(R.layout.loginfo);
 		//add back button to action bar 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
-		mListView = (ListView) findViewById(R.id.logListVIew);
 		
-        
+		mListView = (ListView) findViewById(R.id.place_notification_listview);
 		int placeId = getIntent().getIntExtra("place_id", 0);
 		if(placeId != 0) {
 			Place place = KisiAPI.getInstance().getPlaceById(placeId);
 			KisiAPI.getInstance().getLogs(place, this);
+			getActionBar().setTitle(place.getName());
 		}
 		
 
@@ -88,6 +87,7 @@ public class LogInfo extends Activity implements LogsCallback{
 			return events.get(position).getId();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View vi = convertView;

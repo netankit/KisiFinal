@@ -1,22 +1,19 @@
 package de.kisi.android.ui;
 
-
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.LinearLayout;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TextView;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Place;
@@ -24,60 +21,61 @@ import de.kisi.android.model.Place;
 
 public class PlaceNotificationSettings extends Activity implements OnClickListener {
 
+	private ListView mListView;
+	
 	public void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
-
-
-//		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setTitle(getResources().getString(R.string.notification_settings));
 		setContentView(R.layout.place_notification_settings);
-
-//		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.log_title);
-
-		buildShareDialog();
-
-
-
+		mListView = (ListView) findViewById(R.id.place_notification_listview);
+		mListView.setAdapter(new PlaceNotificationAdapter(this));
+//		buildShareDialog();
 	}
 
-	private void buildShareDialog() {
-		final Place[] places = KisiAPI.getInstance().getPlaces();
-
-		// Getting px form Scale-independent Pixels
-		Resources r = getResources();
-		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
-				350, r.getDisplayMetrics());
-		int height = (int) TypedValue.applyDimension(
-				TypedValue.COMPLEX_UNIT_SP, 50, r.getDisplayMetrics());
-
+	
+	
+	
+	class PlaceNotificationAdapter extends BaseAdapter {
 		
-		Typeface font = Typeface.createFromAsset(this.getApplicationContext().getAssets(), "Roboto-Light.ttf");
-		LinearLayout linearLayout = (LinearLayout) findViewById(R.id.place_linear_layout);
+		private LayoutInflater inflater;
+		private Context context;
+		
+		public PlaceNotificationAdapter(Context context) {
+			super();
+			this.context = context;
+			inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+		
+		@Override
+		public int getCount() {
+			return KisiAPI.getInstance().getPlaces().length;
+		}
 
-		
-//		TextView textView =  new TextView(this);
-//		textView.setText(getResources().getString(R.string.notification_settings));
-//		textView.setTextSize(24);
-//		textView.setTextColor(Color.DKGRAY);
-//		textView.setTypeface(font);
-//		linearLayout.addView(textView, layoutParams);
-		LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		
-		for (final Place p : places) {
-			
-			final Switch placeSwitch =  (Switch) li.inflate(R.layout.place_notification_switch, null); 
-//			final Switch placeSwitch = new Switch(this);
-			placeSwitch.setText(p.getName());
-			placeSwitch.setChecked(p.getNotificationEnabled());
-			placeSwitch.setTypeface(font);
-			placeSwitch.setGravity(Gravity.LEFT);
-			placeSwitch.setHeight(height);
-			placeSwitch.setTextColor(Color.DKGRAY);
-			placeSwitch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-			placeSwitch.setVisibility(View.VISIBLE);
-			linearLayout.addView(placeSwitch);
-			placeSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		@Override
+		public Place getItem(int position) {
+			return KisiAPI.getInstance().getPlaceAt(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return KisiAPI.getInstance().getPlaceAt(position).getId();
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View vi = convertView;
+	        if (vi == null)
+	            vi = inflater.inflate(R.layout.place_notification_item, null);
+	        final Place p = this.getItem(position);
+	        TextView placeName = (TextView) vi.findViewById(R.id.place_name_notification);
+	        placeName.setText(p.getName());
+	        TextView defaultSetting = (TextView) vi.findViewById(R.id.notification_default_setting);
+	        defaultSetting.setText(context.getResources().getString(R.string.default_settings) + ": " +
+	        		Boolean.toString(p.isSuggestUnlock()));
+	        Switch placeSwitch = (Switch) vi.findViewById(R.id.place_switch_notification);
+	        placeSwitch.setChecked(p.getNotificationEnabled());
+	        placeSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -85,10 +83,55 @@ public class PlaceNotificationSettings extends Activity implements OnClickListen
 				} 
 				
 			});
-
+	        return vi;
 		}
-
+		
+		
+		
 	}
+	
+	
+	
+//	private void buildShareDialog() {
+//		final Place[] places = KisiAPI.getInstance().getPlaces();
+//
+//		// Getting px form Scale-independent Pixels
+//		Resources r = getResources();
+//		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+//				350, r.getDisplayMetrics());
+//		int height = (int) TypedValue.applyDimension(
+//				TypedValue.COMPLEX_UNIT_SP, 50, r.getDisplayMetrics());
+//
+//		
+//		Typeface font = Typeface.createFromAsset(this.getApplicationContext().getAssets(), "Roboto-Light.ttf");
+//		LinearLayout linearLayout = (LinearLayout) findViewById(R.id.place_linear_layout);
+//		
+//		LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//		
+//		for (final Place p : places) {
+//			
+//			final Switch placeSwitch =  (Switch) li.inflate(R.layout.place_notification_switch, null); 
+//			placeSwitch.setText(p.getName() + "\t");
+//			placeSwitch.setChecked(p.getNotificationEnabled());
+//			placeSwitch.setTypeface(font);
+//			placeSwitch.setGravity(Gravity.LEFT);
+//			placeSwitch.setHeight(height);
+//			placeSwitch.setTextColor(Color.DKGRAY);
+//			placeSwitch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+//			placeSwitch.setVisibility(View.VISIBLE);
+//			linearLayout.addView(placeSwitch);
+//			placeSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+//
+//				@Override
+//				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//					p.setNotificationEnabled(isChecked);
+//				} 
+//				
+//			});
+//
+//		}
+//
+//	}
 	
 	//listener for the backbutton of the action bar
 	@Override

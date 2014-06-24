@@ -1,13 +1,5 @@
 package de.kisi.android.vicinity.manager;
 
-import de.kisi.android.KisiApplication;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.model.Locator;
-import de.kisi.android.model.Lock;
-import de.kisi.android.model.Place;
-import de.kisi.android.ui.KisiMainActivity;
-import de.kisi.android.vicinity.LockInVicinityActorFactory;
-import de.kisi.android.vicinity.LockInVicinityActorInterface;
 import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -15,6 +7,15 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
+import de.kisi.android.KisiApplication;
+import de.kisi.android.account.AccountActivity;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.model.Locator;
+import de.kisi.android.model.Place;
+import de.kisi.android.ui.KisiMainActivity;
+import de.kisi.android.vicinity.LockInVicinityActorFactory;
+import de.kisi.android.vicinity.LockInVicinityActorInterface;
+
 
 public class NFCReceiver extends Activity{
 
@@ -41,22 +42,26 @@ public class NFCReceiver extends Activity{
 	        // Test all locators for equality to the data string
 	        boolean foundLock = false;
 	        for(Place place : KisiAPI.getInstance().getPlaces()){
-	        	for(Lock lock : place.getLocks()){
-	        		for(Locator locator : lock.getLocators()){
-	        			if (nfcData.equals(locator.getTag())){
-	        		        // get actor for NFC
-	        				LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
-	        				// act
-	        				actor.actOnEntry(locator);
-	        				foundLock = true;
-	        			}
+	        	for(Locator locator : place.getLocators()){
+	        		if (locator.isEnabled() && nfcData.equals(locator.getTag())){
+	        			// get actor for NFC
+	        			LockInVicinityActorInterface actor = LockInVicinityActorFactory.getActor(locator);
+	        			// act
+	        			actor.actOnEntry(locator);
+	        			foundLock = true;
 	        		}
 	        	}
 	        }
 	
 	        if (!foundLock){
-	    		Intent i = new Intent(KisiApplication.getInstance(), KisiMainActivity.class);
-	    		i.putExtra("Type", "nfcNoLock");
+	    		Intent i = null;
+	    		if (KisiAPI.getInstance().getUser() == null){
+	    			i = new Intent(KisiApplication.getInstance(), AccountActivity.class);
+	    			i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+	    		}else{
+	    			i = new Intent(KisiApplication.getInstance(), KisiMainActivity.class);
+	    		}
+    			i.putExtra("Type", "nfcNoLock");
 	    		startActivity(i);
 	        }
 	    }catch(Exception e){

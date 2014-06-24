@@ -20,7 +20,6 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 
 	private Place place;
 	private static long delay = 1500;
-	private String trigger;
 	
 	
 	public LockListOnItemClickListener(Place place) {
@@ -36,9 +35,11 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 		progressDialog.show();
 		final Lock lock = place.getLocks().get(position);
 		Log.d("LockListOnItemClick", String.valueOf(parent.getAdapter().getCount()));
+		Log.d("LockListOnItemClick", "Position: "+position);
+		Log.d("LockListOnItemClick", ((Button)view).getText().toString());
 		
-		
-		
+		LockListAdapter adapter = (LockListAdapter)parent.getAdapter();
+		String trigger = adapter.getTrigger(); 
 		//TODO: implement this!!!
 		String buttonTrigger = "manual";
 		boolean automatic = false;
@@ -50,11 +51,11 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 			buttonTrigger = "beacon";
 		if("geofence".equals(trigger))
 			buttonTrigger = "geofence";
-//		if(suggestedNFC.contains(lock.getId())){
-//			buttonTrigger = "NFC";
-//			automatic = false;
-//		}
-//		
+		if(adapter.isSuggestedNFC(lock.getId())){
+			buttonTrigger = "NFC";
+			automatic = false;
+		}
+		
 		
 		
 		
@@ -66,7 +67,7 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 				progressDialog.dismiss();
 				Toast.makeText(KisiApplication.getInstance(), message, Toast.LENGTH_SHORT).show();
 				//final Button currentButton = (Button) parent.getChildAt(position);
-				final Button currentButton = (Button) parent.getChildAt(position);
+				final Button currentButton = (Button) view;
 				parent.invalidate();
 				// save button design
 				//final Drawable currentBackground = currentButton.getBackground();
@@ -96,13 +97,7 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 				Toast.makeText(KisiApplication.getInstance(), alertMsg, Toast.LENGTH_SHORT).show();
 //				Log.d("LockListOnItemClickListener" , view.toString() + "  " + ((Button) view).getText());
 //				Log.d("LockListOnItemClickListener" , parent.getChildAt(position).toString() + "  " + ((Button)parent.getChildAt(position)).getText());
-				Button button = null ;
-				if( parent.getChildAt(position) == null) {
-					button = (Button) view;
-				}
-				else {
-					button = (Button) parent.getChildAt(position);
-				}
+				Button button = (Button)view ;
 				final Button currentButton = button;
 				parent.invalidate();
 
