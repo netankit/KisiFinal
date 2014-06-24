@@ -47,9 +47,11 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
     private LockListAdapter mLockListAdapter; 
     private ActionBarDrawerToggle mDrawerToggle;
     private int selectedPosition = 0;
-    
+
     private MergeAdapter  mMergeAdapter;
     
+    private Place mPlace = null;
+
     
     private TextView accountName;
     
@@ -87,6 +89,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	            public void onDrawerClosed(View view) {
 	            	super.onDrawerClosed(view);
 	            	Place place = (Place)mDrawerListAdapter.getItem(selectedPosition);
+	            	mPlace = place;
 	            	if (place !=null){
 	            		String newTitle = place.getName();
 	            		getActionBar().setTitle(newTitle);
@@ -246,12 +249,23 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		}
 	}
 	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.main, menu);
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu){
+	    MenuInflater inflater = getMenuInflater();
+	    menu.clear();
+	    if (KisiAPI.getInstance().userIsOwner(mPlace))
+	    	inflater.inflate(R.menu.main, menu);
+	    else
+	    	inflater.inflate(R.menu.main_no_share, menu);
+	    return true;
+	}
 	
 	
 	private void handleIntent(Intent intent) {

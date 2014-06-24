@@ -169,6 +169,8 @@ public class KisiAPI {
 	 *         with the user
 	 */
 	public boolean userIsOwner(Place place) {
+		if (place == null || getUser()== null)
+			return false;
 		return place.getOwnerId() == this.getUser().getId();
 	}
 	
