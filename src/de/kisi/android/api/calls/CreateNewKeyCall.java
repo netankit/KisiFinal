@@ -40,10 +40,10 @@ public class CreateNewKeyCall extends GenericCall {
 			}
 			
 		};
+		createJson();
 	}
 	
-	@Override
-	protected void createJson() {
+	private void createJson() {
 		JSONArray lock_ids = new JSONArray();
 		for (Lock l : locks) {
 			lock_ids.put(l.getId());

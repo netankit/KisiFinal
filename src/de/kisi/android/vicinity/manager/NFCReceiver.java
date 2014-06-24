@@ -8,6 +8,7 @@ import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import de.kisi.android.KisiApplication;
+import de.kisi.android.account.AccountActivity;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Locator;
 import de.kisi.android.model.Place;
@@ -53,8 +54,14 @@ public class NFCReceiver extends Activity{
 	        }
 	
 	        if (!foundLock){
-	    		Intent i = new Intent(KisiApplication.getInstance(), KisiMainActivity.class);
-	    		i.putExtra("Type", "nfcNoLock");
+	    		Intent i = null;
+	    		if (KisiAPI.getInstance().getUser() == null){
+	    			i = new Intent(KisiApplication.getInstance(), AccountActivity.class);
+	    			i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+	    		}else{
+	    			i = new Intent(KisiApplication.getInstance(), KisiMainActivity.class);
+	    		}
+    			i.putExtra("Type", "nfcNoLock");
 	    		startActivity(i);
 	        }
 	    }catch(Exception e){

@@ -6,6 +6,7 @@ import de.kisi.android.api.LoginCallback;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -82,6 +84,42 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		
 		
 		
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		if(getIntent().hasExtra("Type")) {
+			handleIntent(getIntent());
+			getIntent().removeExtra("Type");
+		}
+	}
+	
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		
+		if(intent.hasExtra("Type")) {
+			handleIntent(intent);
+			intent.removeExtra("Type");
+		}
+	}
+
+	private void handleIntent(Intent intent) {
+		// No extras, nothing to do
+		if (intent.getExtras() == null)
+			return;
+		String type = intent.getStringExtra("Type");
+		if (type.equals("nfcNoLock"))
+			handleNFCNoLockIntent();
+	}
+
+	private void handleNFCNoLockIntent(){
+		AlertDialog alertDialog = new AlertDialog.Builder(this).setPositiveButton(getResources().getString(R.string.ok),null).create();
+		alertDialog.setTitle(R.string.restricted_access);
+		alertDialog.setMessage(getResources().getString(R.string.no_access_to_lock_log_in));
+		alertDialog.show();
 	}
 
     @Override

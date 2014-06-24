@@ -40,6 +40,8 @@ public class LoginCall extends GenericCall {
 			}
 
 			public void onFailure(int statusCode, Throwable e, JSONObject response) {
+				Log.d("LoginCall", method.toString());
+				Log.d("LoginCall", json.toString());
 				Log.d("LoginCall", "Login failure");
 				String errormessage = null;
 				// no network connectivity
@@ -62,9 +64,9 @@ public class LoginCall extends GenericCall {
 				return;
 			}
 		};
+		createJson();
 	}
 	
-	@Override
 	protected void createJson() {
 		try {
 			JSONObject userJSON = new JSONObject();

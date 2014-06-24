@@ -74,7 +74,8 @@ public class KisiRestClient {
 		}
 		
 		String url;
-		if(authToken != null) {
+		if(authToken != null && !path.equals("users/sign_in")) {
+
 			url = getAbsoluteUrl(path, authToken);
 		}
 		else {

@@ -16,10 +16,11 @@ public class CreateGatewayCall extends LocatableCall {
 		this.handler = new JsonHttpResponseHandler(){
 			//TODO: Implement a proper handler
 		};
+		
+		createJson();
 	}
 	
-	@Override //override the default json of a locatable call
-	protected void createJson() {
+	private void createJson() {
 		String agentUrl = null;
 		String impeeId = null;
 		String planId = null;
@@ -32,14 +33,12 @@ public class CreateGatewayCall extends LocatableCall {
 	        if (impeeId != null) 
 	            impeeId = impeeId.trim();
 
-	        JSONObject location = generateJSONLocation();
 	    	JSONObject gateway = new JSONObject();
 		
 			gateway.put("name", "Gateway");
 			gateway.put("uri", agentUrl);
 			gateway.put("blinked_up", true);
 			gateway.put("ei_impee_id", impeeId);
-			gateway.put("location", location);
 
 
 			json.put("gateway", gateway);

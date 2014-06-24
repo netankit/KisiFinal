@@ -19,11 +19,6 @@ public class UnlockCall extends LocatableCall {
 					lock.getPlaceId(), 
 					lock.getId()), 
 				HTTPMethod.POST);
-		try {
-			json.put("trigger", trigger);
-			json.put("automatic_execution", automatic_unlock);
-		} catch (JSONException e1) {
-		}
 		handler = new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONObject response) {
@@ -72,5 +67,12 @@ public class UnlockCall extends LocatableCall {
 
 			}	
 		};
+		
+		try {
+			json.put("trigger", trigger);
+			json.put("automatic_execution", automatic_unlock);
+		} catch (JSONException e1) {
+		}
+
 	}
 }

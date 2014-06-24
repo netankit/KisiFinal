@@ -80,11 +80,11 @@ public class RegisterCall extends GenericCall {
 				callback.onRegisterFail(errormessage);
 			};
 		};
+		createJson();
 	}
 
 	
-	@Override
-	protected void createJson() {
+	private void createJson() {
 		try {
 			//build user object
 			JSONObject userJSON = new JSONObject();
