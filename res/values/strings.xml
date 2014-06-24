@@ -2,6 +2,8 @@
 <resources>
 
     <string name="app_name">KISI</string>
+    <string name="demo_email">testing2.4.0@bantook.se</string>
+    <string name="demo_password">thomas123</string>
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="PasswordConfirm">Confirm password</string>
@@ -88,4 +90,5 @@
 	<string name="settings">SETTINGS</string>
 	<string name="account">ACCOUNT</string>
 	<string name="default_settings">default</string>
+	<string name="Demo">Demo</string>
 </resources>

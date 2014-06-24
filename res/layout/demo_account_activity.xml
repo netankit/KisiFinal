@@ -9,9 +9,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".LoginActivity" >
-    
-    
+    tools:context=".RegisterActivity" >
+
     <ImageView
         android:id="@+id/imageView1"
         android:layout_width="80dp"
@@ -21,15 +20,16 @@
         android:contentDescription="@string/logo"
         android:src="@drawable/logo2" />
 
-   <LinearLayout
-        android:id="@+id/place_linear_layout"
+    <LinearLayout
+        android:id="@+id/placelinearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:baselineAligned="false"
         android:orientation="vertical" >
-<TextView
+
+        <TextView
             android:id="@+id/Slogan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,54 +37,61 @@
             android:text="@string/slogantwo"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#B0CDEB"
-            android:textSize="38sp"
-            />
+            android:textSize="38sp" />
 
-        <EditText
-            android:id="@+id/email"
+
+
+		<EditText
+            android:id="@+id/firstName"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="70dp"
             android:ems="10"
-            android:hint="@string/Email"
-            android:inputType="textEmailAddress"
+            android:hint="@string/first_name"
+            android:inputType="text"
             android:textColor="#FFFFFF"
             android:textColorHint="#ffffff" >
 
             <requestFocus />
         </EditText>
-
         <EditText
-            android:id="@+id/password"
+            android:id="@+id/lastName"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:ems="10"
-            android:hint="@string/Password"
-            android:inputType="textPassword"
-            android:textColor="#ffffff"
+            android:hint="@string/last_name"
+            android:inputType="text"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#ffffff" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:ems="10"
+            android:hint="@string/Email"
+            android:inputType="textEmailAddress"
+            android:textColor="#FFFFFF"
             android:textColorHint="#ffffff" />
 
         <TextView
-            android:id="@+id/forgot"
+            android:id="@+id/ErrorMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/forgot_html"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#A6C3FF"
-            android:textSize="13sp" />
+            android:text=""
+            android:textColor="#cf304b"
+            android:visibility="gone" />
 
         <Button
-            android:id="@+id/loginButton"
+            android:id="@+id/goToDemoAccountButton"
             android:layout_width="300dp"
             android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/login_button"
-            android:text="@string/Login"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/register_button"
+            android:text="@string/Demo"
             android:textColor="#ffffff" />
-         
-
     </LinearLayout>
 
     <RelativeLayout
@@ -94,29 +101,16 @@
         android:layout_alignParentLeft="true"
         android:background="#0F2938" >
 
-
         <Button
-            android:id="@+id/registerButton"
+            android:id="@+id/backToLoginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="@string/new_user_html"
+            android:text="@string/back_to_login"
             android:textColor="#ffffff"
             android:textSize="15sp" 
             android:background="@android:color/transparent"/>
-
-        <Button
-            android:id="@+id/demoAccountButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/registerButton"
-            android:background="@android:color/transparent"
-            android:text="@string/Demo"
-            android:textColor="#ffffff"
-            android:textSize="15sp" />
-
     </RelativeLayout>
 
 </RelativeLayout>

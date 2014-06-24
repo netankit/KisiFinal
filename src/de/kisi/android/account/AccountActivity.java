@@ -1,8 +1,5 @@
 package de.kisi.android.account;
 
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.LoginCallback;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -14,13 +11,16 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.LoginCallback;
+import de.kisi.android.demoaccount.DemoAccountActivity;
 
 // see https://github.com/Udinic/AccountAuthenticator/blob/master/src/com/udinic/accounts_authenticator_example/authentication/AuthenticatorActivity.java
 
@@ -67,6 +67,9 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		loginButton.setOnClickListener(this);
 		TextView registerButton = (TextView) findViewById(R.id.registerButton);
 		registerButton.setOnClickListener(this);
+		
+		TextView demoAccountButton = (TextView) findViewById(R.id.demoAccountButton);
+		demoAccountButton.setOnClickListener(this);
 		
 		userNameField = (EditText) findViewById(R.id.email);
 		passwordField = (EditText) findViewById(R.id.password);
@@ -151,6 +154,10 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 			Intent login = new Intent(this, RegisterActivity.class);
 			startActivityForResult(login, REQ_SIGNUP);
 			break;
+		case R.id.demoAccountButton:
+			Intent demo = new Intent(this, DemoAccountActivity.class);
+			startActivity(demo);
+			break;
 		default:
 			break;
 		}
@@ -181,6 +188,12 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 
 	@Override
 	public void onLoginSuccess(String authToken) {
+		if(progressDialog==null) {
+			progressDialog = new ProgressDialog(this);
+			progressDialog.setMessage(getString(R.string.login_loading_message));
+			progressDialog.setCancelable(false);
+			progressDialog.show();
+		}
 		progressDialog.dismiss();
 		final String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 		Bundle data = new Bundle();

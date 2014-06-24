@@ -13,6 +13,7 @@ import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
+import de.kisi.android.model.User;
 
 public class StaticMenuOnClickListener implements OnClickListener {
 	private KisiMainActivity activity;
@@ -31,7 +32,15 @@ public class StaticMenuOnClickListener implements OnClickListener {
 		
 
 		case R.id.setup_kisi_button:
-
+			User user = KisiAPI.getInstance().getUser();
+			String email = user.getEmail();
+			
+			if (KisiApplication.getInstance().getString(R.string.demo_email).equals(email)) {
+				Toast.makeText(KisiApplication.getInstance(),"it's a demo account",Toast.LENGTH_SHORT).show();
+				return;
+			}
+			
+			
 			BlinkupController blinkup = BlinkupController.getInstance();
 			blinkup.intentBlinkupComplete = new Intent(activity, BlinkupCompleteActivity.class);
 
