@@ -23,14 +23,22 @@ public abstract class GenericCall {
 	protected JSONObject json = new JSONObject();
 	protected HTTPMethod method;
 
+	private boolean createJsonCalled = false;
+	
 	protected GenericCall(String path, HTTPMethod method) {
 		this.path = path;
 		this.method = method;
 	}
 
 
+	protected void createJson() {
+		createJsonCalled = true;
+	}
 
-	public void send() {
+	public final void send() {
+		createJson();
+		if(!createJsonCalled)
+			throw new RuntimeException("Overwritten createJson() must call super.createJson()");
 		final GenericCall call = this;
 		JsonHttpResponseHandler realHandler = new JsonHttpResponseHandler() {
 

@@ -20,7 +20,9 @@ public class CreateGatewayCall extends LocatableCall {
 		createJson();
 	}
 	
-	private void createJson() {
+	@Override
+	protected void createJson() {
+		super.createJson();
 		String agentUrl = null;
 		String impeeId = null;
 		String planId = null;

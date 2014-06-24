@@ -14,11 +14,16 @@ import de.kisi.android.model.Lock;
 
 public class UnlockCall extends LocatableCall {
 
+	private String trigger;
+	private boolean automatic_unlock;
+	
 	public UnlockCall(Lock lock, final UnlockCallback callback, String trigger, boolean automatic_unlock) {
 		super(String.format(Locale.ENGLISH, "places/%d/locks/%d/access", 
 					lock.getPlaceId(), 
 					lock.getId()), 
 				HTTPMethod.POST);
+		this.trigger = trigger;
+		this.automatic_unlock = automatic_unlock;
 		handler = new JsonHttpResponseHandler() {
 			
 			public void onSuccess(JSONObject response) {
@@ -68,6 +73,12 @@ public class UnlockCall extends LocatableCall {
 			}	
 		};
 		
+
+	}
+	
+	@Override
+	protected void createJson(){
+		super.createJson();
 		try {
 			json.put("trigger", trigger);
 			json.put("automatic_execution", automatic_unlock);

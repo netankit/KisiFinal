@@ -83,8 +83,9 @@ public class RegisterCall extends GenericCall {
 		createJson();
 	}
 
-	
-	private void createJson() {
+	@Override
+	protected void createJson() {
+		super.createJson();
 		try {
 			//build user object
 			JSONObject userJSON = new JSONObject();

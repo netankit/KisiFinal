@@ -67,7 +67,9 @@ public class LoginCall extends GenericCall {
 		createJson();
 	}
 	
+	@Override
 	protected void createJson() {
+		super.createJson();
 		try {
 			JSONObject userJSON = new JSONObject();
 			//build user object
