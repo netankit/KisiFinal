@@ -65,7 +65,8 @@
         <activity android:name=".ui.KisiMainActivity" 
             android:screenOrientation="portrait"
             android:configChanges="orientation"
-            android:theme="@android:style/Theme.Holo.Light" 
+            android:label="@string/app_name"
+            android:theme="@style/ActionBarWithoutTitle" 
             android:launchMode="singleTop">
               <intent-filter android:label="@string/app_name" >
                 <action android:name="android.intent.action.MAIN" />
