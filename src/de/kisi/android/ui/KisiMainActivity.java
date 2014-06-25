@@ -71,7 +71,6 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		mDrawerList.setFocusableInTouchMode(false);
 		mMergeAdapter = new MergeAdapter();
 		mDrawerListAdapter = new DrawerListAdapter(this);
-		
 		buildTopDivider();
 		
 		mMergeAdapter.addAdapter(mDrawerListAdapter);
@@ -161,7 +160,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		accountName.setText(KisiAPI.getInstance().getUser() == null ?  " " : KisiAPI.getInstance().getUser().getEmail() );
 		if(place != null) {
 			// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
-			selectItem(selectedPosition + 2, mDrawerListAdapter.getItemId(selectedPosition));
+			selectItem(selectedPosition + 2 , mDrawerListAdapter.getItemId(selectedPosition));
         	if (place != null){
         		String newTitle = place.getName();
         		title.setText(newTitle);
@@ -175,8 +174,9 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	private void selectItem(int position, long id) {
 		Place place = KisiAPI.getInstance().getPlaceById((int) id);
-		if(place!=null)
-			getActionBar().setTitle(place.getName());
+		if(place!=null) {
+			title.setText(place.getName());
+		}
 		// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
 		selectedPosition = position - 2;
 		mDrawerListAdapter.selectItem(selectedPosition);
@@ -192,6 +192,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		else {
 			mDrawerList.setItemChecked(2, true);
 		}
+		
 		mDrawerLayout.closeDrawer(mDrawerList);
 	}
 	
@@ -287,16 +288,15 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 			int placeId = intent.getIntExtra("Place", -1);
 			for (int j = 0; j < KisiAPI.getInstance().getPlaces().length; j++) {
 				if (KisiAPI.getInstance().getPlaces()[j].getId() == placeId) {
-					selectItem(j, placeId);
+					// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
+					selectItem(j + 2, placeId);
 					int lockId = intent.getIntExtra("Lock", -1);
 					//check if there is a lockId in the intent and then unlock the right lock
 					if(lockId != -1) {
 						int mActivePosition = mLockListAdapter.getItemPosition(lockId);
 						mLockListAdapter.setTrigger(sender);
 						mLockList.invalidate();
-						Log.d("handle intent", String.valueOf(mLockList.getCount()) );
-						// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
-						//TODO: review this code: +2 caused an indexOutOfBoundsException so i removed it 
+						Log.d("handle intent", String.valueOf(mLockList.getCount()) );						
 						mLockList.performItemClick(mLockList.getAdapter().getView(mActivePosition, null, null), mActivePosition,
 								mLockList.getAdapter().getItemId(mActivePosition));
 					}
@@ -310,7 +310,8 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 			int placeId = intent.getIntExtra("Place", -1);
 			for (int j = 0; j < KisiAPI.getInstance().getPlaces().length; j++) {
 				if (KisiAPI.getInstance().getPlaces()[j].getId() == placeId) {
-					selectItem(j, placeId);
+					// + 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
+					selectItem(j +2 , placeId);
 					int lockId = intent.getIntExtra("Lock", -1);
 					//check if there is a lockId in the intent and then unlock the right lock
 					if(lockId != -1) {

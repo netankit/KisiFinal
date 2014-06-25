@@ -13,8 +13,7 @@ import com.electricimp.blinkup.BlinkupController.ServerErrorHandler;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.OnPlaceChangedListener;
-import de.kisi.android.model.Place;
+
 
 public class StaticMenuOnClickListener implements OnClickListener {
 	private KisiMainActivity activity;

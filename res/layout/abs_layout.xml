@@ -7,9 +7,10 @@
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:id="@+id/actionbar_title"
-        android:textSize="22sp"/>
-
+        android:textSize="22sp"
+        android:singleLine="true"
+        android:ellipsize="end"/>
 </LinearLayout>
