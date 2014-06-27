@@ -50,6 +50,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
     
     private MergeAdapter  mMergeAdapter;
     
+    private Place mPlace = null;
     
     private TextView accountName;
     private TextView title;
@@ -174,8 +175,9 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	private void selectItem(int position, long id) {
 		Place place = KisiAPI.getInstance().getPlaceById((int) id);
-		if(place!=null) {
+		if(place != null) {
 			title.setText(place.getName());
+	    	mPlace = place;
 		}
 		// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
 		selectedPosition = position - 2;
@@ -258,6 +260,18 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
+	
+	@Override
+ 	public boolean onPrepareOptionsMenu(Menu menu){
+ 	    MenuInflater inflater = getMenuInflater();
+ 	    menu.clear();
+ 	    if (KisiAPI.getInstance().userIsOwner(mPlace)) 
+ 	    	inflater.inflate(R.menu.main, menu);
+ 	    else
+ 	    	inflater.inflate(R.menu.main_no_share, menu);
+ 	    return true;
+ 	}
+
 	
 	
 	private void handleIntent(Intent intent) {
