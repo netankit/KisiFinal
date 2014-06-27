@@ -209,7 +209,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		Place place;
 		if(item.getItemId() == R.id.share || item.getItemId() == R.id.share_actionbar_button) {
 			// check if it is a demo user
-			if (KisiAPI.getInstance().getUser().isDemo()) {
+			if (KisiAPI.getInstance().getUser() != null ? KisiAPI.getInstance().getUser().isDemo() : true) {
 				Toast.makeText(KisiApplication.getInstance(),R.string.demo_warning,Toast.LENGTH_SHORT).show();
 				return false;
 			}
@@ -441,7 +441,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		about.setOnClickListener(listener);
 		mMergeAdapter.addView(about);
 		
-		if (!(KisiAPI.getInstance().getUser().isDemo())) {
+		if (!(KisiAPI.getInstance().getUser() != null ? KisiAPI.getInstance().getUser().isDemo() : true)) {
 			final TextView account = (TextView) li.inflate(
 					R.layout.drawer_list_section_item, null);
 			account.setText(getResources().getText(R.string.account));
@@ -463,7 +463,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		
 		final TextView logout = (TextView) li.inflate(R.layout.drawer_list_item, null);	
 		logout.setId(R.id.logout_button);
-		if (KisiAPI.getInstance().getUser().isDemo()) {
+		if (KisiAPI.getInstance().getUser() != null ? KisiAPI.getInstance().getUser().isDemo() : false) {
 			logout.setText(getResources().getText(R.string.leave_demo));
 			logout.setTextColor(KisiApplication.getInstance().getResources().getColor(R.color.orange));
 			logout.setTypeface(null, Typeface.BOLD);

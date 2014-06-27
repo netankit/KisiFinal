@@ -18,8 +18,8 @@ import de.kisi.android.ui.KisiMainActivity;
 
 public class DemoAccountActivity extends AccountAuthenticatorActivity implements OnClickListener, LoginCallback {
 
-	private EditText firstNameField;
-	private EditText lastNameField;
+//	private EditText firstNameField;
+//	private EditText lastNameField;
 	private EditText emailField;
 	private Button loginButton;
 	private ProgressDialog progressDialog;
@@ -36,8 +36,8 @@ public class DemoAccountActivity extends AccountAuthenticatorActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.demo_account_activity);
 		
-		firstNameField = (EditText) findViewById(R.id.firstName);
-		lastNameField = (EditText) findViewById(R.id.lastName);
+//		firstNameField = (EditText) findViewById(R.id.firstName);
+//		lastNameField = (EditText) findViewById(R.id.lastName);
 		emailField = (EditText) findViewById(R.id.email);
 		loginButton = (Button) findViewById(R.id.backToLoginButton);
 		loginButton.setOnClickListener(this);
@@ -64,7 +64,7 @@ public class DemoAccountActivity extends AccountAuthenticatorActivity implements
 	
 	private void demo() {
 		progressDialog = new ProgressDialog(this);
-		progressDialog.setMessage(getString(R.string.login_loading_message));
+		progressDialog.setMessage(getString(R.string.start_demo_message));
 		progressDialog.setCancelable(false);
 		progressDialog.show();
 		

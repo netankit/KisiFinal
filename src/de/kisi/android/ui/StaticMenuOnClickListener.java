@@ -53,7 +53,7 @@ public class StaticMenuOnClickListener implements OnClickListener {
 							Toast.makeText(KisiApplication.getInstance(), errorMsg, Toast.LENGTH_SHORT).show();
 						}
 					});
-			return ;
+			return;
 
 		case R.id.logout_button:
 			activity.logout();

@@ -93,5 +93,6 @@
     <string name="Demo">Demo</string>
     <string name="leave_demo">Leave Demo</string>
     <string name="demo_warning">It\'s a demo account!</string>
+    <string name="start_demo_message">Starting Demo</string>
 
 </resources>
