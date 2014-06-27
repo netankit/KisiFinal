@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="kisi_color" >#2eaadc</color>
+
+    <color name="kisi_color">#2eaadc</color>
+    <color name="orange">#ffa500</color>
+
 </resources>

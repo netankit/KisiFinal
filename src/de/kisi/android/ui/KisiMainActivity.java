@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -27,11 +28,13 @@ import com.electricimp.blinkup.BlinkupController;
 import com.newrelic.agent.android.NewRelic;
 
 import de.kisi.android.BaseActivity;
+import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
 import de.kisi.android.model.Place;
+import de.kisi.android.model.User;
 
 public class KisiMainActivity extends BaseActivity implements OnPlaceChangedListener{
     
@@ -157,7 +160,9 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	
 	private void setUiIntoStartState() {
 		Place place = KisiAPI.getInstance().getPlaceAt(0);
-		accountName.setText(KisiAPI.getInstance().getUser() == null ?  " " : KisiAPI.getInstance().getUser().getEmail() );
+		if (accountName != null) {
+			accountName.setText(KisiAPI.getInstance().getUser() == null ?  " " : KisiAPI.getInstance().getUser().getEmail() );
+		}
 		if(place != null) {
 			// - 2 cause there are 2 elements before the places start in the ListView (TextView and the divider)
 			selectItem(selectedPosition + 2, mDrawerListAdapter.getItemId(selectedPosition));
@@ -203,6 +208,12 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		Place[] places = KisiAPI.getInstance().getPlaces();
 		Place place;
 		if(item.getItemId() == R.id.share || item.getItemId() == R.id.share_actionbar_button) {
+			// check if it is a demo user
+			if (KisiAPI.getInstance().getUser().isDemo()) {
+				Toast.makeText(KisiApplication.getInstance(),R.string.demo_warning,Toast.LENGTH_SHORT).show();
+				return false;
+			}
+			
 			// check if user has a place
 			if (places.length == 0) {
 				Toast.makeText(this, R.string.share_empty_place_error, Toast.LENGTH_LONG).show();
@@ -430,24 +441,35 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		about.setOnClickListener(listener);
 		mMergeAdapter.addView(about);
 		
-		final TextView account = (TextView) li.inflate(R.layout.drawer_list_section_item, null);
-		account.setText(getResources().getText(R.string.account));
-		mMergeAdapter.addView(account);
-		
-		final View divider2 =  (View) li.inflate(R.layout.drawer_list_divider, null);
-		mMergeAdapter.addView(divider2);
-		
-		
-		accountName = (TextView) li.inflate(R.layout.drawer_list_item, null);
-		accountName.setText(KisiAPI.getInstance().getUser() == null ?  " " : KisiAPI.getInstance().getUser().getEmail() );
-		accountName.setTextColor(Color.GRAY);
-		mMergeAdapter.addView(accountName);
+		if (!(KisiAPI.getInstance().getUser().isDemo())) {
+			final TextView account = (TextView) li.inflate(
+					R.layout.drawer_list_section_item, null);
+			account.setText(getResources().getText(R.string.account));
+			mMergeAdapter.addView(account);
+
+			final View divider2 = (View) li.inflate(
+					R.layout.drawer_list_divider, null);
+			mMergeAdapter.addView(divider2);
+
+			accountName = (TextView) li
+					.inflate(R.layout.drawer_list_item, null);
+			accountName.setText(KisiAPI.getInstance().getUser() == null ? " "
+					: KisiAPI.getInstance().getUser().getEmail());
+			accountName.setTextColor(Color.GRAY);
+			mMergeAdapter.addView(accountName);
+		}
 		
 		addDivider();
 		
 		final TextView logout = (TextView) li.inflate(R.layout.drawer_list_item, null);	
 		logout.setId(R.id.logout_button);
-		logout.setText(getResources().getText(R.string.logout));
+		if (KisiAPI.getInstance().getUser().isDemo()) {
+			logout.setText(getResources().getText(R.string.leave_demo));
+			logout.setTextColor(KisiApplication.getInstance().getResources().getColor(R.color.orange));
+			logout.setTypeface(null, Typeface.BOLD);
+		} else {
+			logout.setText(getResources().getText(R.string.logout));
+		}
 		logout.setClickable(true);
 		logout.setOnClickListener(listener);
 		mMergeAdapter.addView(logout);

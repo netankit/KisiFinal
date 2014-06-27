@@ -1,7 +1,12 @@
 package de.kisi.android.model;
 
+import android.widget.Toast;
+
 import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
+
+import de.kisi.android.KisiApplication;
+import de.kisi.android.R;
 
 public class User {
 	@DatabaseField(id = true, index=true)
@@ -62,6 +67,11 @@ public class User {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public boolean isDemo() {
+		String email = getEmail();
+		return KisiApplication.getInstance().getString(R.string.demo_email).equals(email);
 	}
 
 }

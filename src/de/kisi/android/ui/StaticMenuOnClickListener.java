@@ -36,7 +36,7 @@ public class StaticMenuOnClickListener implements OnClickListener {
 			String email = user.getEmail();
 			
 			if (KisiApplication.getInstance().getString(R.string.demo_email).equals(email)) {
-				Toast.makeText(KisiApplication.getInstance(),"it's a demo account",Toast.LENGTH_SHORT).show();
+				Toast.makeText(KisiApplication.getInstance(),R.string.demo_warning,Toast.LENGTH_SHORT).show();
 				return;
 			}
 			
