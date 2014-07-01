@@ -77,4 +77,6 @@
 	<string name="restricted_access">Access restricted</string>
 	<string name="no_access_to_lock">Unfortunately, you do not have access to this lock.</string>
 	<string name="default_settings">default</string>
+	<string name="on">on</string>
+	<string name="off">off</string>
 </resources>
