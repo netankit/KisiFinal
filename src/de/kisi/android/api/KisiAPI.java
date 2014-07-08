@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -112,7 +113,8 @@ public class KisiAPI {
 				loginInProgress = true;
 				KisiRestClient.getInstance().postWithoutAuthToken("users/sign_in", loginJSON, new JsonHttpResponseHandler() {
 
-					public void onSuccess(org.json.JSONObject response) {
+					
+					public void onSuccess(int statusCode, org.apache.http.Header[] headers, org.json.JSONObject response) {
 						oldAuthToken = false;
 						Gson gson = new Gson();
 						User user = gson.fromJson(response.toString(), User.class);
@@ -128,7 +130,7 @@ public class KisiAPI {
 						return;
 					}
 
-					public void onFailure(int statusCode, Throwable e, JSONObject response) {
+					public void onFailure(int statusCode, org.apache.http.Header[] headers, Throwable e, JSONObject response) {
 						oldAuthToken = false;
 						String errormessage = null;
 						// no network connectivity
@@ -179,7 +181,17 @@ public class KisiAPI {
 	public void logout() {
 		if (KisiAPI.getInstance().getUser() != null && KisiAPI.getInstance().getUser().getEmail() != null) {
 			KisiRestClient.getInstance().delete("/users/sign_out", new TextHttpResponseHandler() {
-				public void onSuccess(String msg) {
+				@Override
+				public void onFailure(int arg0, Header[] arg1, String arg2,
+						Throwable arg3) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onSuccess(int arg0, Header[] arg1, String arg2) {
+					// TODO Auto-generated method stub
+					
 				}
 			});
 			KisiAccountManager.getInstance().deleteAccountByName(KisiAPI.getInstance().getUser().getEmail());
@@ -227,7 +239,7 @@ public class KisiAPI {
 			return;
 		KisiRestClient.getInstance().get("places", new JsonHttpResponseHandler() {
 
-			public void onSuccess(JSONArray response) {
+			public void onSuccess(int statusCode, org.apache.http.Header[] headers, JSONArray response) {
 				Gson gson = new Gson();
 				Place[] pl = gson.fromJson(response.toString(), Place[].class);
 				DataManager.getInstance().savePlaces(pl);
@@ -237,7 +249,7 @@ public class KisiAPI {
 				}
 			}
 
-			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+			public void onFailure(int statusCode, org.apache.http.Header[] headers, Throwable e, JSONObject errorResponse) {
 				if (statusCode == 401) {
 					if (oldAuthToken == false)
 						showLoginScreen();
@@ -276,7 +288,7 @@ public class KisiAPI {
 	public void updateLocks(final Place place, final OnPlaceChangedListener listener) {
 		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locks", new JsonHttpResponseHandler() {
 
-			public void onSuccess(JSONArray response) {
+			public void onSuccess(int statusCode, org.apache.http.Header[] headers, JSONArray response) {
 				Gson gson = new Gson();
 				Lock[] locks = gson.fromJson(response.toString(), Lock[].class);
 				for (Lock l : locks) {
@@ -289,7 +301,7 @@ public class KisiAPI {
 				KisiAPI.getInstance().updateLocators(place);
 			}
 
-			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+			public void onFailure(int statusCode, org.apache.http.Header[] headers, Throwable e, JSONObject errorResponse) {
 				if (statusCode == 401) {
 					if (oldAuthToken == false)
 						showLoginScreen();
@@ -357,7 +369,7 @@ public class KisiAPI {
 	public void updateLocators(final Place place) {
 		KisiRestClient.getInstance().get("places/" + String.valueOf(place.getId()) + "/locators", new JsonHttpResponseHandler() {
 
-			public void onSuccess(JSONArray response) {
+			public void onSuccess(int statusCode, org.apache.http.Header[] headers, JSONArray response) {
 				Gson gson = new Gson();
 				String jsonString = response.toString();
 				Locator[] locators = gson.fromJson(jsonString, Locator[].class);
@@ -373,7 +385,7 @@ public class KisiAPI {
 				}
 			}
 
-			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+			public void onFailure(int statusCode, org.apache.http.Header[] headers,  Throwable e, JSONObject errorResponse) {
 				if (statusCode == 401) {
 					if (oldAuthToken == false)
 						showLoginScreen();
@@ -430,7 +442,7 @@ public class KisiAPI {
 
 		KisiRestClient.getInstance().post(url, data, new JsonHttpResponseHandler() {
 
-			public void onSuccess(JSONObject data) {
+			public void onSuccess(int statusCode, org.apache.http.Header[] headers, JSONObject data) {
 				try {
 					Toast.makeText(KisiApplication.getInstance(), String.format(context.getResources().getString(R.string.share_success), data.getString("issued_to_email")),
 							Toast.LENGTH_LONG).show();
@@ -439,7 +451,7 @@ public class KisiAPI {
 				}
 			}
 
-			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+			public void onFailure(int statusCode, org.apache.http.Header[] headers, Throwable e, JSONObject errorResponse) {
 				if (statusCode == 401) {
 					if (oldAuthToken == false)
 						showLoginScreen();
@@ -561,7 +573,7 @@ public class KisiAPI {
 
 		KisiRestClient.getInstance().post(url, data, new JsonHttpResponseHandler() {
 
-			public void onSuccess(JSONObject response) {
+			public void onSuccess(int statusCode, org.apache.http.Header[] headers, JSONObject response) {
 				String message = null;
 				if (response.has("notice")) {
 					try {
@@ -574,7 +586,7 @@ public class KisiAPI {
 					callback.onUnlockSuccess(message);
 			}
 
-			public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+			public void onFailure(int statusCode, org.apache.http.Header[] headers,  Throwable e, JSONObject errorResponse) {
 				// statusCode == 0: no network connectivity
 				String errormessage = null;
 				if (statusCode == 0) {
@@ -718,7 +730,7 @@ public class KisiAPI {
 	public void getLatestVerion(final VersionCheckCallback callback) {
 		KisiRestClient.getInstance().get("stats", new JsonHttpResponseHandler() {
 
-			public void onSuccess(org.json.JSONObject response) {
+			public void onSuccess(int statusCode, org.apache.http.Header[] headers, org.json.JSONObject response) {
 				String result = null;
 				JSONObject JsonAndroid = null;
 				try {
@@ -738,7 +750,7 @@ public class KisiAPI {
 				callback.onVersionResult(result);
 			}
 
-			public void onFailure(java.lang.Throwable e, org.json.JSONArray errorResponse) {
+			public void onFailure(int statusCode, org.apache.http.Header[] headers, java.lang.Throwable e, org.json.JSONArray errorResponse) {
 				callback.onVersionResult("error");
 			}
 		});
@@ -747,7 +759,7 @@ public class KisiAPI {
 	public void getLogs(Place place, final LogsCallback callback) {
 		KisiRestClient.getInstance().get("places/" + place.getId() + "/events", new JsonHttpResponseHandler() {
 			
-			public void onSuccess(JSONArray jsonArray) {
+			public void onSuccess(int statusCode, org.apache.http.Header[] headers, JSONArray jsonArray) {
 				List<Event> events = new LinkedList<Event>();
 				GsonBuilder gb = new GsonBuilder();
 				gb.registerTypeAdapter(Date.class, new DateDeserializer());
@@ -768,7 +780,7 @@ public class KisiAPI {
 				callback.onLogsResult(events);
 			}
 
-			public void onFailure(java.lang.Throwable e, org.json.JSONArray errorResponse) {
+			public void onFailure(int statusCode, org.apache.http.Header[] headers, java.lang.Throwable e, org.json.JSONArray errorResponse) {
 				callback.onLogsResult(null);
 			}
 		});
