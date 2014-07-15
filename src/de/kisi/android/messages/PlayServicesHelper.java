@@ -184,6 +184,20 @@ public class PlayServicesHelper {
 		//
 		Log.d(TAG, "subscribing...");
 
+		String deviceId = getDeviceID();
+		
+		QBMessages.subscribeToPushNotificationsTask(regId, deviceId,
+				QBEnvironment.DEVELOPMENT, new QBCallbackImpl() {
+					@Override
+					public void onComplete(Result result) {
+						if (result.isSuccess()) {
+							Log.d(TAG, "subscribed");
+						}
+					}
+				});
+	}
+	
+	public String getDeviceID(){
 		String deviceId;
 
 		final TelephonyManager mTelephony = (TelephonyManager) context
@@ -194,15 +208,7 @@ public class PlayServicesHelper {
 			deviceId = Settings.Secure.getString(context.getContentResolver(),
 					Settings.Secure.ANDROID_ID); // *** use for tablets
 		}
-		QBMessages.subscribeToPushNotificationsTask(regId, deviceId,
-				QBEnvironment.DEVELOPMENT, new QBCallbackImpl() {
-					@Override
-					public void onComplete(Result result) {
-						if (result.isSuccess()) {
-							Log.d(TAG, "subscribed");
-						}
-					}
-				});
+		return deviceId;
 	}
 
 	/**

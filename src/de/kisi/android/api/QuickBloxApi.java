@@ -39,6 +39,7 @@ import com.quickblox.module.videochat.model.objects.VideoChatConfig;
 import de.kisi.android.Config;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.messages.Message;
+import de.kisi.android.messages.PlayServicesHelper;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
 
@@ -87,7 +88,8 @@ public class QuickBloxApi {
 		}
 		else{ //create temporary QB user
 			Log.d("QuickBloxAPI", "logging in with temporary user...");
-			String uid = "12345"; //create temporary user based on unique device id
+			//create temporary user based on unique device id
+			String uid = new PlayServicesHelper().getDeviceID();
 			login = "tempUser"+uid;
 			password = Config.USER_PASSWORD;
 		}
@@ -193,23 +195,36 @@ public class QuickBloxApi {
 		}
 	}
 	public void initVideoChat(final OnQBVideoChatListener qbVideoChatListener){
-		if(!QBChatService.getInstance().isLoggedIn()){		
-			QBChatService.getInstance().loginWithUser(QuickBloxApi.getInstance().getCurrentQbUser(), new SessionCallback() {
+		if(this.getCurrentQbUser() == null){
+			this.login(new QBCallback() {
+				@Override public void onComplete(Result arg0, Object arg1) {}
+				
 				@Override
-				public void onLoginSuccess() {
-					QuickBloxApi.getInstance().setVideoChatListener(qbVideoChatListener);
-				}
-
-				@Override
-				public void onLoginError(String arg0) {
-					// TODO Error when login
-					Log.e("QuickBloxLogin", "Error When Login");
-
+				public void onComplete(Result result) {
+					if(result.isSuccess()){
+						QuickBloxApi.getInstance().initVideoChat(qbVideoChatListener);;
+					}
 				}
 			});
-
 		}else{
-			QuickBloxApi.getInstance().setVideoChatListener(qbVideoChatListener);
+			if(!QBChatService.getInstance().isLoggedIn()){		
+				QBChatService.getInstance().loginWithUser(this.getCurrentQbUser(), new SessionCallback() {
+					@Override
+					public void onLoginSuccess() {
+						QuickBloxApi.getInstance().setVideoChatListener(qbVideoChatListener);
+					}
+
+					@Override
+					public void onLoginError(String arg0) {
+						// TODO Error when login
+						Log.e("QuickBloxLogin", "Error When Login");
+
+					}
+				});
+
+			}else{
+				QuickBloxApi.getInstance().setVideoChatListener(qbVideoChatListener);
+			}
 		}
 	}
 

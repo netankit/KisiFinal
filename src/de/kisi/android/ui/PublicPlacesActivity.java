@@ -134,6 +134,7 @@ public class PublicPlacesActivity extends Activity {
 							public void onComplete(Result arg0, Object arg1) {}
 							@Override
 							public void onComplete(Result result) {
+								// TODO check if the receiver is registered for push notifications.
 								int receiverID = ((QBUserResult) result).getUser().getId();
 								QuickBloxApi.getInstance().sendMessage(message, receiverID);
 							}
