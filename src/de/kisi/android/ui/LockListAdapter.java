@@ -5,12 +5,13 @@ import java.util.Hashtable;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.model.Lock;
@@ -105,29 +106,35 @@ public class LockListAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Place place = KisiAPI.getInstance().getPlaceById(placeId);
-		Lock lock = place.getLocks().get(position);
-		Log.i("getView",""+position);
+		
+		LinearLayout buttonAndMessageGroup = null;
 		Button button;
+		TextView message;
+		
 		if(convertView == null) {
-			if(buttonList.containsKey(lock.getId())){
-				button = buttonList.get(lock.getId());
-			}else{
-				LayoutInflater li = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				button = (Button) li.inflate(R.layout.lock_button, parent, false);
-				buttonList.put(lock.getId(), button);
+			LayoutInflater li = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			
+			buttonAndMessageGroup = (LinearLayout) li.inflate(R.layout.lock_group, parent, false);
+			
+			button = (Button) li.inflate(R.layout.lock_button, buttonAndMessageGroup, false);
+			button.setText(place.getLocks().get(position).getName());
+			//disable the clickability of the buttons so that the OnItemClickListner of the ListView handels the clicks 
+			button.setFocusable(false);
+			button.setClickable(false);
+			buttonAndMessageGroup.addView(button);
+			
+			message = (TextView) li.inflate(R.layout.lock_message, buttonAndMessageGroup, false);
+			String messageText = place.getLocks().get(position).getActionMessage();
+			if(messageText !=null && messageText.length()>0){
+				message.setText(messageText);
+				buttonAndMessageGroup.addView(message);
 			}
 		}
 		else {
-			button = (Button) convertView;
-			buttonList.put(lock.getId(), button);
+			 buttonAndMessageGroup = (LinearLayout) convertView;
 		}
-		button.setText(lock.getName());
-		//disable the clickability of the buttons so that the OnItemClickListner of the ListView handels the clicks 
-		button.setFocusable(false);
-		button.setClickable(false);
 		
-		
-		return button;
+		return buttonAndMessageGroup;
 	}
 	
 	

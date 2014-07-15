@@ -85,6 +85,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			if(oldVersion < 4) {
 				getPlaceDao();
 				placeDao.executeRaw("ALTER TABLE 'place' ADD COLUMN suggestUnlock BOOLEAN;");
+				TableUtils.dropTable(connectionSource, Lock.class, true);
+				TableUtils.createTable(connectionSource, Lock.class);
 			}
 			
 		} catch (SQLException e) {

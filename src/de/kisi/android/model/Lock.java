@@ -8,14 +8,23 @@ import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 
-
-
-//@DatabaseTable
 public class Lock {
 	@DatabaseField(id = true)
 	private int id;
 	@DatabaseField
 	private String name;
+	@DatabaseField
+	@SerializedName("action_message")
+	private String actionMessage;
+	@DatabaseField
+	@SerializedName("before_action_message")
+	private String beforeActionMessage;
+	@DatabaseField
+	@SerializedName("during_action_message")
+	private String duringActionMessage;
+	@DatabaseField
+	@SerializedName("after_action_message")
+	private String afterActionMessage;
 	@DatabaseField
 	@SerializedName("place_id")
 	private int placeId;
@@ -50,7 +59,6 @@ public class Lock {
 		return null;
 	}
 	
-	
 	public int getId() {
 		return id;
 	}
@@ -60,7 +68,6 @@ public class Lock {
 	public int getPlaceId() {
 		return placeId;
 	}
-
 
 	public void setPlaceId(int placeId) {
 		this.placeId = placeId;
@@ -81,4 +88,35 @@ public class Lock {
 		this.place = place;
 	}
 
+	public String getActionMessage() {
+		return actionMessage;
+	}
+
+	public void setActionMessage(String actionMessage) {
+		this.actionMessage = actionMessage;
+	}
+
+	public String getBeforeActionMessage() {
+		return beforeActionMessage;
+	}
+
+	public void setBeforeActionMessage(String beforeActionMessage) {
+		this.beforeActionMessage = beforeActionMessage;
+	}
+
+	public String getDuringActionMessage() {
+		return duringActionMessage;
+	}
+
+	public void setDuringActionMessage(String duringActionMessage) {
+		this.duringActionMessage = duringActionMessage;
+	}
+
+	public String getAfterActionMessage() {
+		return afterActionMessage;
+	}
+
+	public void setAfterActionMessage(String afterActionMessage) {
+		this.afterActionMessage = afterActionMessage;
+	}
 }

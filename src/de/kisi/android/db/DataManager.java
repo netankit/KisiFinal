@@ -47,7 +47,7 @@ public class DataManager {
 
     }
     
-    public void saveLocks(final Lock[] locks) {    	 
+    public void saveLocks(final Lock[] locks) {
     	try {
 			lockDao.callBatchTasks(new Callable<Void>() {
 
@@ -93,8 +93,6 @@ public class DataManager {
 			e.printStackTrace();
 		}
     }
-    
-    
     
     public void saveLocators(final Locator[] locators) {
     	try {

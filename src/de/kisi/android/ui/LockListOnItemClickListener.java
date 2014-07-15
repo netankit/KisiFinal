@@ -1,11 +1,5 @@
 package de.kisi.android.ui;
 
-import de.kisi.android.KisiApplication;
-import de.kisi.android.R;
-import de.kisi.android.api.KisiAPI;
-import de.kisi.android.api.UnlockCallback;
-import de.kisi.android.model.Lock;
-import de.kisi.android.model.Place;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Handler;
@@ -14,7 +8,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+import de.kisi.android.KisiApplication;
+import de.kisi.android.R;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.UnlockCallback;
+import de.kisi.android.model.Lock;
+import de.kisi.android.model.Place;
 
 public class LockListOnItemClickListener implements OnItemClickListener {
 
@@ -30,13 +31,18 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 	@Override
 	public void  onItemClick(final AdapterView<?> parent,final View view, final int position, long id) {
 		final ProgressDialog progressDialog = new ProgressDialog(parent.getContext());
-		progressDialog.setMessage(KisiApplication.getInstance().getString(R.string.opening));
+		String during_action_message = place.getLocks().get(position).getDuringActionMessage();
+		if (during_action_message != null && during_action_message.length()>0){
+			progressDialog.setMessage(during_action_message);
+		}else{
+			progressDialog.setMessage(KisiApplication.getInstance().getString(R.string.opening));
+		}
 		progressDialog.setCancelable(false);
 		progressDialog.show();
 		final Lock lock = place.getLocks().get(position);
 		Log.d("LockListOnItemClick", String.valueOf(parent.getAdapter().getCount()));
 		Log.d("LockListOnItemClick", "Position: "+position);
-		Log.d("LockListOnItemClick", ((Button)view).getText().toString());
+		Log.d("LockListOnItemClick", ((Button)((LinearLayout) view).getChildAt(0)).getText().toString());
 		
 		LockListAdapter adapter = (LockListAdapter)parent.getAdapter();
 		String trigger = adapter.getTrigger(); 
@@ -65,9 +71,13 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 			@Override
 			public void onUnlockSuccess(String message) {
 				progressDialog.dismiss();
-				Toast.makeText(KisiApplication.getInstance(), message, Toast.LENGTH_SHORT).show();
-				//final Button currentButton = (Button) parent.getChildAt(position);
-				final Button currentButton = (Button) view;
+				String after_action_message = lock.getAfterActionMessage();
+				if(after_action_message != null && after_action_message.length()>0){
+					Toast.makeText(KisiApplication.getInstance(), after_action_message, Toast.LENGTH_LONG).show();
+				}else{
+					Toast.makeText(KisiApplication.getInstance(), message, Toast.LENGTH_SHORT).show();
+				}
+				final Button currentButton = (Button) ((LinearLayout) parent.getChildAt(position)).getChildAt(0);
 				parent.invalidate();
 				// save button design
 				//final Drawable currentBackground = currentButton.getBackground();
@@ -88,7 +98,7 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 						currentButton.setText(currentText);
 
 					}
-				}, delay);	
+				}, delay);
 			}
 
 			@Override
@@ -97,7 +107,13 @@ public class LockListOnItemClickListener implements OnItemClickListener {
 				Toast.makeText(KisiApplication.getInstance(), alertMsg, Toast.LENGTH_SHORT).show();
 //				Log.d("LockListOnItemClickListener" , view.toString() + "  " + ((Button) view).getText());
 //				Log.d("LockListOnItemClickListener" , parent.getChildAt(position).toString() + "  " + ((Button)parent.getChildAt(position)).getText());
-				Button button = (Button)view ;
+				Button button = null ;
+				if( parent.getChildAt(position) == null) {
+					button = (Button) view;
+				}
+				else {
+					button = (Button) ((LinearLayout) parent.getChildAt(position)).getChildAt(0);
+				}
 				final Button currentButton = button;
 				parent.invalidate();
 

@@ -3,5 +3,9 @@
 
     <color name="kisi_color">#2eaadc</color>
     <color name="orange">#ffa500</color>
+    <color name="lock_message_bg" >#555555</color>
+    <color name="lock_message_text" >#aaaaaa</color>
 
+    <color name="lock_message_bg" >#555555</color>
+    <color name="lock_message_text" >#aaaaaa</color>
 </resources>
