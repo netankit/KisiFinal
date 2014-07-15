@@ -93,7 +93,7 @@ public class RegisterCall extends GenericCall {
 			userJSON.put("last_name", last_name);
 			userJSON.put("email", user_email);
 			userJSON.put("password", password);
-			userJSON.put("terms_and_conditions", terms_and_conditions == true?"1":"0");
+			userJSON.put("terms_and_conditions", terms_and_conditions == true?1:0);
 			this.json.put("user", userJSON);
 		} catch (JSONException e1) {
 			e1.printStackTrace();

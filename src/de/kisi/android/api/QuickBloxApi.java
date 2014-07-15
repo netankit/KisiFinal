@@ -193,23 +193,36 @@ public class QuickBloxApi {
 		}
 	}
 	public void initVideoChat(final OnQBVideoChatListener qbVideoChatListener){
-		if(!QBChatService.getInstance().isLoggedIn()){		
-			QBChatService.getInstance().loginWithUser(QuickBloxApi.getInstance().getCurrentQbUser(), new SessionCallback() {
+		if(this.getCurrentQbUser() == null){
+			this.login(new QBCallback() {
+				@Override public void onComplete(Result arg0, Object arg1) {}
+				
 				@Override
-				public void onLoginSuccess() {
-					QuickBloxApi.getInstance().setVideoChatListener(qbVideoChatListener);
-				}
-
-				@Override
-				public void onLoginError(String arg0) {
-					// TODO Error when login
-					Log.e("QuickBloxLogin", "Error When Login");
-
+				public void onComplete(Result result) {
+					if(result.isSuccess()){
+						QuickBloxApi.getInstance().initVideoChat(qbVideoChatListener);;
+					}
 				}
 			});
-
 		}else{
-			QuickBloxApi.getInstance().setVideoChatListener(qbVideoChatListener);
+			if(!QBChatService.getInstance().isLoggedIn()){		
+				QBChatService.getInstance().loginWithUser(this.getCurrentQbUser(), new SessionCallback() {
+					@Override
+					public void onLoginSuccess() {
+						QuickBloxApi.getInstance().setVideoChatListener(qbVideoChatListener);
+					}
+
+					@Override
+					public void onLoginError(String arg0) {
+						// TODO Error when login
+						Log.e("QuickBloxLogin", "Error When Login");
+
+					}
+				});
+
+			}else{
+				QuickBloxApi.getInstance().setVideoChatListener(qbVideoChatListener);
+			}
 		}
 	}
 
