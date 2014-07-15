@@ -15,6 +15,9 @@ import de.kisi.android.ui.CallDialogActivity;
 /**
  * This service class receives the push messages with the ring messages.
  * If the message is correct, it is starting the call dialog.
+ * 
+ * This class is based on a sample project from Quickblox website.
+ * (http://quickblox.com/developers/SimpleSample-messages_users-android)
  */
 public class GCMIntentService extends IntentService {
 	private static final String TAG = GCMIntentService.class.getSimpleName();

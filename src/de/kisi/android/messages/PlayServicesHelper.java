@@ -28,6 +28,9 @@ import de.kisi.android.KisiApplication;
 /**
  * This class provides methods to use the Google Cloud Messaging service, 
  * which is needed by the QuickBlox library.
+ * 
+ * This class is based on a sample project from Quickblox website.
+ * (http://quickblox.com/developers/SimpleSample-messages_users-android)
  */
 public class PlayServicesHelper {
 
