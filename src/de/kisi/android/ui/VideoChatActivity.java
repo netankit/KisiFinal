@@ -30,6 +30,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+/**
+ * This activity is used for video call.
+ *
+ */
 public class VideoChatActivity extends Activity {
 
     private CameraView cameraView;
