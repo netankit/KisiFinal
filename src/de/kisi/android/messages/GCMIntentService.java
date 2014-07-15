@@ -1,35 +1,34 @@
 package de.kisi.android.messages;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import de.kisi.android.Config;
-import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
-import de.kisi.android.model.Place;
 import de.kisi.android.ui.CallDialogActivity;
 
+/**
+ * This service class receives the push messages with the ring messages.
+ * If the message is correct, it is starting the call dialog.
+ * 
+ * This class is based on a sample project from Quickblox website.
+ * (http://quickblox.com/developers/SimpleSample-messages_users-android)
+ */
 public class GCMIntentService extends IntentService {
-
-	public static final int NOTIFICATION_ID = 1;
-
 	private static final String TAG = GCMIntentService.class.getSimpleName();
-
-	private NotificationManager notificationManager;
 
 	public GCMIntentService() {
 		super("GcmIntentService");
 	}
 
+	/**
+	 * This method is handling the intent with the message in it.
+	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Bundle extras = intent.getExtras();
@@ -38,13 +37,8 @@ public class GCMIntentService extends IntentService {
 		// in your BroadcastReceiver.
 		String messageType = googleCloudMessaging.getMessageType(intent);
 
-		if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
-			/*
-			 * Filter messages based on message type. Since it is likely that GCM
-			 * will be extended in the future with new message types, just ignore
-			 * any message types you're not interested in, or that you don't
-			 * recognize.
-			 */
+		if (!extras.isEmpty()) {
+			// Filter messages based on message type.
 			if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
 				Log.i(TAG, "Send error: " + extras.toString());
 			} else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
@@ -66,9 +60,10 @@ public class GCMIntentService extends IntentService {
 							if(message.getTime()>System.currentTimeMillis()-60000){
 								//TODO optional: if the user don't want to get called, ignore the message
 								//TODO optional: verify, that the sender is not blocked by the user
+								
 								Log.d("GCMImtentService", "Received ring from: " + message.getSender());
-								// Post notification
-
+								
+								// Start the call dialog
 								Intent callDialog = new Intent(this, CallDialogActivity.class);
 								callDialog.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 								Bundle bundle = new Bundle();  
@@ -85,17 +80,5 @@ public class GCMIntentService extends IntentService {
 		}
 		// Release the wake lock provided by the WakefulBroadcastReceiver.
 		GcmBroadcastReceiver.completeWakefulIntent(intent);
-	}
-
-	// Put the message into a notification and post it.
-	private void sendNotification(String msg) {
-		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(
-				R.drawable.notification_icon).setContentTitle("GCM Notification").setStyle(
-						new NotificationCompat.BigTextStyle().bigText(msg)).setContentText(msg);
-		notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-		//TODO: audio notification
-		//TODO: if notification is clicked, show the activity, where the user can decide if he wants to start a call
 	}
 }

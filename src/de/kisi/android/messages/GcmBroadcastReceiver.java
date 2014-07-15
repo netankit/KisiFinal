@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
+/**
+ * This Receiver receives messages from Google Cloud Messaging Service.
+ * It starts the service to handle the message.
+ */
 public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
 
     @Override

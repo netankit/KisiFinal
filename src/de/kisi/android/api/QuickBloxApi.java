@@ -44,6 +44,11 @@ public class QuickBloxApi {
 			instance = new QuickBloxApi();
 		return instance;
 	}
+	
+	/**
+	 * Initiate the Quickblox API.
+	 * This will not initiate a connection to Quickblox server, it just configures the library.
+	 */
 	private QuickBloxApi() {
 		SmackAndroid.init(KisiApplication.getInstance());
 		QBSettings.getInstance().fastConfigInit(Config.APP_ID, Config.AUTH_KEY, Config.AUTH_SECRET);
