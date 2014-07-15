@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -71,7 +72,7 @@ public class PublicPlacesActivity extends Activity {
 						}
 					});
 				}else{
-					Log.d("PublicPlacesActivitu", "Unable to login");
+					Log.d("PublicPlacesActivity", "Unable to login");
 				}
 				
 			}
@@ -80,7 +81,9 @@ public class PublicPlacesActivity extends Activity {
 		
 
 		progressDialog = new ProgressDialog(this);
-		progressDialog.setMessage(getString(R.string.loading_message));
+		progressDialog.setMessage(getString(R.string.calling_the_place_owner));
+        progressDialog.setCancelable(false);
+
 	}
 
 	/**
@@ -133,9 +136,12 @@ public class PublicPlacesActivity extends Activity {
 			buttonRing.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					
 					final int myId = (KisiAPI.getInstance().getUser() != null) ? KisiAPI.getInstance().getUser().getId() : -1;
 					final int receiverId = p.getOwnerId();
 					if(myId != receiverId){
+						progressDialog.show();
+						deleteDialog();
 						final Message message = new Message(QuickBloxApi.getInstance().getCurrentQbUser().getId(), p.getOwnerId(), "ring", p.getId());
 	
 						QuickBloxApi.getInstance().getUserByLogin("kisi-"+p.getOwnerId(), new QBCallback() {
@@ -186,9 +192,13 @@ public class PublicPlacesActivity extends Activity {
 			switch (state) {
 			
 			case ACCEPT:
-				// TODO Add security checks and timeout
-				QuickBloxApi.getInstance().acceptVideoChat(receivedVideoChatConfig);
-				startVideoChatActivity();
+				// TODO Add security checks and timeout.
+//				if(progressDialog.isShowing()){
+					QuickBloxApi.getInstance().acceptVideoChat(receivedVideoChatConfig);
+					startVideoChatActivity();
+//				}else{
+//					QuickBloxApi.getInstance().rejectVideoChat(receivedVideoChatConfig);
+//				}
 				break;
 			default:
 				break;
@@ -210,6 +220,7 @@ public class PublicPlacesActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == VIDEO_CHAT_ACTIVITY) {
 			try {
+		        progressDialog.dismiss();
 				QBVideoChatController.getInstance().setQBVideoChatListener(QuickBloxApi.getInstance().getCurrentQbUser(), qbVideoChatListener);
 			} catch (XMPPException e) {
 				e.printStackTrace();
@@ -222,4 +233,22 @@ public class PublicPlacesActivity extends Activity {
 //		QuickBloxApi.getInstance().stopVideoChat();
 		super.onDestroy();
 	}
+	
+    @Override
+    public void onResume() {
+        progressDialog.dismiss();
+        super.onResume();
+    }
+    /**
+     * It sets a timer and deletes the progress dialog.
+     */
+    public void deleteDialog(){
+		final Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            	progressDialog.dismiss();
+            }
+        }, 60000);
+    }
 }

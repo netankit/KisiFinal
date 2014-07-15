@@ -21,6 +21,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
 /**
@@ -31,10 +33,12 @@ public class CallDialogActivity extends Activity{
 
 	private Message message;
 	private VideoChatConfig videoChatConfig;
-
+	private CallDialogActivity instance;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		instance = this;
 
 		showCallDialog();
 
@@ -77,10 +81,10 @@ public class CallDialogActivity extends Activity{
 				startVideoChatActivity(message.getPlace());
 				break;
 			case ON_REJECTED_BY_USER:
-				Toast.makeText(getApplicationContext(), getString(R.string.call_rejected), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), getString(R.string.user_not_available), Toast.LENGTH_SHORT).show();
 				break;
 			case ON_DID_NOT_ANSWERED:
-				Toast.makeText(getApplicationContext(), getString(R.string.call_not_answered), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), getString(R.string.communication_error), Toast.LENGTH_SHORT).show();
 				break;
 			case ON_CANCELED_CALL:
 				videoChatConfig = null;
@@ -93,7 +97,7 @@ public class CallDialogActivity extends Activity{
 	 * Shows the call dialog.
 	 */
 	private void showCallDialog() {
-		autoCancelHandler.postDelayed(autoCancelTask, 30000);
+		autoCancelHandler.postDelayed(autoCancelTask, 10000);
 		alertDialog = showCallDialog(this, new OnCallDialogListener() {
 			@Override
 			public void onAcceptCallClick() {
@@ -114,7 +118,7 @@ public class CallDialogActivity extends Activity{
 		@Override
 		public void run() {
 			if (alertDialog != null && alertDialog.isShowing()){
-				alertDialog.dismiss();
+				instance.finish();
 			}
 		}
 	};
@@ -128,11 +132,11 @@ public class CallDialogActivity extends Activity{
 					switch (which) {
 					case DialogInterface.BUTTON_POSITIVE:
 						callDialogListener.onAcceptCallClick();
-						deleteCallDialog();
+						deleteCallDialog(2000);
 						break;
 					case DialogInterface.BUTTON_NEGATIVE:
 						callDialogListener.onRejectCallClick();
-						deleteCallDialog();
+						deleteCallDialog(2000);
 						break;
 					}
 				}
@@ -145,25 +149,21 @@ public class CallDialogActivity extends Activity{
 			.setNegativeButton(VideoChatConstants.NO, onClickListener)
 			.show();
 		}
+		
 
 		return builder.create();
 	}
 
 
-	private static void deleteCallDialog() {
+	private static void deleteCallDialog(int delay) {
 		final Handler h = new Handler();
 		h.postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				builder = null;
 			}
-		}, 2000);
+		}, delay);
 	}
-
-	public static void dismissDialog() {
-		builder = null;
-	}
-
 
 	/**
 	 * Interface for call dialog.

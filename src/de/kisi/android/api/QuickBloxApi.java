@@ -258,6 +258,14 @@ public class QuickBloxApi {
 	public void acceptVideoChat(VideoChatConfig videoChatConfig){
 		QBVideoChatController.getInstance().acceptCallByFriend(videoChatConfig, null);
 	}
+	
+	/**
+	 * Rejects a video call request.
+	 * @param videoChatConfig
+	 */
+	public void rejectVideoChat(VideoChatConfig videoChatConfig){
+		QBVideoChatController.getInstance().rejectCall(videoChatConfig);
+	}
 
 	/**
 	 * Stops the video chat service.

@@ -70,7 +70,8 @@ public class VideoChatActivity extends Activity {
         cameraView.setQBVideoChatListener(qbVideoChatListener);
 
         // Set Camera init callback
-        cameraView.setFPS(6);
+        cameraView.setFPS(20);
+        cameraView.setDrawingCacheEnabled(true);
         cameraView.setVisibility(View.VISIBLE);
         cameraView.setOnCameraViewListener(new OnCameraViewListener() {
             @Override

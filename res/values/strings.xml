@@ -102,9 +102,10 @@
 	<string name="public_place_ring">Ring</string>
 	<string name="call_start">Call Start</string>
     <string name="call_canceled_by_caller">Call canceled by caller</string>
-	<string name="call_rejected">Call rejected by user</string>
-    <string name="call_not_answered">User did not answer</string>
     <string name="call_not_possible">Calling this place is not possible</string>
+    <string name="calling_the_place_owner">Calling the place owner. Please wait.</string>
+    <string name="user_not_available">User is not available for video chat.</string>
+    <string name="communication_error">Communication error occured.</string>
     <string name="video_chat">Video Chat</string>
-
+	
 </resources>
