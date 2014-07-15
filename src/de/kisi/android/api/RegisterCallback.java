@@ -6,6 +6,5 @@ package de.kisi.android.api;
  */
 public interface RegisterCallback {
 	public void onRegisterSuccess();
-
 	public void onRegisterFail(String errormessage);
 }

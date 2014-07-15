@@ -30,7 +30,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-
 public class VideoChatActivity extends Activity {
 
     private CameraView cameraView;
@@ -51,6 +50,9 @@ public class VideoChatActivity extends Activity {
         initViews();
     }
 
+    /**
+     * Initializes the views.
+     */
     private void initViews() {
         Debugger.logConnection("initViews");
 
@@ -168,6 +170,7 @@ public class VideoChatActivity extends Activity {
 	    inflater.inflate(R.menu.video_chat, menu);
 	    return super.onCreateOptionsMenu(menu);
 	}
+    
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

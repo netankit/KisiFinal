@@ -12,6 +12,10 @@ import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
 import de.kisi.android.api.RegisterCallback;
 
+/**
+ * Call for registration
+ *
+ */
 public class RegisterCall extends GenericCall {
 
 	private String user_email; 
