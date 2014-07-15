@@ -12,6 +12,11 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import de.kisi.android.api.PublicPlacesCallback;
 import de.kisi.android.model.Place;
 
+/**
+ * This call is sending the current position of the device to the server.
+ * The response should contain a list of places, 
+ * that are near your position and that you can ring.
+ */
 public class PublicPlacesCall extends LocatableCall{
 	
 	public PublicPlacesCall(final PublicPlacesCallback callback) {
@@ -50,10 +55,7 @@ public class PublicPlacesCall extends LocatableCall{
 //			}
 //		};
 		
-		
-		
 		callback.onResult(getTestPlaces()); //TODO: remove when server side of this call is implemented
-		
 	}
 	
 	private static Place[] getTestPlaces(){ //TODO: remove when server side of this call is implemented
