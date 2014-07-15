@@ -39,6 +39,7 @@ import com.quickblox.module.videochat.model.objects.VideoChatConfig;
 import de.kisi.android.Config;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.messages.Message;
+import de.kisi.android.messages.PlayServicesHelper;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
 
@@ -87,7 +88,8 @@ public class QuickBloxApi {
 		}
 		else{ //create temporary QB user
 			Log.d("QuickBloxAPI", "logging in with temporary user...");
-			String uid = "12345"; //create temporary user based on unique device id
+			//create temporary user based on unique device id
+			String uid = new PlayServicesHelper().getDeviceID();
 			login = "tempUser"+uid;
 			password = Config.USER_PASSWORD;
 		}
