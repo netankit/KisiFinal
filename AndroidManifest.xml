@@ -48,7 +48,7 @@
 
         <!-- UI Activities -->
         <activity
-            android:name=".account.AccountActivity"
+            android:name="de.kisi.android.account.AccountActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:launchMode="singleTop"
@@ -56,13 +56,13 @@
             android:theme="@style/CustomThemeLogin" >
         </activity>
         <activity
-            android:name=".ui.PlaceNotificationSettings"
+            android:name="de.kisi.android.ui.PlaceNotificationSettings"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light" >
         </activity>
         <activity
-            android:name=".ui.KisiMainActivity"
+            android:name="de.kisi.android.ui.KisiMainActivity"
             android:configChanges="orientation"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
@@ -112,7 +112,7 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.AccountPickerActivity"
+            android:name="de.kisi.android.ui.AccountPickerActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
             android:theme="@style/CustomThemeLogin" />
@@ -168,12 +168,6 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-        <activity
-            android:name=".account.AccountActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"
-            android:theme="@style/CustomThemeLogin" >
-        </activity>
         <activity
             android:name=".account.RegisterActivity"
             android:configChanges="orientation|keyboardHidden"
@@ -258,7 +252,11 @@
         </service>
 
         <!-- Bluetooth end -->
-
+        <activity
+            android:name="de.kisi.android.takeatour.TakeATourActivity"
+            android:label="@string/title_activity_take_atour"
+            android:theme="@style/CustomThemeLogin" >
+        </activity>
     </application>
 
 </manifest>

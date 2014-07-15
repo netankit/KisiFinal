@@ -21,6 +21,7 @@ import de.kisi.android.R;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
 import de.kisi.android.demoaccount.DemoAccountActivity;
+import de.kisi.android.takeatour.TakeATourActivity;
 
 // see https://github.com/Udinic/AccountAuthenticator/blob/master/src/com/udinic/accounts_authenticator_example/authentication/AuthenticatorActivity.java
 
@@ -52,6 +53,8 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Intent takeTour = new Intent(this, TakeATourActivity.class);
+		startActivity(takeTour);
 		//Log.d("AccountActivity", "entered onCreate");
 		setContentView(R.layout.login_activity);
 
@@ -98,8 +101,6 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		}
 	}
 	
-	
-	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		

@@ -4,6 +4,8 @@
     <string name="app_name">KISI</string>
     <string name="demo_email">testing2.4.0@bantook.se</string>
     <string name="demo_password">thomas123</string>
+    <string name="take_tour">Take a tour</string>
+    <string name="app_name_empty"></string>
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="PasswordConfirm">Confirm password</string>
@@ -53,10 +55,11 @@
     <string name="try_again">Try again</string>
     <string name="close_app">Exit</string>
     <string name="notification_settings">Notification settings</string>
-    <string name="about">About</string>
-    <string name="version">Version:\t</string>
     <string name="location_not_available_title">Improve security of keys</string>
     <string name="location_not_available_text">KISI needs to use the following services to improve the security of your keys.</string>
+    <string name="place_overview">PLACES</string>
+    <string name="about">About</string>
+    <string name="version">Version:\t</string>
     <string name="geofence_not_available_title">Geofencing Not Available</string>
     <string name="geofence_not_available_text">Please, enable Wi-Fi or Network for location detection.</string>
     <string name="cancel">Cancel</string>
@@ -64,8 +67,9 @@
     <string name="ok">OK</string>
     <string name="location">Location Service</string>
     <string name="wifi">Wi-Fi</string>
-    <string name="restricted_access">Access restricted</string>
+    <string name="title_activity_take_atour">TakeATourActivity</string>
     <string name="no_access_to_lock">Unfortunately, you do not have access to this lock.</string>
+    <string name="restricted_access">Access restricted</string>
     <string name="no_access_to_lock_log_in">Please log in to gain access to your locks.</string>
     <string name="automatic_relogin_failed">Automatic login failed. For your security, please sign in again.</string>
     <string name="bluetooth">Bluetooth</string>
@@ -86,7 +90,6 @@
     <string name="success_reg">Registration Successful!</string>
     <string name="successful_reg">We\'ve sent you an email to confirm your address. Please check your inbox and follow the instructions in the message.</string>
     <string name="click_login">Once done, come back to the KISI app and log in.</string>
-    <string name="place_overview">PLACES</string>
     <string name="settings">SETTINGS</string>
     <string name="account">ACCOUNT</string>
     <string name="default_settings">default</string>
