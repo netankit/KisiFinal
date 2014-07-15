@@ -23,7 +23,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
 
-
+/**
+ * This activity is started by a push notification and is responsible for showing a call dialog to the user.
+ *
+ */
 public class CallDialogActivity extends Activity{
 
 	private Message message;
@@ -86,6 +89,9 @@ public class CallDialogActivity extends Activity{
 		}
 	};
 
+	/**
+	 * Shows the call dialog.
+	 */
 	private void showCallDialog() {
 		autoCancelHandler.postDelayed(autoCancelTask, 30000);
 		alertDialog = showCallDialog(this, new OnCallDialogListener() {
@@ -159,7 +165,10 @@ public class CallDialogActivity extends Activity{
 	}
 
 
-
+	/**
+	 * Interface for call dialog.
+	 *
+	 */
 	public interface OnCallDialogListener {
 		public void onAcceptCallClick();
 		public void onRejectCallClick();

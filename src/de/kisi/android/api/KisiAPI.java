@@ -1,7 +1,6 @@
 package de.kisi.android.api;
 
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,19 +9,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.quickblox.core.QBCallback;
-import com.quickblox.core.result.Result;
-import com.quickblox.module.messages.QBMessages;
-import com.quickblox.module.messages.model.QBSubscription;
-import com.quickblox.module.messages.result.QBSubscriptionArrayResult;
 
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
@@ -74,7 +66,7 @@ public class KisiAPI {
 		this.sendCall(new CreateGatewayCall(blinkUpResponse));
 	}
 	
-	public void getLatestVerion(final VersionCheckCallback callback) {
+	public void getLatestVersion(final VersionCheckCallback callback) {
 		this.sendCall(new VersionCheckCall(callback));
 	}
 	
@@ -91,6 +83,10 @@ public class KisiAPI {
 		return true;
 	}
 	
+	/**
+	 * Sends a call to the server.
+	 * If a login is in progress, the call will be delayed.
+	 */
 	private void sendCall(GenericCall call) {
 		if (!loginInProgress || (call instanceof LoginCall)
 				|| (call instanceof RegisterCall)
@@ -101,7 +97,6 @@ public class KisiAPI {
 				callQueue.add(call);
 			}
 		}
-		
 	}
 	
 	private void processCallQueue() {
@@ -113,6 +108,9 @@ public class KisiAPI {
 		}
 	}
 	
+	/**
+	 * Login to Kisi server
+	 */
 	public synchronized void login(String email, String password, final LoginCallback callback){
 		loginInProgress = true;
 		LoginCall loginCall = new LoginCall(email, password, new LoginCallback() {
@@ -138,6 +136,12 @@ public class KisiAPI {
 		sendCall(loginCall);
 	}
 	
+	/**
+	 * End the session to Kisi Server.
+	 * Delete Kisi Account on Device.
+	 * Delete the database.
+	 * Stop some services.
+	 */
 	public void logout(){
 		new LogoutCall().send();
 		if(KisiAPI.getInstance().getUser()!=null)
@@ -159,17 +163,16 @@ public class KisiAPI {
 	}
 	
 	public void updatePlaces(final OnPlaceChangedListener listener) {
-		if(getUser() == null)
+		if(getUser() == null){
 			return;
-
+		}
 		new UpdatePlacesCall(listener).send();
 	}
 	
 	/**
 	 * Checks if the place is owned by the user or just shared
 	 * 
-	 * @param place
-	 *            Place to be checked
+	 * @param place Place to be checked
 	 * @return true if user is owner, false if someone else shares this place
 	 *         with the user
 	 */
@@ -190,7 +193,9 @@ public class KisiAPI {
 		new UnlockCall(lock, callback, trigger, automatic_unlock).send();
 	}
 	
-	// Registration: Registers user by sending in a JSON object with user information.
+	/**
+	 * Registers user at Kisi server by sending in a JSON object with user information.
+	 */
 	public void register(
 			String first_name, 
 			String last_name, 
@@ -215,7 +220,7 @@ public class KisiAPI {
 	 * @return true, if the current user is the owner of at least one public place
 	 */
 	public boolean isUserOwnerOfPublicPlace(){
-		return true; //TODO: implement
+		return true; //TODO: implement? Is this required?
 		//for testing, it is good to return true
 	}
 	
@@ -295,10 +300,8 @@ public class KisiAPI {
 					try {
 						event = gson.fromJson(jsonArray.getJSONObject(i).toString(), Event.class);
 					} catch (JsonSyntaxException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (JSONException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					events.add(event);
@@ -311,6 +314,4 @@ public class KisiAPI {
 			}
 		});
 	}
-	
-
 }

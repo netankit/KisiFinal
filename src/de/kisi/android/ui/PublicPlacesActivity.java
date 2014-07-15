@@ -35,6 +35,10 @@ import de.kisi.android.api.PublicPlacesCallback;
 import de.kisi.android.api.QuickBloxApi;
 import de.kisi.android.model.Place;
 
+/**
+ * This activity shows the public places around the user.
+ * 
+ */
 public class PublicPlacesActivity extends Activity {
 
 	private ListView placeListView;
@@ -79,6 +83,10 @@ public class PublicPlacesActivity extends Activity {
 		progressDialog.setMessage(getString(R.string.loading_message));
 	}
 
+	/**
+	 * Wrapper for public places.
+	 *
+	 */
 	class PublicPlacesAdapter extends BaseAdapter {
 
 		private LayoutInflater inflater;
@@ -104,6 +112,7 @@ public class PublicPlacesActivity extends Activity {
 		public long getItemId(int position) {
 			return getItem(position).getId();
 		}
+
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
@@ -148,7 +157,9 @@ public class PublicPlacesActivity extends Activity {
 		}
 	}
 
-	// listener for the backbutton of the action bar
+	/**
+	 *  Listener for the backbutton of the action bar
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -160,6 +171,9 @@ public class PublicPlacesActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Listener for video chat.
+	 */
 	OnQBVideoChatListener qbVideoChatListener = new OnQBVideoChatListener() {
 		@Override
 		public void onVideoChatStateChange(CallState state, VideoChatConfig receivedVideoChatConfig) {
@@ -182,12 +196,17 @@ public class PublicPlacesActivity extends Activity {
 			}
 		}
 	};
+	
+	/**
+	 * Creates an intent for the video chat activity and starts that activity with current video chat configuration.
+	 */
 	private void startVideoChatActivity() {
 		Intent intent = new Intent(getBaseContext(), VideoChatActivity.class);
 		intent.putExtra(VideoChatConfig.class.getCanonicalName(), videoChatConfig);
 		startActivityForResult(intent, VIDEO_CHAT_ACTIVITY);
 	}
 
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == VIDEO_CHAT_ACTIVITY) {
 			try {

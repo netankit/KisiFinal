@@ -6,13 +6,20 @@ import org.json.JSONObject;
 import android.location.Location;
 import de.kisi.android.vicinity.manager.GeofenceManager;
 
+/**
+ * This class is the generalization of a call, 
+ * that sends the position of the device to the server.
+ */
 public abstract class LocatableCall extends GenericCall {
 
 	protected LocatableCall(String path, HTTPMethod method) {
 		super(path, method);
-
 	}
-		
+	
+	/**
+	 * Overwrite this method if you want the location data 
+	 * at a special position in the Json object
+	 */
 	@Override
 	protected void createJson(){
 		super.createJson();
@@ -24,6 +31,9 @@ public abstract class LocatableCall extends GenericCall {
 		
 	}
 	
+	/**
+	 * @return Returns the devices current position in a Json object.
+	 */
 	private JSONObject generateJSONLocation() {
 		JSONObject location = new JSONObject();
 		Location currentLocation = GeofenceManager.getInstance().getLocation();
@@ -42,5 +52,4 @@ public abstract class LocatableCall extends GenericCall {
 		}
         return location;
 	}
-
 }

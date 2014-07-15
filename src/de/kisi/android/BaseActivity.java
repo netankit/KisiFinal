@@ -39,7 +39,7 @@ public class BaseActivity extends FragmentActivity implements VersionCheckCallba
 		//check if there is already a dialog and if the user is already log in
 		if(KisiAPI.getInstance().getUser() != null) {
 			checkForServices();
-			KisiAPI.getInstance().getLatestVerion(this);
+			KisiAPI.getInstance().getLatestVersion(this);
 		}
 		
 	}

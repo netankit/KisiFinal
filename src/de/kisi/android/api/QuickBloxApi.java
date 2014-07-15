@@ -1,24 +1,13 @@
 package de.kisi.android.api;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.jivesoftware.smack.XMPPException;
-
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.os.Handler;
 import android.util.Log;
-
 import com.google.gson.Gson;
 import com.quickblox.core.QBCallback;
 import com.quickblox.core.QBSettings;
 import com.quickblox.core.result.Result;
 import com.quickblox.internal.core.helper.StringifyArrayList;
 import com.quickblox.module.auth.QBAuth;
-import com.quickblox.module.auth.result.QBSessionResult;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.listeners.SessionCallback;
 import com.quickblox.module.chat.smack.SmackAndroid;
@@ -31,21 +20,23 @@ import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.users.result.QBUserResult;
 import com.quickblox.module.videochat.core.QBVideoChatController;
-import com.quickblox.module.videochat.model.definition.VideoChatConstants;
 import com.quickblox.module.videochat.model.listeners.OnQBVideoChatListener;
-import com.quickblox.module.videochat.model.objects.CallType;
 import com.quickblox.module.videochat.model.objects.VideoChatConfig;
 
 import de.kisi.android.Config;
 import de.kisi.android.KisiApplication;
 import de.kisi.android.messages.Message;
 import de.kisi.android.messages.PlayServicesHelper;
-import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
 
+/**
+ * This is a wrapper to communicate with Quickblox servers. 
+ *
+ */
 public class QuickBloxApi {
 
 	// -------------------- Singleton Stuff: --------------------
+	
 	private static QuickBloxApi instance;
 
 	public static synchronized QuickBloxApi getInstance() {
@@ -53,6 +44,11 @@ public class QuickBloxApi {
 			instance = new QuickBloxApi();
 		return instance;
 	}
+	
+	/**
+	 * Initiate the Quickblox API.
+	 * This will not initiate a connection to Quickblox server, it just configures the library.
+	 */
 	private QuickBloxApi() {
 		SmackAndroid.init(KisiApplication.getInstance());
 		QBSettings.getInstance().fastConfigInit(Config.APP_ID, Config.AUTH_KEY, Config.AUTH_SECRET);
@@ -69,11 +65,21 @@ public class QuickBloxApi {
 		this.qBUser.setPassword(password);
 	}
 
+	/**
+	 * Getter for currentQbUser.
+	 * @return
+	 */
 	public QBUser getCurrentQbUser() {
 		return qBUser;
 	}
 
-
+	/**
+	 * This function is used to login to QuickBlox servers. When the login is completed, 
+	 * it calls the onComplete method in callback. It gets the current user from KisiAPI.
+	 * If the user is not logged in to KISI servers, it creates a new user in quickblox 
+	 * servers by using the deviceID.
+	 * @param callback
+	 */
 	public void login(final QBCallback callback){
 
 		Log.d("QuickBloxAPI","Logging in...");
@@ -94,8 +100,6 @@ public class QuickBloxApi {
 			password = Config.USER_PASSWORD;
 		}
 		final QBUser user = new QBUser(login, password);
-
-
 
 		QBAuth.createSession(new QBCallback() {
 			@Override
@@ -152,6 +156,11 @@ public class QuickBloxApi {
 		});
 	}
 
+	/**
+	 * Sends a push notification message to the user.
+	 * @param message
+	 * @param qbUserId
+	 */
 	public void sendMessage(Message message, int qbUserId) {
 		// Send Push: create QuickBlox Push Notification Event
 		QBEvent qbEvent = new QBEvent();
@@ -179,11 +188,20 @@ public class QuickBloxApi {
 			}
 		});
 	}
-
+	
+	/**
+	 * Wraps the getUserByLogin method from QBUsers. It gets a user from his username. 
+	 * @param login
+	 * @param callback
+	 */
 	public void getUserByLogin(String login, QBCallback callback){
 		QBUsers.getUserByLogin(login, callback);
 	}
 
+	/**
+	 * Sets and initializes the video chat listener in QBVideoChatController.
+	 * @param qbVideoChatListener
+	 */
 	private void setVideoChatListener(OnQBVideoChatListener qbVideoChatListener){
 		try {
 			QBVideoChatController.getInstance().setQBVideoChatListener(QuickBloxApi.getInstance().getCurrentQbUser(), qbVideoChatListener);
@@ -194,6 +212,11 @@ public class QuickBloxApi {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Initializes the video chat. If the user is not logged in, It tries to login.
+	 * @param qbVideoChatListener
+	 */
 	public void initVideoChat(final OnQBVideoChatListener qbVideoChatListener){
 		if(this.getCurrentQbUser() == null){
 			this.login(new QBCallback() {
@@ -228,10 +251,17 @@ public class QuickBloxApi {
 		}
 	}
 
+	/**
+	 * Accepts a video call request.
+	 * @param videoChatConfig
+	 */
 	public void acceptVideoChat(VideoChatConfig videoChatConfig){
 		QBVideoChatController.getInstance().acceptCallByFriend(videoChatConfig, null);
 	}
 
+	/**
+	 * Stops the video chat service.
+	 */
 	public void stopVideoChat(){
 		QBVideoChatController.getInstance().stopCalling();
 		QBVideoChatController.getInstance().clearVideoChatsList();

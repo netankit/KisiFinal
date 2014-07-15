@@ -6,11 +6,13 @@ import java.io.Serializable;
  * This class represents an push message, that is sent when you ring the bell of a public place.
  */
 public class Message implements Serializable{
-	private int sender; //Quickblox user id of sender
-	private int receiver; //Kisi user id of receiver
-	private long time; //when to ring button was pressed; in ms
-	private String type; //ring
-	private int place; //id of the place
+	private static final long serialVersionUID = -4008050943262238302L;
+	
+	private int sender; // Quickblox user id of sender
+	private int receiver; // Kisi user id of receiver
+	private long time; // when the ring button was pressed/the object was created; in milliseconds since January 1, 1970 00:00:00.0 UTC.
+	private String type; // has to be "ring". Change this if you want to implement other types of push messages
+	private int place; // id of the place
 	
 	public Message(int sender, int receiver, String type, int place) {
 		this.sender = sender;
