@@ -65,6 +65,7 @@ public class VideoChatActivity extends Activity {
 
         // Set Camera init callback
         cameraView.setFPS(6);
+        cameraView.setVisibility(View.VISIBLE);
         cameraView.setOnCameraViewListener(new OnCameraViewListener() {
             @Override
             public void onCameraSupportedPreviewSizes(List<Camera.Size> supportedPreviewSizes) {

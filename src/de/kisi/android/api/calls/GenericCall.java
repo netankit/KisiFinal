@@ -60,8 +60,13 @@ public abstract class GenericCall {
 
 
 			public void onFailure(int statusCode, Throwable e, JSONObject response) {
-				Log.d("GenericCall", "call failed: "+response.toString());
+				if (response == null) {
+					Log.d("GenericCall", "call failed: response is null");
 
+				} else {
+					Log.d("GenericCall", "call failed: "+response.toString());
+				}
+				
 				if (checkOptimisticSignIn(statusCode))
 					if (call.handler != null)
 						call.handler.onFailure(statusCode, e, response);
@@ -69,7 +74,12 @@ public abstract class GenericCall {
 			}
 			
 			public void onFailure(int statusCode, Throwable e, JSONArray response) {
-				Log.d("GenericCall", "call failed: "+response.toString());
+				if (response == null) {
+					Log.d("GenericCall", "call failed: response is null");
+
+				} else {
+					Log.d("GenericCall", "call failed: "+response.toString());
+				}
 				
 				if (checkOptimisticSignIn(statusCode))
 					if (call.handler != null)
