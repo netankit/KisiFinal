@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_marginTop="10dp"
+    android:orientation="vertical">	
+	
+	<RelativeLayout
+	    android:id="@+id/cameraViewLayout"
+	    android:layout_height="wrap_content"
+	    android:layout_width="match_parent"
+       	android:layout_marginTop="10dp"
+	    android:layout_gravity="center_horizontal">
+	
+	    <!--<android.opengl.GLSurfaceView-->
+	    <!--android:id="@+id/cameraView"-->
+	    <!--android:layout_height="220dp"-->
+	    <!--android:layout_width="200dp"-->
+	    <!--android:layout_marginTop="5dp"-->
+	    <!--android:layout_centerHorizontal="true"/>-->
+	
+	    <jp.co.cyberagent.android.gpuimage.OpponentGlSurfaceView
+	        android:id="@+id/opponentView"
+	        android:layout_height="240dp"
+	        android:layout_width="match_parent"
+	        android:layout_centerHorizontal="true" />
+	
+	    <com.quickblox.module.videochat.views.CameraView
+	        android:id="@+id/cameraView"
+	        android:layout_width="50dp"
+	        android:layout_height="50dp"
+	        android:layout_marginRight="10dp"	        
+	        android:layout_marginBottom="10dp"	        
+	        android:layout_alignRight="@+id/opponentView"
+	        android:layout_alignBottom="@+id/opponentView" />
+	    
+	    <ProgressBar
+	        android:id="@+id/opponentImageLoading"
+	        android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:layout_centerHorizontal="true"
+	        android:layout_centerVertical="true"
+	        android:visibility="visible" />
+	    
+	</RelativeLayout>
+
+   	<ListView
+        android:id="@+id/video_chat_lock_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@android:color/transparent"
+       	android:layout_marginTop="10dp"
+        android:dividerHeight="15dp"
+        android:paddingTop="15dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+		android:clipToPadding="false"
+        android:scrollbars="none"
+        android:visibility="gone">
+         	
+    </ListView> 
+
+</LinearLayout>

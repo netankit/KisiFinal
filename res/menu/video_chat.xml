@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+   		<item android:id="@+id/endVideoChat"
+   		     android:title="End Video Chat"
+   		     android:showAsAction="always"
+   		     android:icon="@drawable/ic_action_end_call"
+   		/>
+</menu>

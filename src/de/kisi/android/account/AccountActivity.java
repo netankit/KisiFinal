@@ -22,6 +22,7 @@ import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.LoginCallback;
 import de.kisi.android.demoaccount.DemoAccountActivity;
 import de.kisi.android.takeatour.TakeATourActivity;
+import de.kisi.android.ui.PublicPlacesActivity;
 
 // see https://github.com/Udinic/AccountAuthenticator/blob/master/src/com/udinic/accounts_authenticator_example/authentication/AuthenticatorActivity.java
 
@@ -70,6 +71,8 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 		loginButton.setOnClickListener(this);
 		TextView registerButton = (TextView) findViewById(R.id.registerButton);
 		registerButton.setOnClickListener(this);
+		Button publicPlacesButton = (Button) findViewById(R.id.publicPlacesButton);
+		publicPlacesButton.setOnClickListener(this);
 		
 		TextView demoAccountButton = (TextView) findViewById(R.id.demoAccountButton);
 		demoAccountButton.setOnClickListener(this);
@@ -159,6 +162,10 @@ public class AccountActivity extends AccountAuthenticatorActivity implements OnC
 			Intent demo = new Intent(this, DemoAccountActivity.class);
 			startActivity(demo);
 			break;
+		case R.id.publicPlacesButton:
+			Intent publicPlacesIntent = new Intent(this, PublicPlacesActivity.class);
+			this.startActivity(publicPlacesIntent);
+			return;
 		default:
 			break;
 		}

@@ -27,9 +27,15 @@ public class StaticMenuOnClickListener implements OnClickListener {
 	@Override
 	public void onClick(View v) {			
 		
-		switch(v.getId()) {
-			case R.id.refreshButton:
-				KisiAPI.getInstance().refresh(activity);
+		switch (v.getId()) {
+		
+		case R.id.publicPlacesButton:
+			Intent publicPlacesIntent = new Intent(activity, PublicPlacesActivity.class);
+			activity.startActivity(publicPlacesIntent);
+			return;
+		
+		case R.id.refreshButton:
+			KisiAPI.getInstance().refresh(activity);
 			return;
 		
 

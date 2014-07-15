@@ -1,6 +1,7 @@
 package de.kisi.android.api;
 
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,19 +9,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-
-
-
-
-
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.quickblox.core.QBCallback;
+import com.quickblox.core.result.Result;
+import com.quickblox.module.messages.QBMessages;
+import com.quickblox.module.messages.model.QBSubscription;
+import com.quickblox.module.messages.result.QBSubscriptionArrayResult;
 
 import de.kisi.android.KisiApplication;
 import de.kisi.android.R;
@@ -30,6 +32,7 @@ import de.kisi.android.api.calls.CreateNewKeyCall;
 import de.kisi.android.api.calls.GenericCall;
 import de.kisi.android.api.calls.LoginCall;
 import de.kisi.android.api.calls.LogoutCall;
+import de.kisi.android.api.calls.PublicPlacesCall;
 import de.kisi.android.api.calls.RegisterCall;
 import de.kisi.android.api.calls.UnlockCall;
 import de.kisi.android.api.calls.UpdateLocatorsCall;
@@ -37,6 +40,7 @@ import de.kisi.android.api.calls.UpdateLocksCall;
 import de.kisi.android.api.calls.UpdatePlacesCall;
 import de.kisi.android.api.calls.VersionCheckCall;
 import de.kisi.android.db.DataManager;
+import de.kisi.android.messages.PlayServicesHelper;
 import de.kisi.android.model.Event;
 import de.kisi.android.model.Lock;
 import de.kisi.android.model.Place;
@@ -142,6 +146,7 @@ public class KisiAPI {
 		BluetoothLEManager.getInstance().stopService();
 		LockInVicinityDisplayManager.getInstance().update();
 		NotificationManager.removeAllNotification();
+		new PlayServicesHelper().unsubscribe();
 	}
 	
 	public void showLoginScreen() {
@@ -202,6 +207,17 @@ public class KisiAPI {
 				callback));
 	}
 	
+	public void getPublicPlaces(PublicPlacesCallback callback){
+		sendCall(new PublicPlacesCall(callback));
+	}
+	
+	/**
+	 * @return true, if the current user is the owner of at least one public place
+	 */
+	public boolean isUserOwnerOfPublicPlace(){
+		return true; //TODO: implement
+		//for testing, it is good to return true
+	}
 	
 	// -------------------- DATA: --------------------
 	public User getUser() {
@@ -213,14 +229,14 @@ public class KisiAPI {
 	}
 	
 	public Place getPlaceAt(int index){
-		Place[] places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+		Place[] places = getPlaces();
 		if(places != null && index>=0 && index<places.length)
 			return places[index];
 		return null;
 	}
 	
 	public Place getPlaceById(int num){
-		Place[]  places = DataManager.getInstance().getAllPlaces().toArray(new Place[0]);
+		Place[]  places = getPlaces();
 		for(Place p : places)
 			if(p.getId() == num)
 				return p;

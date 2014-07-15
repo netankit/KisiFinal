@@ -36,6 +36,36 @@
     <!-- Wifi Manager -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
+    <!-- Virtual Intercom -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
+    
+    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
+    <uses-feature android:name="android.hardware.camera.flash"/>
+    
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    
+    <!-- Push Notifications -->
+    <!-- App receives GCM messages. -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <!-- GCM connects to Google Services. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- GCM requires a Google account. -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- Keeps the processor from sleeping when a message is received. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Access to  device info-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- use a custom permission so only this application can receive GCM messages. -->
+    <permission
+        android:name="de.kisi.android.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="de.kisi.android.permission.C2D_MESSAGE" />
+    
+    
     <application
         android:name="de.kisi.android.KisiApplication"
         android:allowBackup="true"
@@ -60,6 +90,21 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light" >
+        </activity>
+        <activity android:name=".ui.PublicPlacesActivity"
+             android:screenOrientation="portrait"
+             android:configChanges="orientation"
+             android:theme="@android:style/Theme.Holo.Light">
+        </activity>
+        <activity android:name=".ui.CallDialogActivity"
+             android:screenOrientation="portrait"
+             android:configChanges="orientation"
+             android:theme="@android:style/Theme.Holo.Light">
+        </activity>
+        <activity android:name=".ui.VideoChatActivity"
+             android:screenOrientation="portrait"
+             android:configChanges="orientation"
+             android:theme="@android:style/Theme.Holo.Light">
         </activity>
         <activity
             android:name="de.kisi.android.ui.KisiMainActivity"
@@ -145,6 +190,17 @@
             </intent-filter>
         </receiver>
         <!-- Notification end -->
+
+		<!-- Broadcast receiver for push messages -->
+        <receiver
+            android:name=".messages.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="de.kisi.android" />
+            </intent-filter>
+        </receiver>
 
 
         <!-- Geofence -->
@@ -257,6 +313,10 @@
             android:label="@string/title_activity_take_atour"
             android:theme="@style/CustomThemeLogin" >
         </activity>
+        <!-- Virtual Intercom -->
+		<service android:name="com.quickblox.module.videochat.core.service.QBVideoChatService"/>
+		<!-- Intent service for push messages -->
+        <service android:name=".messages.GCMIntentService" />
     </application>
 
 </manifest>

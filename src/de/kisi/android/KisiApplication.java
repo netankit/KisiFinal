@@ -1,12 +1,18 @@
 package de.kisi.android;
 
+import com.quickblox.module.chat.smack.SmackAndroid;
+
 import android.app.Application;
 import android.content.pm.PackageManager.NameNotFoundException;
+import de.kisi.android.api.KisiAPI;
+import de.kisi.android.api.QuickBloxApi;
+import de.kisi.android.messages.PlayServicesHelper;
 import de.kisi.android.vicinity.manager.GeofenceManager;
 
 
 public class KisiApplication extends Application {
 
+	
 	private static KisiApplication instance;
 	/**
 	 * Retuns a valid Context object
@@ -18,6 +24,13 @@ public class KisiApplication extends Application {
 	public String getVersion() throws NameNotFoundException {
 		String versionName = (this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);
 		return versionName;
+	}
+	public int getVersionCode() {
+		try {
+			return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+		} catch (NameNotFoundException e) {
+			return 0;
+		}
 	}
 	
 	/**
@@ -38,6 +51,8 @@ public class KisiApplication extends Application {
 		// So far the BLE Framework requires a lot of Power
 		// Only run BLE when it is realy required
 		//BluetoothLEManager.getInstance().startService(false);
+		QuickBloxApi.getInstance();
+		
 	}
 
 	@Override

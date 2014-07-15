@@ -26,6 +26,8 @@ import android.widget.Toast;
 import com.commonsware.cwac.merge.MergeAdapter;
 import com.electricimp.blinkup.BlinkupController;
 import com.newrelic.agent.android.NewRelic;
+import com.quickblox.core.QBCallback;
+import com.quickblox.core.result.Result;
 
 import de.kisi.android.BaseActivity;
 import de.kisi.android.KisiApplication;
@@ -33,6 +35,8 @@ import de.kisi.android.R;
 import de.kisi.android.account.KisiAuthenticator;
 import de.kisi.android.api.KisiAPI;
 import de.kisi.android.api.OnPlaceChangedListener;
+import de.kisi.android.api.QuickBloxApi;
+import de.kisi.android.messages.PlayServicesHelper;
 import de.kisi.android.model.Place;
 import de.kisi.android.model.User;
 
@@ -119,6 +123,9 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		else {
 			setUiIntoStartState();
 		}
+		
+		
+		
 	}
 	
 	
@@ -151,8 +158,7 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 	}
 	
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
-	    @SuppressWarnings("rawtypes")
-		@Override
+	    @Override
 	    public void onItemClick(AdapterView parent, View view, int position, long id) {
 	    	selectItem(position, id);
 	    }
@@ -170,8 +176,21 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		else {
 			KisiAPI.getInstance().updatePlaces(this);
 		}
+		
+		if(KisiAPI.getInstance().getUser()!=null && KisiAPI.getInstance().isUserOwnerOfPublicPlace()){
+			QuickBloxApi.getInstance().login(new QBCallback() {
+				@Override
+				public void onComplete(Result result) {
+					if ( result.isSuccess()){
+							PlayServicesHelper ps = new PlayServicesHelper();
+					}
+				}
+				@Override
+				public void onComplete(Result arg0, Object arg1) {
+				}
+			});
+		}
 	}
-	
 	
 	private void selectItem(int position, long id) {
 		Place place = KisiAPI.getInstance().getPlaceById((int) id);
@@ -398,6 +417,17 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		
 		LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	
+		StaticMenuOnClickListener listener =  new StaticMenuOnClickListener(this);
+		
+		addDivider();
+		final TextView publicPlacesButton = (TextView) li.inflate(R.layout.drawer_list_item, null);		
+		publicPlacesButton.setId(R.id.publicPlacesButton);
+		publicPlacesButton.setText(getResources().getText(R.string.public_places));
+		publicPlacesButton.setClickable(true);
+		publicPlacesButton.setOnClickListener(listener);
+		mMergeAdapter.addView(publicPlacesButton);
+		
+		
 		final TextView settings = (TextView) li.inflate(R.layout.drawer_list_section_item, null);
 		settings.setText(getResources().getText(R.string.settings));
 		mMergeAdapter.addView(settings);
@@ -405,7 +435,6 @@ public class KisiMainActivity extends BaseActivity implements OnPlaceChangedList
 		final View divider =  (View) li.inflate(R.layout.drawer_list_divider, null);
 		mMergeAdapter.addView(divider);
 	
-		StaticMenuOnClickListener listener =  new StaticMenuOnClickListener(this);
 		
 		final TextView refreshButton = (TextView) li.inflate(R.layout.drawer_list_item, null);
 		refreshButton.setId(R.id.refreshButton);
